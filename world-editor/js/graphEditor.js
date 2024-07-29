@@ -30,9 +30,12 @@ export default class GraphEditor {
                 this.selected.y = this.mouse.y
             }
         })
+        this.canvas.addEventListener('click', (e) => {
+            if (e.button == 0) { // left click
 
+            }
+        })
         this.canvas.addEventListener('mousedown', (e) => {
-            e.preventDefault();
             if (e.button === 2) { //right click
                 if (this.selected) {
                     this.selected = null
@@ -55,7 +58,8 @@ export default class GraphEditor {
         })
 
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault())
-        this.canvas.addEventListener('mouseup', (e) => this.draging = false)
+        this.canvas.addEventListener('mouseup', (e) => (this.draging = false),(this.selected = null) )
+        this.canvas.addEventListener('mouseleave', (e) => this.selected = null)
 
     }
 

@@ -27,7 +27,7 @@ class Car {
     }
 
     update(roadBorders, traffic) {
-        if (this.damage) return
+        if (this.damage) return false
 
         this.#move()
         this.polygons = this.#createPolygon()
@@ -35,17 +35,17 @@ class Car {
 
         if (this.sensors) {
             this.sensors?.update(roadBorders, traffic)
-            const offsets = this.sensors.readings.map(s => s == null ? 0 : 1 - s.offset)
-            const outputs = NeuralNetwork.feedForward(offsets, this.brain)
 
             if (this.useBrain) {
+                const offsets = this.sensors.readings.map(s => s == null ? 0 : 1 - s.offset)
+                const outputs = NeuralNetwork.feedForward(offsets, this.brain)
                 this.controls.forward = outputs[0]
                 this.controls.left = outputs[1]
                 this.controls.right = outputs[2]
                 this.controls.reverse = outputs[3]
             }
         }
-
+        return true
     }
 
     #assessDamage(roadBorders, traffic) {

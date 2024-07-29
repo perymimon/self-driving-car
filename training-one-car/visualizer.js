@@ -37,7 +37,7 @@ class Visualizer {
                 ctx.beginPath()
                 ctx.moveTo(xInput, bottom)
                 ctx.lineTo(xOutput, top)
-                ctx.lineWidth = 2
+                ctx.lineWidth = 4
                 ctx.setLineDash([4, 4])
                 ctx.strokeStyle = getRGBA(weights[i][j])
                 ctx.stroke()

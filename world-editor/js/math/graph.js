@@ -45,7 +45,8 @@ export default class Graph {
     }
 
     dispose() {
-
+        this.points = [];
+        this.segments = [];
     }
 
     pointExists(point) {

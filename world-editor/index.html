@@ -13,10 +13,11 @@
 </div>
 <script type="module">
     import Graph from './js/math/graph.js'
-    import Point from "./js/primitives/point.js";
-    import Segment from "./js/primitives/segment.js";
     import GraphEditor from "./js/graphEditor.js";
     import ViewPort from "./js/viewport.js";
+    import Envelope from "./js/primitives/envelope.js";
+    import World from "./js/world.js"
+    import Polygon from "./js/primitives/polygon.js";
 
     editorCanvas.width = 600
     editorCanvas.height = 600
@@ -36,15 +37,29 @@
 
     // const graph = new Graph([p1, p2, p3, p4], [s1, s3])
     const graph = graphInfo ? Graph.Load(graphInfo) : new Graph()
+    const world = new World(graph)
     const viewPort = new ViewPort(editorCanvas)
     const graphEditor = new GraphEditor(viewPort, graph)
 
     animate()
+    world.generate()
+    var hash = ''
+
+
 
     function animate() {
         viewPort.reset()
+        if(hash != world.hash()){
+            world.generate()
+            hash = world.hash()
+        }
+        world.draw(ctx)
+        ctx.globalAlpha = 0.3
         graphEditor.display()
+        ctx.globalAlpha = 1
 
+
+        new Polygon([]).draw(ctx)
         requestAnimationFrame(animate)
 
     }
@@ -52,8 +67,6 @@
     document.getElementById('disposeButton').onclick = function dispose() {
         graphEditor.dispose()
     }
-
-
     document.getElementById('saveButton').onclick = function save() {
         localStorage.setItem('graph', JSON.stringify(graph))
     }
