@@ -1,7 +1,9 @@
 export default class Segment {
-    constructor(p1, p2) {
+    constructor(p1, p2, shape='line') {
         this.p1 = p1;
         this.p2 = p2;
+        this.shape = shape
+        // todo: make arc shape. and make intersection for it
     }
 
     draw(ctx, {width = 2, color = "black", dash=null} = {}) {

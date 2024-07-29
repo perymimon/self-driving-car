@@ -1,7 +1,7 @@
 import Segment from "./segment.js";
 import {average, getIntersection} from "../math/utils.js"
 import Point from "./point.js";
-import {getRandomColor} from "../cavas-utils.js";
+import {getRandomColor, style} from "../cavas-utils.js";
 
 export default class Polygon {
     constructor(points) {
@@ -52,9 +52,7 @@ export default class Polygon {
     draw(ctx, {stroke = 'blue', lineWidth = 2, fill = "rgba(0,0,255,0.3)"} = {}) {
         if (!this.points?.length) return;
         ctx.beginPath()
-        ctx.fillStyle = fill
-        ctx.strokeStyle = stroke
-        ctx.lineWidth = lineWidth
+        style(ctx,{fill, stroke, lineWidth})
         ctx.moveTo(this.points[0].x, this.points[0].y)
         for (let i = 1; i < this.points.length; i++) {
             ctx.lineTo(this.points[i].x, this.points[i].y)
@@ -76,12 +74,9 @@ export default class Polygon {
         const segs1 = poly1.segments
         const segs2 = poly2.segments
         let counter = 0
-        // for (let [i, seg1] of segs1.entries())
-        //     for (let [j, seg2] of segs2.entries()) {
         for (let i = 0; i < segs1.length; i++) {
             for (let j = 0; j < segs2.length; j++) {
                 let seg1 = segs1[i], seg2 = segs2[j];
-                console.log(seg1, seg2)
                 counter++
                 let int = getIntersection(seg1, seg2)
                 if (int && ![0, 1].includes(int.offset)) {

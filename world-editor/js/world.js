@@ -17,8 +17,9 @@ export default class World {
     }
 
     generate() {
-        this.envelopes = this.graph.segments.map(
-            seg => new Envelope(seg, this.roadWidth, this.roadRoundness)
+        let {graph, roadRoundness, roadWidth} = this
+        this.envelopes = graph.segments.map(
+            seg => new Envelope(seg, roadWidth, roadRoundness)
         )
 
         this.roadBorders = Polygon.union(this.envelopes.map(env => env.poly));

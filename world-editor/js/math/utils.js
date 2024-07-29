@@ -1,4 +1,5 @@
 import Point from "../primitives/point.js";
+import Segment from "../primitives/segment.js";
 
 export function getNearestPoint(point, points, threshold = Number.MAX_SAFE_INTEGER) {
     if (points.length === 0) return null;
@@ -74,14 +75,16 @@ export function getIntersection(seg1, seg2) {
     const tTop = (D.x - C.x) * (A.y - C.y) - (D.y - C.y) * (A.x - C.x)
     const uTop = (C.y - A.y) * (A.x - B.x) - (C.x - A.x) * (A.y - B.y)
     const bottom = (D.y - C.y) * (B.x - A.x) - (D.x - C.x) * (B.y - A.y)
-    if (bottom != 0) {
+    const eps = 0.001;
+    const maxeps = 0.999
+    if (Math.abs(bottom) > eps) {
         const t = tTop / bottom
         const u = uTop / bottom
         if ((t >= 0 && t <= 1) && (u >= 0 && u <= 1))
             return {
                 x: lerp(A.x, B.x, t),
                 y: lerp(A.y, B.y, t),
-                offset: t
+                offset: t> maxeps? 1: (t<eps?0:t)
             }
     }
 
@@ -110,4 +113,15 @@ export function random(min, max, integer = true) {
     if (integer)
         return Math.floor(result)
     return result
+}
+
+export function isPointIntoPolygon(point, poly) {
+    const outerPoint = new Point(-10000, -10000)
+    const crossSegment = new Segment(outerPoint, point)
+    let intersectionCount = 0;
+    for (const seg of poly.segments) {
+        const int = getIntersection(crossSegment, seg)
+        if (int) intersectionCount++
+    }
+    return intersectionCount % 2 == 1
 }
