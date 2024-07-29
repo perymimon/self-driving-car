@@ -19,22 +19,13 @@ export default class GraphEditor {
         this.#addEventListeners()
     }
 
+    getNearestPoint(point, excludes = []) {
+        let  points = this.graph.points.filter(p=> !excludes.includes(p))
+        return getNearestPoint(point, points, 20 * this.viewPort.zoom)
+    }
 
     #addEventListeners() {
-        const {viewPort} = this
-        this.canvas.addEventListener('mousemove', (e) => {
-            this.mouse = viewPort.getMouse(e, true)
-            this.hovered = getNearestPoint(this.mouse, this.graph.points, 20 * viewPort.zoom)
-            if (this.draging){
-                this.selected.x = this.mouse.x
-                this.selected.y = this.mouse.y
-            }
-        })
-        this.canvas.addEventListener('click', (e) => {
-            if (e.button == 0) { // left click
-
-            }
-        })
+        let mousedownPoint = null
         this.canvas.addEventListener('mousedown', (e) => {
             if (e.button === 2) { //right click
                 if (this.selected) {
@@ -43,11 +34,12 @@ export default class GraphEditor {
                 } else if (this.hovered) {
                     this.#removePoint(this.hovered)
                 }
-            } else if (e.button == 0) { // left click
+            } else if (e.button == 0) { // left down
                 if (this.hovered) {
                     // If hovered just select the node
-                    this.#selectPoint(this.hovered)
-                    this.draging = true
+                    // this.#selectPoint(this.hovered)
+                    this.draging = this.hovered
+                    mousedownPoint = this.mouse
                 } else {
                     // if not create and add a new point
                     if (this.graph.addPoint(this.mouse))
@@ -56,10 +48,42 @@ export default class GraphEditor {
                 }
             }
         })
+        this.canvas.addEventListener('mousemove', (e) => {
+            this.mouse = this.viewPort.getMouse(e, true)
+            this.hovered = this.getNearestPoint(this.mouse,[this.draging])
+            if (this.draging) {
+                this.draging.x = this.mouse.x
+                this.draging.y = this.mouse.y
+            }
+        })
 
-        this.canvas.addEventListener('contextmenu', (e) => e.preventDefault())
-        this.canvas.addEventListener('mouseup', (e) => (this.draging = false),(this.selected = null) )
+        this.canvas.addEventListener('mouseup', (e) => {
+                if (e.button == 0) {// left click
+                    if (mousedownPoint.equal(this.mouse)) {
+                        if (this.hovered) {
+                            // If hovered just select the node
+                            this.#selectPoint(this.hovered)
+                            this.draging = null
+                        } else {
+                            // if not create and add a new point
+                            if (this.graph.addPoint(this.mouse))
+                                console.log('add new point at', this.mouse)
+                            this.#selectPoint(this.mouse)
+                        }
+                    } else { // dragging
+                        if ( this.hovered && this.draging) {
+                            this.graph.segments.forEach(seg => seg.replacePoint(this.draging, this.hovered))
+                            this.graph.removePoint(this.draging)
+
+                        }
+                        this.draging = null
+                    }
+                }
+            }
+        )
+
         this.canvas.addEventListener('mouseleave', (e) => this.selected = null)
+        this.canvas.addEventListener('contextmenu', (e) => e.preventDefault())
 
     }
 
@@ -77,11 +101,13 @@ export default class GraphEditor {
         if (this.selected == this.hovered)
             this.selected = null
     }
-    dispose(){
+
+    dispose() {
         this.graph.dispose()
         this.selected = null
         this.hovered = null
     }
+
     display() {
         let {ctx} = this
         this.graph.draw(ctx);

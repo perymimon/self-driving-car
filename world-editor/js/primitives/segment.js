@@ -27,5 +27,11 @@ export default class Segment {
     contains(point){
         return this.p1.equal(point) || this.p2.equal(point);
     }
+    replacePoint(oldP, newP){
+        if(oldP.equal(this.p1)) this.p1 = newP
+        else if(oldP.equal(this.p2)) this.p2 = newP
+        else return false
+        return true
+    }
 
 }
