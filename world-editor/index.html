@@ -15,12 +15,12 @@
     import Graph from './js/math/graph.js'
     import GraphEditor from "./js/graphEditor.js";
     import ViewPort from "./js/viewport.js";
-    import Envelope from "./js/primitives/envelope.js";
     import World from "./js/world.js"
     import Polygon from "./js/primitives/polygon.js";
+    import {scale} from "./js/math/utils.js";
 
-    editorCanvas.width = 600
-    editorCanvas.height = 600
+    editorCanvas.width = innerWidth
+    editorCanvas.height = innerHeight
 
     const ctx = editorCanvas.getContext('2d')
 
@@ -46,14 +46,14 @@
     var hash = ''
 
 
-
     function animate() {
         viewPort.reset()
-        if(hash != world.hash()){
+        if (hash != world.hash()) {
             world.generate()
             hash = world.hash()
         }
-        world.draw(ctx)
+        let viewPoint = scale(viewPort.getOffset(), -1)
+        world.draw(ctx, viewPoint)
         ctx.globalAlpha = 0.3
         graphEditor.display()
         ctx.globalAlpha = 1

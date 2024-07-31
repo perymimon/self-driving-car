@@ -3,7 +3,8 @@ import Polygon from "./primitives/polygon.js";
 import {add, distance, eps, lerp, scale} from "./math/utils.js";
 import Segment from "./primitives/segment.js";
 import Point from "./primitives/point.js";
-
+import Tree from "./items/tree.js";
+import Building from "./items/building.js";
 export default class World {
     roadWidth = 100
     roadRoundness = 10
@@ -80,13 +81,14 @@ export default class World {
                 if (removing) removed.add(base2)
             }
         }
-        return Array.from(new Set(bases).difference(removed))
+        bases = Array.from(new Set(bases).difference(removed))
+        return bases.map(b=> new Building(b,200))
     }
 
     #generatedTrees(count = 10, tryCount = 30) {
         let points = [
             ...this.roadBorders.map(s => [s.p1, s.p2]).flat(),
-            ...this.buildings.map(p => p.points).flat()
+            ...this.buildings.map(p => p.base.points).flat()
         ]
         let left = Math.min(...points.map(p => p.x))
         let right = Math.max(...points.map(p => p.x))
@@ -94,7 +96,7 @@ export default class World {
         let bottom = Math.max(...points.map(p => p.y))
 
         const illegalPoly = [
-            ...this.buildings,
+            ...this.buildings.map(b=> b.base),
             ...this.envelopes.map(e => e.poly)
         ]
 
@@ -107,11 +109,11 @@ export default class World {
             )
             let keep = !illegalPoly.some(poly => poly.containsPoint(p))
             keep = keep && !illegalPoly.some(poly => poly.distanceToPoint(p) < this.treeSize / 2)
-            keep = keep && !trees.some(tree => distance(tree, p) < this.treeSize)
+            keep = keep && !trees.some(tree => distance(tree.center, p) < this.treeSize)
             let closeToSomething = illegalPoly.some(poly => poly.distanceToPoint(p) <= this.treeSize * 2)
             keep = keep && closeToSomething
             if (keep) {
-                trees.push(p)
+                trees.push( new Tree(p, this.treeSize))
                 if (trees.length >= count) return trees
                 trying = tryCount
             }
@@ -120,7 +122,7 @@ export default class World {
         return trees
     }
 
-    draw(ctx) {
+    draw(ctx, viewPoint) {
         for (let env of this.envelopes) {
             env.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
         }
@@ -130,12 +132,15 @@ export default class World {
 
         this.roadBorders.forEach(road => road.draw(ctx, {color: 'white', width: 4}));
 
-        this.buildings.forEach(building => {
-            building.draw(ctx, {drawId: true})
+        let items = [...this.buildings, ...this.trees]
+            .sort((a, b) =>
+                b.base.distanceToPoint(viewPoint) -
+                a.base.distanceToPoint(viewPoint)
+            )
+        items.forEach(item => {
+            item.draw(ctx, viewPoint,{drawId: true})
         });
-        this.trees.forEach(tree => {
-            tree.draw(ctx, {drawId: true, color: 'rgba(0,0,0,0.5)', size: this.treeSize})
-        });
+
     }
 
 }

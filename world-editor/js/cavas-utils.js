@@ -19,10 +19,11 @@ export function getRandomColor(){
     let hue = 290 + Math.random() * 260;
     return `hsl(${hue}, 100%, 60%)`;
 }
-export function style(ctx,{stroke = 'blue', lineWidth = 2, fill = "rgba(0,0,255,0.3)"}={}){
+export function style(ctx,{stroke = 'blue', lineWidth = 2, fill = "rgba(0,0,255,0.3)", join='miter'}={}){
     ctx.fillStyle = fill
     ctx.strokeStyle = stroke
     ctx.lineWidth = lineWidth
+    ctx.lineJoin = join
 }
 
 export function drawText(ctx, text, x, y, style = {}){

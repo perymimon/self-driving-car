@@ -40,10 +40,12 @@ export default class Polygon {
         }
         return false
     }
-    intersectCircumCircles(poly, spacing = 0){
+
+    intersectCircumCircles(poly, spacing = 0) {
         let dis = distance(this.centeroid(), poly.centeroid())
         return dis <= this.getRadius() + poly.getRadius() + spacing
     }
+
     // getCircumscribedRadius
     getRadius(poly) {
         let centroid = this.centeroid()
@@ -91,6 +93,7 @@ export default class Polygon {
     distanceToPoly(poly) {
         return Math.min(...this.points.map((p) => poly.distanceToPoint(p)));
     }
+
     static union(polys) {
         Polygon.multiBreak(polys)
         const keptSegments = []
@@ -113,11 +116,17 @@ export default class Polygon {
     }
 
 
-
-    draw(ctx, {stroke = 'blue', lineWidth = 2, fill = "rgba(0,0,255,0.3)", drawCenter = false, drawId = false} = {}) {
+    draw(ctx, {
+        stroke = 'blue',
+        lineWidth = 2,
+        fill = "rgba(0,0,255,0.3)",
+        join = "miter",
+        drawCenter = false,
+        drawId = false
+    } = {}) {
         if (!this.points?.length) return;
         ctx.beginPath()
-        style(ctx, {fill, stroke, lineWidth})
+        style(ctx, {fill, stroke, lineWidth, join})
         ctx.moveTo(this.points[0].x, this.points[0].y)
         for (let i = 1; i < this.points.length; i++) {
             ctx.lineTo(this.points[i].x, this.points[i].y)
@@ -125,10 +134,13 @@ export default class Polygon {
         ctx.closePath()
         ctx.fill()
         ctx.stroke()
-        let center = this.centeroid()
-        if (drawCenter) center.draw(ctx, {color: 'purple'})
-        if (this.label) drawText(ctx, this.label, center.x, center.y)
-        if (drawId) drawText(ctx, this.id, center.x, center.y)
+        // my extra
+        if (drawCenter || drawId) {
+            let center = this.centeroid()
+            if (drawCenter) center.draw(ctx, {color: 'purple'})
+            if (this.label) drawText(ctx, this.label, center.x, center.y)
+            if (drawId) drawText(ctx, this.id, center.x, center.y)
+        }
 
     }
 

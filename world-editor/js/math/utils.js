@@ -2,6 +2,7 @@ import Point from "../primitives/point.js";
 import Segment from "../primitives/segment.js";
 
 export const eps = 0.001
+
 export function getNearestPoint(point, points, threshold = Number.MAX_SAFE_INTEGER) {
     if (points.length === 0) return null;
 
@@ -40,9 +41,11 @@ export function magnitude(p) {
 export function average(p1, p2) {
     return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
 }
+
 export function dot(p1, p2) {
     return p1.x * p2.x + p1.y * p2.y;
 }
+
 export function translate(point, angle, offset) {
     return new Point(
         point.x + Math.cos(angle) * offset,
@@ -60,6 +63,13 @@ export function radToDeg(rad) {
 
 export function lerp(A, B, t) {
     return A + (B - A) * t
+}
+
+export function lerp2D(A, B, t) {
+    return new Point(
+        lerp(A.x, B.x, t),
+        lerp(A.y, B.y, t),
+    )
 }
 
 export function getIntersection(seg1, seg2) {
@@ -127,12 +137,12 @@ export function random(min, max, integer = true) {
         return Math.floor(result)
     return result
 }
-export function pseudoRandom(sid, min, max, integer = true) {
-    let random = Math.cos((1000 * sid) / 17 )
-    let result = random * (max - min + 1) + min;
-    if (integer)
-        return Math.floor(result)
-    return result
+
+export function pseudoRandom(sid) {
+    let hash = 0;
+    sid = String(sid / 17)
+    hash = Array.from(sid).reduce((sum, c)=> sum * 31 + sid.charCodeAt(c))
+    return Math.abs(Math.cos(hash));
 }
 
 export function isPointIntoPolygon(point, poly) {
@@ -144,4 +154,11 @@ export function isPointIntoPolygon(point, poly) {
         if (int) intersectionCount++
     }
     return intersectionCount % 2 == 1
+}
+
+export function getFake3dPoint(point, viewPoint, height) {
+    const dir = normalize(subtract(point, viewPoint));
+    const dist = distance(point, viewPoint);
+    const scalar = Math.atan(dist / height) / (Math.PI / 2);
+    return add(point, scale(dir, height * scalar));
 }
