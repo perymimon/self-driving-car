@@ -1,6 +1,7 @@
 import Point from "../primitives/point.js";
 import Segment from "../primitives/segment.js";
 
+export const eps = 0.001
 export function getNearestPoint(point, points, threshold = Number.MAX_SAFE_INTEGER) {
     if (points.length === 0) return null;
 
@@ -27,8 +28,20 @@ export function add(p1, p2) {
 export function scale(p, scalar = 1) {
     return new Point(p.x * scalar, p.y * scalar)
 }
-export function average(p1,p2){
-    return new Point((p1.x + p2.x)/2, (p1.y + p2.y)/2)
+
+export function normalize(p) {
+    return scale(p, 1 / magnitude(p))
+}
+
+export function magnitude(p) {
+    return Math.hypot(p.x, p.y)
+}
+
+export function average(p1, p2) {
+    return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
+}
+export function dot(p1, p2) {
+    return p1.x * p2.x + p1.y * p2.y;
 }
 export function translate(point, angle, offset) {
     return new Point(
@@ -45,7 +58,7 @@ export function radToDeg(rad) {
     return (180 / Math.PI) * rad
 }
 
-function lerp(A, B, t) {
+export function lerp(A, B, t) {
     return A + (B - A) * t
 }
 
@@ -84,7 +97,7 @@ export function getIntersection(seg1, seg2) {
             return {
                 x: lerp(A.x, B.x, t),
                 y: lerp(A.y, B.y, t),
-                offset: t> maxeps? 1: (t<eps?0:t)
+                offset: t > maxeps ? 1 : (t < eps ? 0 : t)
             }
     }
 
@@ -110,6 +123,13 @@ export function polysIntersect(poly1, poly2) {
 
 export function random(min, max, integer = true) {
     let result = Math.random() * (max - min + 1) + min;
+    if (integer)
+        return Math.floor(result)
+    return result
+}
+export function pseudoRandom(sid, min, max, integer = true) {
+    let random = Math.cos((1000 * sid) / 17 )
+    let result = random * (max - min + 1) + min;
     if (integer)
         return Math.floor(result)
     return result

@@ -24,3 +24,13 @@ export function style(ctx,{stroke = 'blue', lineWidth = 2, fill = "rgba(0,0,255,
     ctx.strokeStyle = stroke
     ctx.lineWidth = lineWidth
 }
+
+export function drawText(ctx, text, x, y, style = {}){
+    let {font = '30px Arial', color = 'black' } = style
+    ctx.beginPath();
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(text, x, y);
+}
