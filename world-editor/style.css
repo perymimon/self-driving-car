@@ -1,7 +1,30 @@
-body{
+body,html{
+    margin:0;
+    padding:0;
     background-color: #000;
     text-align: center;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 #editorCanvas{
-    background-color: #a8a777;
+    background-color: #8aae6f;
+}
+canvas{
+    flex: 1;
+}
+label{
+    background-color: white;
+    border: none;
+    font-size: 20px;
+    border-radius: 10px;
+    text-shadow: 1px -1px 4px rgba(0, 0, 0, 0.69);
+    cursor: pointer;
+    padding: 0.1em;
+
+    input{
+        border: none;
+        appearance: textfield;
+    }
 }

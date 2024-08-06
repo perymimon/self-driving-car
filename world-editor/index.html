@@ -6,31 +6,41 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="editorCanvas"></canvas>
 <div id="controls">
     <button id="disposeButton">🗑️ clear</button>
     <button id="saveButton">💾 save</button>
+    |
+    <form id="graphTools" style="display:inline-block">
+        <label>🌐<input type="radio" name="graph" value="graph"/></label>
+        <label>🔴<input type="radio" name="graph" value="stop"/></label>
+        <label>🚶<input type="radio" name="graph" value="cross"/></label>
+        <label>🚗<input type="radio" name="graph" value="start"/></label>
+        <label>🅿️<input type="radio" name="graph" value="parking"/></label>
+        <label>🚦<input type="radio" name="graph" value="light"/></label>
+        <label>🎯<input type="radio" name="graph" value="target"/></label>
+    </form>
 </div>
+<canvas id="editorCanvas"></canvas>
+
 <script type="module">
     import Graph from './js/math/graph.js'
-    import GraphEditor from "./js/graphEditor.js";
+    import GraphEditor from "./js/editors/graphEditor.js";
+    import StopEditor from "./js/editors/stopEditor.js";
+    import CrossEditor from "./js/editors/crossEditor.js";
     import ViewPort from "./js/viewport.js";
     import World from "./js/world.js"
     import Polygon from "./js/primitives/polygon.js";
     import {scale} from "./js/math/utils.js";
+    import StartEditor from "./js/editors/startEditor.js";
+    import YieldEditor from "./js/editors/yieldEditor.js";
+    import ParkingEditor from "./js/editors/parkingEditor.js";
+    import TargetEditor from "./js/editors/targetEditor.js";
+    import LightEditor from "./js/editors/lightEditor.js";
 
     editorCanvas.width = innerWidth
     editorCanvas.height = innerHeight
 
     const ctx = editorCanvas.getContext('2d')
-
-    // window.p1 = new Point(100, 100)
-    // const p2 = new Point(200, 200)
-    // const p3 = new Point(100, 200)
-    // const p4 = new Point(0, 0)
-    //
-    // const s1 = new Segment(p1, p2)
-    // const s3 = new Segment(p2, p3)
 
     const graphString = localStorage.getItem('graph')
     const graphInfo = graphString ? JSON.parse(graphString) : null
@@ -39,12 +49,23 @@
     const graph = graphInfo ? Graph.Load(graphInfo) : new Graph()
     const world = new World(graph)
     const viewPort = new ViewPort(editorCanvas)
-    const graphEditor = new GraphEditor(viewPort, graph)
+
+    const tools = {
+        graph: {editor: new GraphEditor(viewPort, graph)},
+        stop: {editor: new StopEditor(viewPort, world)},
+        cross: {editor: new CrossEditor(viewPort, world)},
+        start: {editor: new StartEditor(viewPort, world)},
+        yield: {editor: new YieldEditor(viewPort, world)},
+        parking: {editor: new ParkingEditor(viewPort, world)},
+        target: {editor: new TargetEditor(viewPort, world)},
+        light: {editor: new LightEditor(viewPort, world)},
+    }
 
     animate()
     world.generate()
     var hash = ''
 
+    setMode('target')
 
     function animate() {
         viewPort.reset()
@@ -55,7 +76,9 @@
         let viewPoint = scale(viewPort.getOffset(), -1)
         world.draw(ctx, viewPoint)
         ctx.globalAlpha = 0.3
-        graphEditor.display()
+        for (let mode in tools) {
+            tools[mode].editor.display()
+        }
         ctx.globalAlpha = 1
 
 
@@ -66,9 +89,29 @@
 
     document.getElementById('disposeButton').onclick = function dispose() {
         graphEditor.dispose()
+        world.markings.length = 0
     }
     document.getElementById('saveButton').onclick = function save() {
         localStorage.setItem('graph', JSON.stringify(graph))
+    }
+    document.getElementById('graphTools').onchange = function save(e) {
+        e.preventDefault()
+        let formData = new FormData(this);
+        let mode = formData.get('graph')
+        setMode(mode)
+
+    }
+
+    function setMode(mode) {
+        disableEditors()
+        tools[mode]?.editor.enable()
+        document.querySelector(`input[value="${mode}"]`).checked = true
+    }
+
+    function disableEditors() {
+        for (let mode in tools) {
+            tools[mode].editor.disable()
+        }
     }
 </script>
 </body>

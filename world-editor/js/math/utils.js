@@ -13,7 +13,20 @@ export function getNearestPoint(point, points, threshold = Number.MAX_SAFE_INTEG
     })
     return distance(point, nearest) > threshold ? null : nearest
 }
+export function getNearestSegment(point, segments, threshold) {
+    if (segments.length === 0) return null;
 
+    let minDist = Number.MAX_SAFE_INTEGER;
+    let nearest = null
+    for (let seg of segments) {
+        let dist = seg.distanceToPoint(point)
+        if(dist < minDist && dist < threshold) {
+            minDist = dist
+            nearest = seg
+        }
+    }
+    return nearest
+}
 export function distance(p1, p2) {
     return Math.hypot(p1.x - p2.x, p1.y - p2.y)
 }
@@ -159,6 +172,23 @@ export function isPointIntoPolygon(point, poly) {
 export function getFake3dPoint(point, viewPoint, height) {
     const dir = normalize(subtract(point, viewPoint));
     const dist = distance(point, viewPoint);
-    const scalar = Math.atan(dist / height) / (Math.PI / 2);
+    const scalar = Math.atan(dist / 300) / (Math.PI / 2);
     return add(point, scale(dir, height * scalar));
+}
+
+// export function getFake3dPoint(point,viewPoint, height){
+//     let deep = 10
+//     let s = deep / (deep + height)
+//     const dir = subtract(point, viewPoint);
+//     console.log(s);
+//     return add(point, scale(dir, s));
+// }
+export function inRange(min,max, value){
+    if(value <= min) return false
+    if(value >= max) return false
+    return true
+}
+
+export function perpendicular(p){
+    return new Point(-p.y, p.x)
 }

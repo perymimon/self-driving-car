@@ -35,3 +35,10 @@ export function drawText(ctx, text, x, y, style = {}){
     ctx.textBaseline = 'middle'
     ctx.fillText(text, x, y);
 }
+export function drawCircle(ctx, x, y,r, s = {}){
+    style(ctx,s)
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+    ctx.fill()
+
+}

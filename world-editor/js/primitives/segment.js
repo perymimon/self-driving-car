@@ -10,10 +10,11 @@ export default class Segment {
         // todo: make arc shape. and make intersection for it
     }
 
-    draw(ctx, {width = 2, color = "black", dash=null} = {}) {
+    draw(ctx, {width = 2, color = "black", dash=null , cap = "butt"} = {}) {
         ctx.beginPath();
         ctx.lineWidth = width;
         ctx.strokeStyle = color;
+        ctx.lineCap = cap;
         if(dash)
             ctx.setLineDash(dash)
         ctx.moveTo(this.p1.x, this.p1.y);

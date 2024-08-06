@@ -20,6 +20,9 @@ export default class World {
         this.roadBorders = []
         this.buildings = []
         this.trees = []
+        this.laneGuides = []
+
+        this.markings = []
 
         this.generate()
     }
@@ -38,6 +41,21 @@ export default class World {
 
         this.buildings = this.#generateBuildings()
         this.trees = this.#generatedTrees(30)
+        this.laneGuides = this.#generateLaneGuides()
+    }
+
+    #generateLaneGuides(){
+        const tmpEvnelope = []
+        for (let seg of this.graph.segments) {
+            tmpEvnelope.push(
+                new Envelope(
+                    seg,
+                    this.roadWidth / 2,
+                    this.roadRoundness
+                ),
+            )
+        }
+        return Polygon.union(tmpEvnelope.map(seg => seg.poly))
     }
 
     #generateBuildings() {
@@ -126,6 +144,11 @@ export default class World {
         for (let env of this.envelopes) {
             env.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
         }
+
+        for(let marking of this.markings){
+            marking.draw(ctx);
+        }
+
         this.graph.segments.forEach(seg => {
             seg.draw(ctx, {dash: [10, 10], color: 'white', width: 4});
         });
@@ -140,6 +163,10 @@ export default class World {
         items.forEach(item => {
             item.draw(ctx, viewPoint,{drawId: true})
         });
+
+        // for( const seg of this.laneGuides){
+        //     seg.draw(ctx, {color:'red'})
+        // }
 
     }
 

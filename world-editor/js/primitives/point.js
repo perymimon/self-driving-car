@@ -12,9 +12,9 @@ export default class Point {
 
         if(outline){
             ctx.beginPath()
-            ctx.lineWidth = 2
+            ctx.lineWidth = 3
             ctx.strokeStyle = 'red'
-            ctx.arc(this.x, this.y, radius * 0.6, 0, Math.PI * 2)
+            ctx.arc(this.x, this.y, radius , 0, Math.PI * 2)
             ctx.stroke()
         }
         if(fill){

@@ -1,7 +1,7 @@
 import Segment from "./segment.js";
 import {average, distance, getIntersection} from "../math/utils.js"
 import Point from "./point.js";
-import {drawText, getRandomColor, style} from "../cavas-utils.js";
+import {drawText, getRandomColor, style} from "../canvas-utils.js";
 
 export default class Polygon {
     static count = 0
