@@ -42,7 +42,7 @@ var traffic = [
 animate()
 
 function generateCars(N) {
-    return Array.from(Array(N), i => new Car(road.getLaneCenter(1), 100, 30, 50, "AI", 4))
+    return Array.from(Array(N), () => new Car(road.getLaneCenter(1), 100, 30, 50, "AI", 4))
 }
 
 function save() {

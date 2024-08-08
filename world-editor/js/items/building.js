@@ -70,7 +70,7 @@ export default class Building {
                 a.distanceToPoint(viewPoint)
         );
         this.base.draw(ctx, style);
-        sides.forEach((side, i) => side.draw(ctx, style));
+        sides.forEach(side => side.draw(ctx, style));
         ceiling.draw(ctx, {fill: 'white', stroke: 'white'});
         roofPolys.forEach(poly => poly.draw(ctx, {fill: "#D44", stroke: "#C44", lineWidth: 8, join: "round"}))
     }

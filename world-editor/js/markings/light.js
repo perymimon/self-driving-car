@@ -1,8 +1,6 @@
 import Segment from "../primitives/segment.js";
-import {translate, angle, average, perpendicular, add, scale, lerp2D} from "../math/utils.js";
-import Envelope from "../primitives/envelope.js";
+import {add, lerp2D, perpendicular, scale} from "../math/utils.js";
 import Marking from "./marking.js";
-import {drawCircle, style} from "../canvas-utils.js";
 
 export default class Light extends Marking {
     constructor(center, directionVector, width, height) {

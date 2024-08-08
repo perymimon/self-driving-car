@@ -49,7 +49,7 @@ function generateCars(N) {
     const start = world.markings.filter(m => m instanceof Start).at(0)
     let point = start?.center ?? new Point(100, 100)
     let dir = start.directionVector ?? new Point(0, -1)
-    return Array.from(Array(N), i => new Car(point.x, point.y, 30, 50, "AI", 4, Math.PI / 2 - angle(dir)))
+    return Array.from(Array(N), () => new Car(point.x, point.y, 30, 50, "AI", 4, Math.PI / 2 - angle(dir)))
 }
 
 function save() {

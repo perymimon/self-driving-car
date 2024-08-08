@@ -1,5 +1,4 @@
 import {getNearestSegment, inRange} from "../math/utils.js";
-import Stop from "../markings/stop.js";
 
 export default class MarkingEditor {
     constructor(viewport, world , targetSegments) {

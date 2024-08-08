@@ -52,7 +52,7 @@ export default class Polygon {
     }
 
     // getCircumscribedRadius
-    getRadius(poly) {
+    getRadius() {
         let centroid = this.centeroid()
         return this.points.reduce((max, point) => {
             let dis = distance(point, centroid)

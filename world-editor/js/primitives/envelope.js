@@ -1,4 +1,4 @@
-import {subtract, angle, translate, radToDeg} from "../math/utils.js";
+import {angle, subtract, translate} from "../math/utils.js";
 import Polygon from "./polygon.js";
 import Segment from "./segment.js";
 

@@ -1,4 +1,3 @@
-import Point from "../primitives/point.js";
 import {getNearestPoint} from "../math/utils.js";
 import Segment from "../primitives/segment.js";
 

@@ -1,4 +1,3 @@
-import {getNearestSegment, inRange} from "../math/utils.js";
 import Cross from "../markings/cross.js";
 import MarkingEditor from "./markingEditor.js";
 

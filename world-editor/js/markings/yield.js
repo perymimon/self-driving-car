@@ -1,6 +1,4 @@
-import Segment from "../primitives/segment.js";
-import {translate, angle} from "../math/utils.js";
-import Envelope from "../primitives/envelope.js";
+import {angle} from "../math/utils.js";
 import Marking from "./marking.js";
 
 export default class Yield extends Marking{

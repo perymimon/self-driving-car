@@ -1,7 +1,5 @@
-import Segment from "../primitives/segment.js";
 import {add, lerp, lerp2D, pseudoRandom, scale, subtract, translate} from "../math/utils.js";
 import Polygon from "../primitives/polygon.js";
-import Point from "../primitives/point.js";
 
 export default class Tree {
     heightCoef = 0.2

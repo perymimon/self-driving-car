@@ -1,5 +1,4 @@
 import MarkingEditor from "./markingEditor.js";
-import Yield from "../markings/yield.js";
 import Parking from "../markings/parking.js";
 
 export default class ParkingEditor extends MarkingEditor {
