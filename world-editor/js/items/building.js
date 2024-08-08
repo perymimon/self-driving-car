@@ -8,6 +8,13 @@ export default class Building {
         this.height = height
     }
 
+    static load(info){
+        let build =new Building()
+        build.base = Polygon.load(info.base)
+        build.height = info.height
+        return build
+    }
+
     draw(ctx, viewPoint) {
         let basePoints = this.base.points
         let topPoints = basePoints.map(p =>

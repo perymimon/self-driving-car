@@ -7,8 +7,9 @@
 </head>
 <body>
 <div id="controls">
-    <button id="disposeButton">🗑️ clear</button>
-    <button id="saveButton">💾 save</button>
+    <button id="disposeButton">🗑️</button>
+    <button id="saveButton">💾</button>
+    <label>📁<input type="file" id="fileInput" accept='.world' > </label>
     |
     <form id="graphTools" style="display:inline-block">
         <label>🌐<input type="radio" name="graph" value="graph"/></label>
@@ -42,13 +43,17 @@
 
     const ctx = editorCanvas.getContext('2d')
 
-    const graphString = localStorage.getItem('graph')
-    const graphInfo = graphString ? JSON.parse(graphString) : null
+    const worldString = localStorage.getItem('world')
+    const worldInfo = worldString ? JSON.parse(worldString) : null
 
-    // const graph = new Graph([p1, p2, p3, p4], [s1, s3])
-    const graph = graphInfo ? Graph.Load(graphInfo) : new Graph()
-    const world = new World(graph)
-    const viewPort = new ViewPort(editorCanvas)
+    var world = worldInfo ? World.Load(worldInfo) : new World(new Graph())
+    const graph = world.graph
+
+    // // const graph = new Graph([p1, p2, p3, p4], [s1, s3])
+    // const graph = graphInfo ? Graph.Load(graphInfo) : new Graph()
+    // const world = new World(graph)
+
+    const viewPort = new ViewPort(editorCanvas, world.zoom, world.offset)
 
     const tools = {
         graph: {editor: new GraphEditor(viewPort, graph)},
@@ -62,7 +67,6 @@
     }
 
     animate()
-    world.generate()
     var hash = ''
 
     setMode('target')
@@ -80,20 +84,47 @@
             tools[mode].editor.display()
         }
         ctx.globalAlpha = 1
-
-
         new Polygon([]).draw(ctx)
         requestAnimationFrame(animate)
 
     }
 
     document.getElementById('disposeButton').onclick = function dispose() {
-        graphEditor.dispose()
+        tools.graph.editor.dispose()
         world.markings.length = 0
     }
     document.getElementById('saveButton').onclick = function save() {
-        localStorage.setItem('graph', JSON.stringify(graph))
+        world.offset = viewPort.offset
+        world.zoom  =  viewPort.zoom
+
+        let a = document.createElement('a')
+        a.setAttribute('href', `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(world))}`)
+        a.setAttribute('download', 'name.world')
+        a.click()
+
+        localStorage.setItem('world', JSON.stringify(world))
     }
+    document.getElementById('fileInput').addEventListener('change', function load(event) {
+            const file = event.target.files[0]
+            if (!file) {
+                alert('No File selected')
+                return
+            }
+            let reader = new FileReader()
+            reader.readAsText(file)
+            reader.onload = (evt) => {
+                let fileContent = evt.target.result
+                let jsonData = JSON.parse(fileContent)
+
+                world = World.Load(jsonData)
+                localStorage.setItem('world', JSON.stringify(world))
+                location.reload()
+
+            }
+        }
+    )
+
+
     document.getElementById('graphTools').onchange = function save(e) {
         e.preventDefault()
         let formData = new FormData(this);

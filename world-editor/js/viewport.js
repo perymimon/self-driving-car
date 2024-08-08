@@ -3,13 +3,13 @@ import {add, subtract, scale} from "./math/utils.js";
 
 export default class Viewport {
 
-    constructor(canvas) {
+    constructor(canvas, zoom = 1, offset = null) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
 
-        this.zoom = 1
+        this.zoom = zoom
         this.center = new Point(canvas.width / 2, canvas.height / 2);
-        this.offset = scale(this.center, -1)
+        this.offset = offset || scale(this.center, -1)
 
         this.drag = {
             start: new Point(0, 0),

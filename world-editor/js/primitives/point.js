@@ -3,6 +3,9 @@ export default class Point {
         this.x = x;
         this.y = y;
     }
+    static load(p){
+        return new Point(p.x, p.y)
+    }
     draw(ctx, {size = 18, color="black", outline = false, fill=false} = {}){
         const radius = size / 2
         ctx.beginPath()
@@ -28,4 +31,5 @@ export default class Point {
     equal(p){
         return p.x === this.x && p.y === this.y
     }
+
 }

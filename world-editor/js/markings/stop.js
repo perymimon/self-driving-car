@@ -10,7 +10,7 @@ export default class Stop extends Marking{
     }
 
     draw(ctx, viewPoint) {
-        this.border.draw(ctx, {width:5, color:'white '})
+        this.border.draw(ctx, {width:5, color:'white'})
         // this.poly.draw(ctx, viewPoint);
         ctx.save()
         ctx.translate(this.center.x, this.center.y)

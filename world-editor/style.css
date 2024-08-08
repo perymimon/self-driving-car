@@ -14,7 +14,8 @@ body,html{
 canvas{
     flex: 1;
 }
-label{
+label,button{
+    display: inline-block;
     background-color: white;
     border: none;
     font-size: 20px;
@@ -26,5 +27,8 @@ label{
     input{
         border: none;
         appearance: textfield;
+    }
+    input[type=file]{
+        display: none;
     }
 }

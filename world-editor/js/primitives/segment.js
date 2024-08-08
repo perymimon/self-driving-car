@@ -1,4 +1,5 @@
 import {add, distance, dot, magnitude, normalize, scale, subtract} from "../math/utils.js";
+import Point from "./point.js";
 
 export default class Segment {
     static counter = 0
@@ -8,6 +9,14 @@ export default class Segment {
         this.shape = shape
         this.id = Segment.counter++
         // todo: make arc shape. and make intersection for it
+    }
+    static load(info){
+        let seg = new Segment()
+        seg.shape = info.shape
+        seg.p1 = Point.load(info.p1)
+        seg.p2 = Point.load(info.p2)
+        seg.id = info.id
+        return seg
     }
 
     draw(ctx, {width = 2, color = "black", dash=null , cap = "butt"} = {}) {

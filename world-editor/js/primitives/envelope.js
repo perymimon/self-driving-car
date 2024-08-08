@@ -1,14 +1,21 @@
 import {subtract, angle, translate, radToDeg} from "../math/utils.js";
 import Polygon from "./polygon.js";
+import Segment from "./segment.js";
 
 
 export default class Envelope {
     constructor(skeleton, width, roundness = 1) {
-        this.skeleton = skeleton;
-
-        this.poly = this.#generatePolygon(width, roundness)
+        if(skeleton) {
+            this.skeleton = skeleton;
+            this.poly = this.#generatePolygon(width, roundness)
+        }
     }
-
+    static load(info){
+        let env = new Envelope()
+        env.skeleton = new Segment(info.skeleton.p1, info.skeleton.p2)
+        env.poly = Polygon.load(info.poly)
+        return env
+    }
     #generatePolygon(width, roundness) {
         const {p1, p2} = this.skeleton
 

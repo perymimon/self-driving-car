@@ -8,7 +8,7 @@ export default class Start extends Marking{
         super(center, directionVector, width, height);
         this.img = new Image()
         this.img.onload = function (){       }
-        this.img.src = 'car.png'
+        this.img.src = '/world-editor/car.png'
 
     }
 

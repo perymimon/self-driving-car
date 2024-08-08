@@ -74,7 +74,7 @@ export default class GraphEditor {
 
     #handleMouseUp(e) {
         if (e.button == 0) {// left click
-            if (this.mousedown.equal(this.mouse)) {
+            if (this.mousedown?.equal(this.mouse)) {
                 if (this.hovered) {
                     // If hovered just select the node
                     this.#selectPoint(this.hovered)

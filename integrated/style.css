@@ -1,0 +1,39 @@
+body{
+    margin: 0;
+    background: #4a4a4a;
+    display: flex;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+}
+#carCanvas{
+    background: #679c35;
+    /*width: 200px*/
+}
+#networkCanvas{
+    background: #957895;
+    /*width: 200px*/
+}
+
+#verticalButtons{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+
+}
+
+button{
+    border: none;
+    border-radius: 5px;
+    padding: 5px 5px 7px 5px;
+    cursor: pointer;
+    font-size: 30px;
+    filter: grayscale(1);
+}
+button:hover{
+    filter: grayscale(0);
+    background: #939191;
+}

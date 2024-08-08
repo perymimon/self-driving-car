@@ -1,5 +1,5 @@
 class Car {
-    constructor(x, y, width, height, control, maxSpeed = 3) {
+    constructor(x, y, width, height, control, maxSpeed = 3, angle = 0) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -10,9 +10,11 @@ class Car {
         this.maxSpeed = maxSpeed
         this.maxReverseSpeed = -1.5
         this.friction = 0.05
-        this.angle = 0
+        this.angle = angle
         this.damage = false
         this.control = control
+
+        this.fitness = 0
 
         this.useBrain = control == 'AI'
 
@@ -30,6 +32,8 @@ class Car {
         if (this.damage) return false
 
         this.#move()
+        this.fitness += this.speed
+
         this.polygons = this.#createPolygon()
         this.damage = this.#assessDamage(roadBorders, traffic)
 

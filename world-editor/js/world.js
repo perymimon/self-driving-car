@@ -2,9 +2,20 @@ import Envelope from "./primitives/envelope.js";
 import Polygon from "./primitives/polygon.js";
 import {add, distance, eps, lerp, scale} from "./math/utils.js";
 import Segment from "./primitives/segment.js";
-import Point from "./primitives/point.js";
 import Tree from "./items/tree.js";
 import Building from "./items/building.js";
+import Graph from "./math/graph.js";
+import Cross from "./markings/cross.js";
+import Light from "./markings/light.js";
+import Parking from "./markings/parking.js";
+import Start from "./markings/start.js";
+import Stop from "./markings/stop.js";
+import Target from "./markings/target.js";
+import Yield from "./markings/yield.js";
+import Point from "./primitives/point.js";
+
+const Markings = {Cross, Light, Parking, Start, Stop, Target, Yield}
+
 export default class World {
     roadWidth = 100
     roadRoundness = 10
@@ -14,7 +25,7 @@ export default class World {
     treeSize = 160
 
     constructor(graph) {
-        this.graph = graph;
+        this.graph = graph || new Graph();
 
         this.envelopes = []
         this.roadBorders = []
@@ -22,9 +33,42 @@ export default class World {
         this.trees = []
         this.laneGuides = []
 
+        this.cars = []
+        this.bestCar = null
+
         this.markings = []
 
-        this.generate()
+
+        if (graph)
+            this.generate()
+    }
+
+    static Load(info) {
+        let world = new World();
+        world.graph = Graph.Load(info.graph)
+        world.roadWidth = info.roadWidth
+        world.roadRoundness = info.roadRoundness
+        world.buildingWidth = info.buildingWidth
+        world.buildingMinLength = info.buildingMinLength
+        world.spacing = info.spacing
+        world.treeSize = info.treeSize
+
+        world.envelopes = info.envelopes.map((env) => Envelope.load(env))
+        world.roadBorders = info.roadBorders.map(seg => Segment.load(seg))
+        world.buildings = info.buildings.map((env) => Building.load(env))
+        world.trees = info.trees.map((t) => new Tree(t.center, info.treeSize))
+        world.laneGuides = info.laneGuides.map((seg) => Segment.load(seg))
+        world.markings = info.markings.map((mark) => {
+            return new Markings[mark.type](
+                Point.load(mark.center),
+                Point.load(mark.directionVector),
+                mark.width,
+                mark.height
+            )
+        })
+        world.zoom = info.zoom
+        world.offset = info.offset
+        return world
     }
 
     hash() {
@@ -44,10 +88,10 @@ export default class World {
         this.laneGuides = this.#generateLaneGuides()
     }
 
-    #generateLaneGuides(){
-        const tmpEvnelope = []
+    #generateLaneGuides() {
+        const tmpEnvelope = []
         for (let seg of this.graph.segments) {
-            tmpEvnelope.push(
+            tmpEnvelope.push(
                 new Envelope(
                     seg,
                     this.roadWidth / 2,
@@ -55,7 +99,7 @@ export default class World {
                 ),
             )
         }
-        return Polygon.union(tmpEvnelope.map(seg => seg.poly))
+        return Polygon.union(tmpEnvelope.map(seg => seg.poly))
     }
 
     #generateBuildings() {
@@ -100,7 +144,7 @@ export default class World {
             }
         }
         bases = Array.from(new Set(bases).difference(removed))
-        return bases.map(b=> new Building(b,200))
+        return bases.map(b => new Building(b, 200))
     }
 
     #generatedTrees(count = 10, tryCount = 30) {
@@ -114,7 +158,7 @@ export default class World {
         let bottom = Math.max(...points.map(p => p.y))
 
         const illegalPoly = [
-            ...this.buildings.map(b=> b.base),
+            ...this.buildings.map(b => b.base),
             ...this.envelopes.map(e => e.poly)
         ]
 
@@ -131,7 +175,7 @@ export default class World {
             let closeToSomething = illegalPoly.some(poly => poly.distanceToPoint(p) <= this.treeSize * 2)
             keep = keep && closeToSomething
             if (keep) {
-                trees.push( new Tree(p, this.treeSize))
+                trees.push(new Tree(p, this.treeSize))
                 if (trees.length >= count) return trees
                 trying = tryCount
             }
@@ -140,29 +184,41 @@ export default class World {
         return trees
     }
 
-    draw(ctx, viewPoint) {
+    draw(ctx, viewPoint, showStartMarkings = true) {
         for (let env of this.envelopes) {
             env.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
         }
 
-        for(let marking of this.markings){
+        for (let marking of this.markings) {
+            if(showStartMarkings == false && marking instanceof Start) continue
             marking.draw(ctx);
         }
 
-        this.graph.segments.forEach(seg => {
+        for (let seg of this.graph.segments) {
             seg.draw(ctx, {dash: [10, 10], color: 'white', width: 4});
-        });
+        }
 
-        this.roadBorders.forEach(road => road.draw(ctx, {color: 'white', width: 4}));
+        for (let road of this.roadBorders) {
+            road.draw(ctx, {color: 'white', width: 4})
+        }
+
+        ctx.globalAlpha = .2
+        for (let car of this.cars) {
+            car.draw(ctx, 'blue')
+        }
+        ctx.globalAlpha = 1
+        this.bestCar?.draw(ctx, 'blue', true)
 
         let items = [...this.buildings, ...this.trees]
             .sort((a, b) =>
                 b.base.distanceToPoint(viewPoint) -
                 a.base.distanceToPoint(viewPoint)
             )
-        items.forEach(item => {
-            item.draw(ctx, viewPoint,{drawId: true})
-        });
+        // items is buildings and trees
+        for (let item of items) {
+            item.draw(ctx, viewPoint, {drawId: true})
+        }
+
 
         // for( const seg of this.laneGuides){
         //     seg.draw(ctx, {color:'red'})

@@ -16,6 +16,11 @@ export default class Polygon {
         this.label = label
     }
 
+    static load(info){
+        return new Polygon(
+            info.points.map(i=> new Point(i.x,i.y)),
+        )
+    }
     containsSegment(seg) {
         const midPoint = average(seg.p1, seg.p2)
         return this.containsPoint(midPoint, seg.p2)
