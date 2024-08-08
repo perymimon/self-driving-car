@@ -1,5 +1,5 @@
 const carCanvas = document.querySelector('#carCanvas');
-const  lanes = 5
+const lanes = 5
 carCanvas.width = lanes * 80;
 
 const networkCanvas = document.querySelector('#networkCanvas');
@@ -9,7 +9,6 @@ const carCtx = carCanvas.getContext('2d');
 const networkCtx = networkCanvas.getContext('2d');
 
 const road = new Road(carCanvas.width / 2, carCanvas.width * 0.9, lanes);
-// const car = new Car(road.getLaneCenter(1), 100, 30, 50,"AI",4)
 const cars = generateCars(1000)
 var bestCar = cars[0]
 var goodCars = [...cars]
@@ -25,24 +24,24 @@ if (localStorage.getItem('bestBrain')) {
 
 
 var traffic = [
-    new Car(road.getLaneCenter(1), -100, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(0), -300, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(2), -300, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(2), -500, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(1), -500, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(0), -900, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(1), -700, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(0), -100, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(3), -300, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(4), -400, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(0), -700, 30, 50, "DUMMY", 2),
-    new Car(road.getLaneCenter(4), -600, 30, 50, "DUMMY", 2),
+    new Car(road.getLaneCenter(1), -100, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(0), -300, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(2), -300, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(2), -500, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(1), -500, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(0), -900, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(1), -700, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(0), -100, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(3), -300, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(4), -400, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(0), -700, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(4), -600, 30, 50, "DUMMY", 0, 3),
 ]
 
 animate()
 
 function generateCars(N) {
-    return Array.from(Array(N), () => new Car(road.getLaneCenter(1), 100, 30, 50, "AI", 4))
+    return Array.from(Array(N), () => new Car(road.getLaneCenter(1), 100, 30, 50, "AI", 0, 4, 'red'))
 }
 
 function save() {
@@ -81,7 +80,7 @@ function animate(time) {
             car.update(road.borders, traffic)
         }
     }
-    goodCars = goodCars.filter(car=>!car.damage)
+    goodCars = goodCars.filter(car => !car.damage)
 
 
     let candidatesCars = goodCars.filter(car => Math.abs(car.y - farestCar.y) <= 100)
@@ -100,13 +99,13 @@ function animate(time) {
     road.draw(carCtx)
 
     for (let car of traffic) {
-        car.draw(carCtx, 'red')
+        car.draw(carCtx)
     }
 
     carCtx.globalAlpha = 0.2
 
     for (let car of cars) {
-        car.draw(carCtx, 'blue')
+        car.draw(carCtx)
     }
     carCtx.globalAlpha = 1
 

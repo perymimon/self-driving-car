@@ -1,5 +1,13 @@
+const carImg = new Image();
+carImg.src = "/car.png"
+const resolver = Promise.withResolvers()
+carImg.onload = function(){
+    resolver.resolve()
+}
+
+
 class Car {
-    constructor(x, y, width, height, control, maxSpeed = 3, angle = 0) {
+    constructor(x, y, width, height, controlType, angle = 0, maxSpeed = 3, color = "blue") {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -12,19 +20,35 @@ class Car {
         this.friction = 0.05
         this.angle = angle
         this.damage = false
-        this.control = control
+        this.control = controlType
 
         this.fitness = 0
 
-        this.useBrain = control == 'AI'
+        this.useBrain = controlType == 'AI'
 
-        if (control != "DUMMY") {
+        if (controlType != "DUMMY") {
             this.sensors = new Sensor(this)
             this.brain = new NeuralNetwork([
                 this.sensors.rayCount, 6, 4
             ])
         }
         this.controls = new Controls(this.control)
+
+
+        this.mask = document.createElement("canvas");
+        this.mask.width = width;
+        this.mask.height = height;
+
+        const maskCtx = this.mask.getContext("2d");
+        resolver.promise.then(() => {
+            maskCtx.fillStyle = color;
+            maskCtx.rect(0, 0, this.width, this.height);
+            maskCtx.fill();
+
+            maskCtx.globalCompositeOperation = "destination-atop";
+            maskCtx.drawImage(carImg, 0, 0, this.width, this.height);
+        })
+
 
     }
 
@@ -134,23 +158,45 @@ class Car {
     //     this.sensors.draw(ctx)
     // }
 
-    draw(ctx, color = 'black', drawSensor) {
+    // draw(ctx, color = 'black', drawSensor) {
+    //     drawSensor && this.sensors?.draw(ctx)
+    //
+    //     if (this.damage)
+    //         ctx.fillStyle = 'gray'
+    //     else
+    //         ctx.fillStyle = color
+    //
+    //     let {polygons} = this
+    //     ctx.beginPath()
+    //     ctx.moveTo(polygons[0].x, polygons[0].y)
+    //     for (let i = 1; i < polygons.length; i++) {
+    //         ctx.lineTo(polygons[i].x, polygons[i].y)
+    //     }
+    //     ctx.lineTo(polygons[0].x, polygons[0].y)
+    //     ctx.fill()
+    //
+    //
+    // }
+    draw(ctx, drawSensor = false) {
         drawSensor && this.sensors?.draw(ctx)
 
-        if (this.damage)
-            ctx.fillStyle = 'gray'
-        else
-            ctx.fillStyle = color
-
-        let {polygons} = this
-        ctx.beginPath()
-        ctx.moveTo(polygons[0].x, polygons[0].y)
-        for (let i = 1; i < polygons.length; i++) {
-            ctx.lineTo(polygons[i].x, polygons[i].y)
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(-this.angle);
+        if (!this.damage) {
+            ctx.drawImage(this.mask,
+                -this.width / 2,
+                -this.height / 2,
+                this.width,
+                this.height);
+            ctx.globalCompositeOperation = "multiply";
         }
-        ctx.lineTo(polygons[0].x, polygons[0].y)
-        ctx.fill()
-
+        ctx.drawImage(carImg,
+            -this.width / 2,
+            -this.height / 2,
+            this.width,
+            this.height);
+        ctx.restore();
 
     }
 }
