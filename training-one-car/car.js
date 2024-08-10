@@ -7,7 +7,7 @@ carImg.onload = function(){
 
 
 class Car {
-    constructor(x, y, width, height, controlType, angle = 0, maxSpeed = 3, color = "blue") {
+    constructor(x, y, width, height, controlType, angle = 0, maxSpeed = 4, color = "blue") {
         this.x = x;
         this.y = y;
         this.width = width;

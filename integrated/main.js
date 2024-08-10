@@ -46,13 +46,14 @@ function restart(world) {
         // .map(b => b.base.segments)
         // .flat()
         .map(s => [s.p1, s.p2])
-    viewPort = new ViewPort(carCanvas, world.zoom, world.offset)
+    viewPort = new ViewPort(carCanvas, 1, world.offset)
 }
 
 animate()
 
 function generateCars(N) {
-    const start = world.markings.filter(m => m instanceof Start).at(0)
+    const starts = world.markings.filter(m => m instanceof Start)
+    let start = starts[random(0,starts.length-1,true)]
     let point = start?.center ?? new Point(100, 100)
     let dir = start?.directionVector ?? new Point(0, -1)
     return Array.from(Array(N), () => new Car(point.x, point.y, 30, 50, "AI", Math.PI / 2 - angle(dir), 4, 'red'))
