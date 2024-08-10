@@ -152,7 +152,7 @@
     }
 
     document.getElementById('graphTools').onsubmit = (evt) => evt.preventDefault()
-    document.getElementById('graphTools').onchange = function save(e) {
+    document.getElementById('graphTools').onchange = function(e) {
         e.preventDefault()
         let formData = new FormData(this);
         let mode = formData.get('graph')

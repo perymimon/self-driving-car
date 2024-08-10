@@ -1,5 +1,5 @@
 import Segment from "./segment.js";
-import {average, distance, getIntersection} from "../math/utils.js"
+import {average, distance} from "../math/utils.js"
 import Point from "./point.js";
 import {drawText, getRandomColor, style} from "../canvas-utils.js";
 
@@ -7,6 +7,7 @@ export default class Polygon {
     static count = 0
     #center = null
     #radius = null
+
     constructor(points, label) {
         this.points = points;
         this.segments = []
@@ -16,8 +17,8 @@ export default class Polygon {
         this.id = Polygon.count++
         this.label = label
 
-        for(let p of this.points)
-            p.addEventListener('change',e=> {
+        for (let p of this.points)
+            p.addEventListener('change', e => {
                 this.#center = null
                 this.#radius = null
             })
@@ -34,7 +35,7 @@ export default class Polygon {
         return this.containsPoint(midPoint, seg.p2)
     }
 
-    containsPoint(point, spacing =0) {
+    containsPoint(point, spacing = 0) {
         if (distance(point, this.centeroid) > (this.radius + spacing))
             return false
         const outerPoint = new Point(-10000, -10000)
@@ -47,22 +48,41 @@ export default class Polygon {
         return intersectionCount % 2 == 1
     }
 
-    intersectPoly(poly , spacing) {
-        if(this.#intersectCircumCircles(poly, spacing)){
+    intersectPoly(poly, spacing) {
+        if (this.#intersectCircumCircles(poly, spacing)) {
             for (let s1 of this.segments) {
                 for (let s2 of poly.segments) {
-                    if (getIntersection(s1, s2)) return true
+                    if (s1.intersection(s2)) return true
                 }
             }
-            return false
         }
         return false
 
     }
 
+    intersectSeg(seg) {
+        // if (distance(seg.center, this.centeroid) > seg.radius + this.radius)
+        //     return false
+        if (!this.#intersectCircumCircles(seg)) return null
+        // for (let polSeg of this.segments) {
+        //     let touch = seg.intersection(polSeg)
+        //     if (touch) return touch
+        // }
+        let touches = []
+        for (let polSeg of this.segments) {
+            let touche = seg.intersection(polSeg)
+            if (!touche) continue
+            touches.push(touche)
+        }
+
+        if (touches.length == 0) return null
+        touches.sort((a, b) => a.offset - b.offset)
+        return touches[0]
+
+    }
+
     #intersectCircumCircles(poly, spacing = 0) {
-        let dis = distance(this.centeroid, poly.centeroid)
-        return dis <= this.radius + poly.radius + spacing
+        return distance(this.centeroid, poly.centeroid) <= this.radius + poly.radius + spacing
     }
 
     // getCircumscribedRadius
@@ -123,10 +143,10 @@ export default class Polygon {
     }
 
     static multiUnion(polys) {
-        if(polys.length == 0) return []
+        if (polys.length == 0) return []
         let poly = polys.at(0)
         for (let i = 1; i < polys.length; i++) {
-            poly = Polygon.union(poly,polys[i])
+            poly = Polygon.union(poly, polys[i])
         }
 
         return poly.segments
@@ -168,7 +188,7 @@ export default class Polygon {
             for (let j = 0; j < segs2.length; j++) {
                 let seg1 = segs1[i], seg2 = segs2[j];
                 counter++
-                let int = getIntersection(seg1, seg2)
+                let int = seg1.intersection(seg2)
                 if (int && ![0, 1].includes(int.offset)) {
                     let point = new Point(int.x, int.y)
                     let aux1 = seg1.p2

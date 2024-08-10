@@ -18,7 +18,7 @@ const Markings = {Cross, Light, Parking, Start, Stop, Target, Yield}
 
 export default class World {
     roadWidth = 100
-    roadRoundness = 1
+    roadRoundness = 6
     buildingWidth = 150
     buildingMinLength = 150
     spacing = 50
@@ -204,7 +204,7 @@ export default class World {
 
     inRenderBox
 
-    draw(ctx, viewPort, showStartMarkings = true) {
+    draw(ctx, viewPort, {showStartMarkings = true, showItems = true}) {
         let viewPoint = scale(viewPort.getOffset(), -1)
         for (let env of this.envelopes) {
             env.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
@@ -229,18 +229,18 @@ export default class World {
         }
         ctx.globalAlpha = 1
         this.bestCar?.draw(ctx, true)
-
-        let items = [...this.buildings, ...this.trees]
-            .filter(item => viewPort.inRenderBox(item.base.points))
-            .sort((a, b) =>
-                b.base.distanceToPoint(viewPoint) -
-                a.base.distanceToPoint(viewPoint)
-            )
-        // ITEMS IS BUILDINGS AND TREES
-        for (let item of items) {
-            item.draw(ctx, viewPoint, {drawId: true})
+        if (showItems) {
+            let items = [...this.buildings, ...this.trees]
+                .filter(item => viewPort.inRenderBox(item.base.points))
+                .sort((a, b) =>
+                    b.base.distanceToPoint(viewPoint) -
+                    a.base.distanceToPoint(viewPoint)
+                )
+            // ITEMS IS BUILDINGS AND TREES
+            for (let item of items) {
+                item.draw(ctx, viewPoint, {drawId: true})
+            }
         }
-
 
         // for( const seg of this.laneGuides){
         //     seg.draw(ctx, {color:'red'})

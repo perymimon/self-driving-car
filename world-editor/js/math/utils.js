@@ -165,7 +165,7 @@ export function isPointIntoPolygon(point, poly) {
     const crossSegment = new Segment(outerPoint, point)
     let intersectionCount = 0;
     for (const seg of poly.segments) {
-        const int = getIntersection(crossSegment, seg)
+        const int = crossSegment.intersection(seg)
         if (int) intersectionCount++
     }
     return intersectionCount % 2 == 1

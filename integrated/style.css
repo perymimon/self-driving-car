@@ -10,11 +10,10 @@ body{
 }
 #carCanvas{
     background: #679c35;
-    /*width: 200px*/
 }
-#networkCanvas{
+#networkCanvas,#miniMapCanvas{
     background: #957895;
-    /*width: 200px*/
+
 }
 
 #verticalButtons{

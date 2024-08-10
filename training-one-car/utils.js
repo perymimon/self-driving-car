@@ -79,3 +79,4 @@ function random(min,max,integer = true){
         return Math.floor(result)
     return result
 }
+
