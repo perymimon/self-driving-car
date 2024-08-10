@@ -62,7 +62,7 @@ export default class Polygon {
 
     #intersectCircumCircles(poly, spacing = 0) {
         let dis = distance(this.centeroid, poly.centeroid)
-        return dis <= this.radius + poly.radius() + spacing
+        return dis <= this.radius + poly.radius + spacing
     }
 
     // getCircumscribedRadius

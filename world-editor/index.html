@@ -45,8 +45,6 @@
     import CrossEditor from "./js/editors/crossEditor.js";
     import ViewPort from "./js/viewport.js";
     import World from "./js/world.js"
-    import Polygon from "./js/primitives/polygon.js";
-    import {scale} from "./js/math/utils.js";
     import StartEditor from "./js/editors/startEditor.js";
     import YieldEditor from "./js/editors/yieldEditor.js";
     import ParkingEditor from "./js/editors/parkingEditor.js";
@@ -64,19 +62,15 @@
     const worldInfo = worldString ? JSON.parse(worldString) : null
 
     var world = worldInfo ? World.Load(worldInfo) : new World(new Graph())
+    var viewPort = null
+    var tools = {}
 
-    // // const graph = new Graph([p1, p2, p3, p4], [s1, s3])
-    // const graph = graphInfo ? Graph.Load(graphInfo) : new Graph()
-    // const world = new World(graph)
-
-    const viewPort = new ViewPort(editorCanvas, world.zoom, world.offset)
-
-    var tools = generateTools()
-
+    restart(world)
     setMode('graph')
 
-    function generateTools(){
-        return {
+    function restart(world) {
+        viewPort = new ViewPort(editorCanvas, world.zoom, world.offset)
+        tools = {
             graph: {editor: new GraphEditor(viewPort, world.graph)},
             stop: {editor: new StopEditor(viewPort, world)},
             cross: {editor: new CrossEditor(viewPort, world)},
@@ -86,6 +80,7 @@
             target: {editor: new TargetEditor(viewPort, world)},
             light: {editor: new LightEditor(viewPort, world)},
         }
+
 
     }
 
@@ -120,7 +115,7 @@
                 let jsonData = JSON.parse(fileContent)
 
                 world = World.Load(jsonData)
-                tools = generateTools()
+                restart(world)
                 // localStorage.setItem('world', JSON.stringify(world))
             }
         }

@@ -225,10 +225,10 @@ export default class World {
 
         ctx.globalAlpha = .2
         for (let car of this.cars) {
-            car.draw(ctx, 'blue')
+            car.draw(ctx)
         }
         ctx.globalAlpha = 1
-        this.bestCar?.draw(ctx, 'blue', true)
+        this.bestCar?.draw(ctx, true)
 
         let items = [...this.buildings, ...this.trees]
             .filter(item => viewPort.inRenderBox(item.base.points))
