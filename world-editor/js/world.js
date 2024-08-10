@@ -18,7 +18,7 @@ const Markings = {Cross, Light, Parking, Start, Stop, Target, Yield}
 
 export default class World {
     roadWidth = 100
-    roadRoundness = 10
+    roadRoundness = 1
     buildingWidth = 150
     buildingMinLength = 150
     spacing = 50
@@ -41,6 +41,16 @@ export default class World {
 
         if (graph)
             this.generate()
+    }
+
+    dispose() {
+        this.graph.dispose()
+        this.envelopes = []
+        this.roadBorders = []
+        this.buildings = []
+        this.trees = []
+        this.laneGuides = []
+        this.markings = []
     }
 
     static Load(info) {
@@ -77,14 +87,15 @@ export default class World {
 
     generate() {
         let {graph, roadRoundness, roadWidth} = this
-        this.envelopes = graph.segments.map(
-            seg => new Envelope(seg, roadWidth, roadRoundness)
+        this.envelopes = graph.segments.map(seg =>
+            new Envelope(seg, roadWidth, roadRoundness)
         )
 
-        this.roadBorders = Polygon.union(this.envelopes.map(env => env.poly));
+        this.roadBorders = Polygon.multiUnion(this.envelopes.map(env => env.poly));
 
         this.buildings = this.#generateBuildings()
-        this.trees = this.#generatedTrees(30)
+        let treeCount = Math.min(10, this.buildings.length / 10)
+        this.trees = this.#generatedTrees(treeCount)
         this.laneGuides = this.#generateLaneGuides()
     }
 
@@ -99,17 +110,20 @@ export default class World {
                 ),
             )
         }
-        return Polygon.union(tmpEnvelope.map(seg => seg.poly))
+        return Polygon.multiUnion(tmpEnvelope.map(seg => seg.poly))
     }
 
     #generateBuildings() {
         const tmpEvnelope = []
-        for (let seg of this.graph.segments) {
+        let segments = this.graph.segments
+
+        for (let seg of segments) {
             tmpEvnelope.push(
                 new Envelope(seg, this.roadWidth + this.buildingWidth + this.spacing * 2, this.roadRoundness),
             )
         }
-        let guidesSegments = Polygon.union(tmpEvnelope.map(env => env.poly))
+
+        let guidesSegments = Polygon.multiUnion(tmpEvnelope.map(env => env.poly))
         guidesSegments = guidesSegments.filter(seg => seg.length() >= this.buildingMinLength)
 
         let supports = []
@@ -138,8 +152,11 @@ export default class World {
             for (let base2 of bases.slice(i + 1)) {
                 if (removed.has(base2)) continue
                 let removing = false
-                removing = removing || base1.intersectCircumCircles(base2, this.spacing) && base1.intersectPoly(base2)
-                removing = removing || base1.distanceToPoly(base2) < this.spacing - eps
+
+                removing = removing
+                    || base1.intersectPoly(base2, this.spacing)
+                    || base1.distanceToPoly(base2) < this.spacing - eps
+
                 if (removing) removed.add(base2)
             }
         }
@@ -147,7 +164,7 @@ export default class World {
         return bases.map(b => new Building(b, 200))
     }
 
-    #generatedTrees(count = 10, tryCount = 30) {
+    #generatedTrees(count = 10, tryCount = 40) {
         let points = [
             ...this.roadBorders.map(s => [s.p1, s.p2]).flat(),
             ...this.buildings.map(p => p.base.points).flat()
@@ -169,9 +186,10 @@ export default class World {
                 lerp(left, right, Math.random()),
                 lerp(top, bottom, Math.random())
             )
-            let keep = !illegalPoly.some(poly => poly.containsPoint(p))
-            keep = keep && !illegalPoly.some(poly => poly.distanceToPoint(p) < this.treeSize / 2)
-            keep = keep && !trees.some(tree => distance(tree.center, p) < this.treeSize)
+            let keep = !illegalPoly.some(poly => poly.containsPoint(p, this.treeSize / 2))
+                && !illegalPoly.some(poly => poly.distanceToPoint(p) < this.treeSize / 2)
+                && !trees.some(tree => distance(tree.center, p) < this.treeSize)
+
             let closeToSomething = illegalPoly.some(poly => poly.distanceToPoint(p) <= this.treeSize * 2)
             keep = keep && closeToSomething
             if (keep) {
@@ -184,13 +202,16 @@ export default class World {
         return trees
     }
 
-    draw(ctx, viewPoint, showStartMarkings = true) {
+    inRenderBox
+
+    draw(ctx, viewPort, showStartMarkings = true) {
+        let viewPoint = scale(viewPort.getOffset(), -1)
         for (let env of this.envelopes) {
             env.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
         }
 
         for (let marking of this.markings) {
-            if(showStartMarkings == false && marking instanceof Start) continue
+            if (showStartMarkings == false && marking instanceof Start) continue
             marking.draw(ctx);
         }
 
@@ -210,11 +231,12 @@ export default class World {
         this.bestCar?.draw(ctx, 'blue', true)
 
         let items = [...this.buildings, ...this.trees]
+            .filter(item => viewPort.inRenderBox(item.base.points))
             .sort((a, b) =>
                 b.base.distanceToPoint(viewPoint) -
                 a.base.distanceToPoint(viewPoint)
             )
-        // items is buildings and trees
+        // ITEMS IS BUILDINGS AND TREES
         for (let item of items) {
             item.draw(ctx, viewPoint, {drawId: true})
         }

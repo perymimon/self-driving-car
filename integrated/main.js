@@ -1,7 +1,7 @@
 import Graph from '../world-editor/js/math/graph.js'
 import ViewPort from "../world-editor/js/viewport.js";
 import World from "../world-editor/js/world.js"
-import {angle, scale} from "../world-editor/js/math/utils.js";
+import {angle} from "../world-editor/js/math/utils.js";
 import Start from "../world-editor/js/markings/start.js";
 import Point from "../world-editor/js/primitives/point.js";
 
@@ -19,46 +19,70 @@ const networkCtx = networkCanvas.getContext('2d');
 
 const worldString = localStorage.getItem('world')
 const worldInfo = worldString ? JSON.parse(worldString) : null
-const world = worldInfo ? World.Load(worldInfo) : new World(new Graph())
+let world = worldInfo ? World.Load(worldInfo) : new World(new Graph())
 const viewPort = new ViewPort(carCanvas, world.zoom, world.offset)
 
-const N = 100
-const cars = generateCars(N)
-var bestCar = cars[0]
-var goodCars = [...cars]
-
-if (localStorage.getItem('bestBrain')) {
-    let bestBrain = JSON.parse(localStorage.getItem('bestBrain'));
-    for (let car of cars) {
-        let brain = structuredClone(bestBrain)
-        car.brain = NeuralNetwork.mutate(brain, 0.1);
-    }
-    cars[0].brain = bestBrain
-}
-
-
+const N = 10
+var cars = []
+var bestCar = null
 var traffic = []
-var roadBorders = world.roadBorders
-    // .map(b => b.base.segments)
-    // .flat()
-    .map(s => [s.p1, s.p2])
+var roadBorders = []
+
+function restart() {
+    cars = generateCars(N)
+    bestCar = cars[0]
+    if (localStorage.getItem('bestBrain')) {
+        let bestBrain = JSON.parse(localStorage.getItem('bestBrain'));
+        for (let car of cars) {
+            let brain = structuredClone(bestBrain)
+            car.brain = NeuralNetwork.mutate(brain, 0.1);
+        }
+        cars[0].brain = bestBrain
+    }
+    roadBorders = world.roadBorders
+        // .map(b => b.base.segments)
+        // .flat()
+        .map(s => [s.p1, s.p2])
+
+}
 
 animate()
 
 function generateCars(N) {
     const start = world.markings.filter(m => m instanceof Start).at(0)
     let point = start?.center ?? new Point(100, 100)
-    let dir = start.directionVector ?? new Point(0, -1)
+    let dir = start?.directionVector ?? new Point(0, -1)
     return Array.from(Array(N), () => new Car(point.x, point.y, 30, 50, "AI", Math.PI / 2 - angle(dir), 4, 'red'))
 }
 
-function save() {
+document.getElementById('saveBrain').addEventListener('click', function save() {
     localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain))
-}
+})
 
-function discard() {
+document.getElementById('discardBrain').addEventListener('click', function discard() {
     localStorage.removeItem('bestBrain')
-}
+})
+
+document.getElementById('fileInput').addEventListener('change', function load(event) {
+        const file = event.target.files[0]
+        if (!file) {
+            alert('No File selected')
+            return
+        }
+        let reader = new FileReader()
+        reader.onload = (evt) => {
+            let fileContent = evt.target.result
+            let jsonData = JSON.parse(fileContent)
+
+            world = World.Load(jsonData)
+            restart()
+        }
+        reader.readAsText(file)
+
+    }
+)
+
+
 
 function animate(time) {
     // ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -67,25 +91,21 @@ function animate(time) {
         car.update(roadBorders, [])
     }
     let max = Math.max(...cars.map(c => c.fitness))
+
+    for (let car of cars.filter(car => !car.damage)) {
+        car.update(roadBorders, traffic)
+    }
     bestCar = cars.find(c => c.fitness == max)
 
-    // let farestCar = goodCars.reduce((best, car) => best.y > car.y ? car : best)
-    for (let car of goodCars) {
-        // if (Math.abs(farestCar.y - car.y) > carCanvas.height) {
-        //     car.damage = true
-        // } else {
-        car.update(roadBorders, traffic)
-        // }
+    if (bestCar) {
+        viewPort.offset.x = -bestCar.x
+        viewPort.offset.y = -bestCar.y
     }
-    goodCars = goodCars.filter(car => !car.damage)
 
-    viewPort.offset.x = -bestCar.x
-    viewPort.offset.y = -bestCar.y
 
     viewPort.reset()
-    let viewPoint = scale(viewPort.getOffset(), -1)
 
-    world.draw(carCtx, viewPoint, false)
+    world.draw(carCtx, viewPort, false)
 
     for (let car of traffic) {
         car.draw(carCtx, 'red')
@@ -99,6 +119,6 @@ function animate(time) {
     networkCtx.lineDashOffset = -time / 50
 
     networkCtx.clearRect(0, 0, networkCanvas.width, networkCanvas.height)
-    Visualizer.drawNetwork(networkCtx, bestCar.brain)
+    if (bestCar) Visualizer.drawNetwork(networkCtx, bestCar.brain)
     requestAnimationFrame(animate)
 }

@@ -9,9 +9,10 @@
 <div id="controls">
     <button id="disposeButton">🗑️</button>
     <button id="saveButton">💾</button>
-    <label>📁<input type="file" id="fileInput" accept='.world' > </label>
+    <label>📁<input type="file" id="fileInput" accept='.world'> </label>
+    <button id="openOSMModal">🌍</button>
     |
-    <form id="graphTools" style="display:inline-block">
+    <form id="graphTools" class="toolbar" style="display:inline-block">
         <label>🌐<input type="radio" name="graph" value="graph"/></label>
         <label>🔴<input type="radio" name="graph" value="stop"/></label>
         <label>🚶<input type="radio" name="graph" value="cross"/></label>
@@ -20,8 +21,22 @@
         <label>🚦<input type="radio" name="graph" value="light"/></label>
         <label>🎯<input type="radio" name="graph" value="target"/></label>
     </form>
+
+    <button id="generateButton">⚒️</button>
+
 </div>
-<canvas id="editorCanvas"></canvas>
+<div class="canvasContainer">
+    <canvas id="editorCanvas"></canvas>
+</div>
+<!-- The Modal -->
+<dialog id="myModal">
+    <h2>Open Street Map Input</h2>
+    <textarea id="osmInput"></textarea>
+    <div class="toolbar">
+        <button id="processModalBtn">Process</button>
+        <button id="closeModalBtn">Close</button>
+    </div>
+</dialog>
 
 <script type="module">
     import Graph from './js/math/graph.js'
@@ -37,17 +52,18 @@
     import ParkingEditor from "./js/editors/parkingEditor.js";
     import TargetEditor from "./js/editors/targetEditor.js";
     import LightEditor from "./js/editors/lightEditor.js";
-
-    editorCanvas.width = innerWidth
-    editorCanvas.height = innerHeight
+    import {parseRoads} from "./js/math/osm.js";
 
     const ctx = editorCanvas.getContext('2d')
+
+    var rect = editorCanvas.parentNode.getBoundingClientRect();
+    editorCanvas.width = rect.width;
+    editorCanvas.height = rect.height - 31;
 
     const worldString = localStorage.getItem('world')
     const worldInfo = worldString ? JSON.parse(worldString) : null
 
     var world = worldInfo ? World.Load(worldInfo) : new World(new Graph())
-    const graph = world.graph
 
     // // const graph = new Graph([p1, p2, p3, p4], [s1, s3])
     // const graph = graphInfo ? Graph.Load(graphInfo) : new Graph()
@@ -55,47 +71,34 @@
 
     const viewPort = new ViewPort(editorCanvas, world.zoom, world.offset)
 
-    const tools = {
-        graph: {editor: new GraphEditor(viewPort, graph)},
-        stop: {editor: new StopEditor(viewPort, world)},
-        cross: {editor: new CrossEditor(viewPort, world)},
-        start: {editor: new StartEditor(viewPort, world)},
-        yield: {editor: new YieldEditor(viewPort, world)},
-        parking: {editor: new ParkingEditor(viewPort, world)},
-        target: {editor: new TargetEditor(viewPort, world)},
-        light: {editor: new LightEditor(viewPort, world)},
+    var tools = generateTools()
+
+    setMode('graph')
+
+    function generateTools(){
+        return {
+            graph: {editor: new GraphEditor(viewPort, world.graph)},
+            stop: {editor: new StopEditor(viewPort, world)},
+            cross: {editor: new CrossEditor(viewPort, world)},
+            start: {editor: new StartEditor(viewPort, world)},
+            yield: {editor: new YieldEditor(viewPort, world)},
+            parking: {editor: new ParkingEditor(viewPort, world)},
+            target: {editor: new TargetEditor(viewPort, world)},
+            light: {editor: new LightEditor(viewPort, world)},
+        }
+
     }
 
-    animate()
-    var hash = ''
-
-    setMode('target')
-
-    function animate() {
-        viewPort.reset()
-        if (hash != world.hash()) {
-            world.generate()
-            hash = world.hash()
-        }
-        let viewPoint = scale(viewPort.getOffset(), -1)
-        world.draw(ctx, viewPoint)
-        ctx.globalAlpha = 0.3
-        for (let mode in tools) {
-            tools[mode].editor.display()
-        }
-        ctx.globalAlpha = 1
-        new Polygon([]).draw(ctx)
-        requestAnimationFrame(animate)
-
+    document.getElementById('generateButton').onclick = function () {
+        world.generate()
     }
 
     document.getElementById('disposeButton').onclick = function dispose() {
-        tools.graph.editor.dispose()
-        world.markings.length = 0
+        world.dispose()
     }
     document.getElementById('saveButton').onclick = function save() {
         world.offset = viewPort.offset
-        world.zoom  =  viewPort.zoom
+        world.zoom = viewPort.zoom
 
         let a = document.createElement('a')
         a.setAttribute('href', `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(world))}`)
@@ -117,21 +120,47 @@
                 let jsonData = JSON.parse(fileContent)
 
                 world = World.Load(jsonData)
-                localStorage.setItem('world', JSON.stringify(world))
-                location.reload()
-
+                tools = generateTools()
+                // localStorage.setItem('world', JSON.stringify(world))
             }
         }
     )
+    const modal = document.getElementById('myModal')
 
+    document.getElementById('myModal').addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.close();
+        }
+    })
 
+    // Get the button that opens the modal
+    document.getElementById('openOSMModal').addEventListener('click', () => {
+        modal.showModal();
+    })
+
+    // Get the button that closes the modal
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+        modal.close();
+    })
+    document.getElementById('processModalBtn').onclick = function parsePsmData() {
+        if (osmInput.value == "") return
+
+        let {points, segments} = parseRoads(JSON.parse(osmInput.value))
+        world.graph.points = points
+        world.graph.segments = segments
+        world.generate()
+        console.log(world.laneGuides)
+        modal.close()
+    }
+
+    document.getElementById('graphTools').onsubmit = (evt) => evt.preventDefault()
     document.getElementById('graphTools').onchange = function save(e) {
         e.preventDefault()
         let formData = new FormData(this);
         let mode = formData.get('graph')
         setMode(mode)
-
     }
+
 
     function setMode(mode) {
         disableEditors()
@@ -144,6 +173,22 @@
             tools[mode].editor.disable()
         }
     }
+
+    animate()
+
+    function animate() {
+        viewPort.reset()
+
+        world.draw(ctx, viewPort, true)
+        // viewPort.drawRenderBox(ctx)
+        ctx.globalAlpha = 0.3
+        for (let mode in tools) {
+            tools[mode].editor.display()
+        }
+        ctx.globalAlpha = 1
+        requestAnimationFrame(animate)
+    }
+
 </script>
 </body>
 </html>

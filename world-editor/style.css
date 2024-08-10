@@ -1,3 +1,6 @@
+*{
+    box-sizing: border-box;
+}
 body,html{
     margin:0;
     padding:0;
@@ -11,8 +14,11 @@ body,html{
 #editorCanvas{
     background-color: #8aae6f;
 }
-canvas{
+.canvasContainer{
     flex: 1;
+}
+canvas{
+
 }
 label,button{
     display: inline-block;
@@ -30,5 +36,16 @@ label,button{
     }
     input[type=file]{
         display: none;
+    }
+}
+
+dialog{
+    textarea{
+        height: 10em;
+        width: min(80em,50vw);
+    }
+    .toolbar{
+        display: flex;
+        justify-content: space-around;
     }
 }

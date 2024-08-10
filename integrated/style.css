@@ -25,15 +25,27 @@ body{
 
 }
 
-button{
-    border: none;
-    border-radius: 5px;
-    padding: 5px 5px 7px 5px;
-    cursor: pointer;
-    font-size: 30px;
-    filter: grayscale(1);
-}
+
 button:hover{
     filter: grayscale(0);
     background: #939191;
+}
+
+label,button{
+    display: inline-block;
+    background-color: white;
+    border: none;
+    font-size: 20px;
+    border-radius: 10px;
+    text-shadow: 1px -1px 4px rgba(0, 0, 0, 0.69);
+    cursor: pointer;
+    padding: 0.1em;
+    filter: grayscale(1);
+    input{
+        border: none;
+        appearance: textfield;
+    }
+    input[type=file]{
+        display: none;
+    }
 }

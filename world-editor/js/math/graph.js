@@ -9,6 +9,8 @@ export default class Graph {
 
     static Load(info) {
         const points = info.points.map(p => Point.load(p))
+        // let pointMap = new Map(points.map((o,i)=> [o.id, o]))
+
         const segments = info.segments.map(seg => new Segment(
             points.find(p => p.equal(seg.p1)),
             points.find(p => p.equal(seg.p2))

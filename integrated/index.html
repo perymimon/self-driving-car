@@ -8,8 +8,9 @@
 <body>
 <canvas id="carCanvas"></canvas>
 <div id="verticalButtons">
-    <button onclick="save()">💾</button>
-    <button onclick="discard()">🗑️</button>
+    <button id="saveBrain">💾</button>
+    <button id="discardBrain" >🗑️</button>
+    <label>📁<input type="file" id="fileInput" accept='.world'> </label>
 </div>
 <canvas id="networkCanvas"></canvas>
 <script src="../training-one-car/visualizer.js"></script>
@@ -19,5 +20,7 @@
 <script src="../training-one-car/controls.js"></script>
 <script src="../training-one-car/car.js"></script>
 <script src="main.js" type="module"></script>
+
+
 </body>
 </html>

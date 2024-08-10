@@ -13,6 +13,7 @@ export function getNearestPoint(point, points, threshold = Number.MAX_SAFE_INTEG
     })
     return distance(point, nearest) > threshold ? null : nearest
 }
+
 export function getNearestSegment(point, segments, threshold) {
     if (segments.length === 0) return null;
 
@@ -20,13 +21,14 @@ export function getNearestSegment(point, segments, threshold) {
     let nearest = null
     for (let seg of segments) {
         let dist = seg.distanceToPoint(point)
-        if(dist < minDist && dist < threshold) {
+        if (dist < minDist && dist < threshold) {
             minDist = dist
             nearest = seg
         }
     }
     return nearest
 }
+
 export function distance(p1, p2) {
     return Math.hypot(p1.x - p2.x, p1.y - p2.y)
 }
@@ -154,7 +156,7 @@ export function random(min, max, integer = true) {
 export function pseudoRandom(sid) {
     let hash = 0;
     sid = String(sid / 17)
-    hash = Array.from(sid).reduce((sum, c)=> sum * 31 + sid.charCodeAt(c))
+    hash = Array.from(sid).reduce((sum, c) => sum * 31 + sid.charCodeAt(c))
     return Math.abs(Math.cos(hash));
 }
 
@@ -183,12 +185,23 @@ export function getFake3dPoint(point, viewPoint, height) {
 //     console.log(s);
 //     return add(point, scale(dir, s));
 // }
-export function inRange(min,max, value){
-    if(value <= min) return false
-    if(value >= max) return false
+export function inRange(min, max, value) {
+    if (value <= min) return false
+    if (value >= max) return false
     return true
 }
 
-export function perpendicular(p){
+export function perpendicular(p) {
     return new Point(-p.y, p.x)
+}
+
+export function domainMap(v, domain, limit) {
+    let [ds, de] = domain
+    let [ls, le] = limit
+
+    return (v - ds) / (de - ds) * (le - ls) + ls
+}
+
+export function degToRad(deg) {
+    return deg * Math.PI / 180
 }

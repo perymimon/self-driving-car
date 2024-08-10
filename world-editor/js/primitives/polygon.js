@@ -5,7 +5,8 @@ import {drawText, getRandomColor, style} from "../canvas-utils.js";
 
 export default class Polygon {
     static count = 0
-
+    #center = null
+    #radius = null
     constructor(points, label) {
         this.points = points;
         this.segments = []
@@ -14,19 +15,28 @@ export default class Polygon {
         this.segments.push(new Segment(points[i - 1], points[0]));
         this.id = Polygon.count++
         this.label = label
+
+        for(let p of this.points)
+            p.addEventListener('change',e=> {
+                this.#center = null
+                this.#radius = null
+            })
     }
 
-    static load(info){
+    static load(info) {
         return new Polygon(
-            info.points.map(i=> new Point(i.x,i.y)),
+            info.points.map(i => new Point(i.x, i.y)),
         )
     }
+
     containsSegment(seg) {
         const midPoint = average(seg.p1, seg.p2)
         return this.containsPoint(midPoint, seg.p2)
     }
 
-    containsPoint(point) {
+    containsPoint(point, spacing =0) {
+        if (distance(point, this.centeroid) > (this.radius + spacing))
+            return false
         const outerPoint = new Point(-10000, -10000)
         const crossSegment = new Segment(outerPoint, point)
         let intersectionCount = 0;
@@ -37,30 +47,42 @@ export default class Polygon {
         return intersectionCount % 2 == 1
     }
 
-    intersectPoly(poly) {
-        for (let s1 of this.segments) {
-            for (let s2 of poly.segments) {
-                if (getIntersection(s1, s2)) return true
+    intersectPoly(poly , spacing) {
+        if(this.#intersectCircumCircles(poly, spacing)){
+            for (let s1 of this.segments) {
+                for (let s2 of poly.segments) {
+                    if (getIntersection(s1, s2)) return true
+                }
             }
+            return false
         }
         return false
+
     }
 
-    intersectCircumCircles(poly, spacing = 0) {
-        let dis = distance(this.centeroid(), poly.centeroid())
-        return dis <= this.getRadius() + poly.getRadius() + spacing
+    #intersectCircumCircles(poly, spacing = 0) {
+        let dis = distance(this.centeroid, poly.centeroid)
+        return dis <= this.radius + poly.radius() + spacing
     }
 
     // getCircumscribedRadius
-    getRadius() {
-        let centroid = this.centeroid()
-        return this.points.reduce((max, point) => {
-            let dis = distance(point, centroid)
+    get radius() {
+        if (this.#radius) return this.#radius
+        this.#radius = this.points.reduce((max, point) => {
+            let dis = distance(point, this.centeroid)
             return dis > max ? dis : max
         }, 0)
+        this.freezePoints()
+        return this.#radius
     }
 
-    centeroid() {
+    freezePoints() {
+        // Object.freeze(this.points)
+        // this.points.forEach((point) => Object.freeze(point))
+    }
+
+    get centeroid() {
+        if (this.#center) return this.#center
         let {points} = this
         let xSum = 0;
         let ySum = 0;
@@ -84,7 +106,8 @@ export default class Polygon {
         const Cx = xSum / (6 * signedArea);
         const Cy = ySum / (6 * signedArea);
 
-        return new Point(Cx, Cy);
+        this.#center = new Point(Cx, Cy);
+        return this.#center
     }
 
     drawSegment(ctx) {
@@ -99,55 +122,33 @@ export default class Polygon {
         return Math.min(...this.points.map((p) => poly.distanceToPoint(p)));
     }
 
-    static union(polys) {
-        Polygon.multiBreak(polys)
-        const keptSegments = []
-        for (let i = 0; i < polys.length; i++) {
-            for (let seg of polys[i].segments) {
-                let keep = true
-                for (let j = 0; j < polys.length; j++) {
-                    if (i == j) continue
-                    if (polys[j].containsSegment(seg)) {
-                        keep = false
-                        break
-                    }
-                }
-                if (keep)
-                    keptSegments.push(seg)
-            }
+    static multiUnion(polys) {
+        if(polys.length == 0) return []
+        let poly = polys.at(0)
+        for (let i = 1; i < polys.length; i++) {
+            poly = Polygon.union(poly,polys[i])
         }
-        return keptSegments
 
+        return poly.segments
     }
 
-
-    draw(ctx, {
-        stroke = 'blue',
-        lineWidth = 2,
-        fill = "rgba(0,0,255,0.3)",
-        join = "miter",
-        drawCenter = false,
-        drawId = false
-    } = {}) {
-        if (!this.points?.length) return;
-        ctx.beginPath()
-        style(ctx, {fill, stroke, lineWidth, join})
-        ctx.moveTo(this.points[0].x, this.points[0].y)
-        for (let i = 1; i < this.points.length; i++) {
-            ctx.lineTo(this.points[i].x, this.points[i].y)
+    static union(poly1, poly2) {
+        Polygon.break(poly1, poly2)
+        let segments = []
+        for (let seg of poly1.segments) {
+            if (!poly2.containsSegment(seg))
+                segments.push(seg)
         }
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        // my extra
-        if (drawCenter || drawId) {
-            let center = this.centeroid()
-            if (drawCenter) center.draw(ctx, {color: 'purple'})
-            if (this.label) drawText(ctx, this.label, center.x, center.y)
-            if (drawId) drawText(ctx, this.id, center.x, center.y)
+        for (let seg of poly2.segments) {
+            if (!poly1.containsSegment(seg))
+                segments.push(seg)
         }
 
+        let poly = new Polygon([])
+        poly.segments = segments
+        return poly
     }
+
 
     static multiBreak(polys) {
         for (let i = 0; i < polys.length; i++) {
@@ -158,6 +159,8 @@ export default class Polygon {
     }
 
     static break(poly1, poly2) {
+        if (poly1.radius + poly2.radius < distance(poly1.centeroid, poly2.centeroid))
+            return
         const segs1 = poly1.segments
         const segs2 = poly2.segments
         let counter = 0
@@ -180,4 +183,31 @@ export default class Polygon {
         // console.log(counter)
     }
 
+    draw(ctx, {
+        stroke = 'blue',
+        lineWidth = 2,
+        fill = "rgba(0,0,255,0.3)",
+        join = "miter",
+        drawCenter = false,
+        drawId = false
+    } = {}) {
+        if (!this.points?.length) return;
+        ctx.beginPath()
+        style(ctx, {fill, stroke, lineWidth, join})
+        ctx.moveTo(this.points[0].x, this.points[0].y)
+        for (let i = 1; i < this.points.length; i++) {
+            ctx.lineTo(this.points[i].x, this.points[i].y)
+        }
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+        // my extra
+        if (drawCenter || drawId) {
+            let center = this.centeroid
+            if (drawCenter) center.draw(ctx, {color: 'purple'})
+            if (this.label) drawText(ctx, this.label, center.x, center.y)
+            if (drawId) drawText(ctx, this.id, center.x, center.y)
+        }
+
+    }
 }

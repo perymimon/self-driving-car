@@ -3,10 +3,11 @@ import Point from "./point.js";
 
 export default class Segment {
     static counter = 0
-    constructor(p1, p2, shape='line') {
+    constructor(p1, p2, oneWay = true, shape='line') {
         this.p1 = p1;
         this.p2 = p2;
         this.shape = shape
+        this.oneWay = oneWay
         this.id = Segment.counter++
         // todo: make arc shape. and make intersection for it
     }

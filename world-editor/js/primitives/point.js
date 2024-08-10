@@ -1,10 +1,37 @@
-export default class Point {
+export default class Point  extends EventTarget{
+    #x =0
+    #y = 0
+    static count = 0
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
+        super()
+        this.#x = x;
+        this.#y = y;
+        this.id = Point.count++
+    }
+    set x(v){
+        this.#x = v
+        this.#trigger('change',{key:'x',value:v})
+    }
+    get x(){
+        return this.#x
+    }
+    set y(v){
+        this.#y = v
+        this.#trigger('change',{key:'y',value:v})
+    }
+    get y(){
+        return this.#y
+    }
+    toJSON(){
+        let {x, y} = this
+        return {x,y}
     }
     static load(p){
         return new Point(p.x, p.y)
+    }
+    #trigger(eventName, detail = {}) {
+        const event = new CustomEvent(eventName, { detail });
+        this.dispatchEvent(event);
     }
     draw(ctx, {size = 18, color="black", outline = false, fill=false} = {}){
         const radius = size / 2
