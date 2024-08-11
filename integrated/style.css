@@ -1,8 +1,7 @@
-body{
+body, html{
     margin: 0;
     background: #4a4a4a;
     display: flex;
-    overflow: hidden;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -11,8 +10,20 @@ body{
 #carCanvas{
     background: #679c35;
 }
+#visualizer{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    position: absolute;
+    right: 0;
+}
 #networkCanvas,#miniMapCanvas{
-    background: #957895;
+    background: rgba(149, 120, 149, 0.46);
+
+}
+#miniMapCanvas{
+    border-radius:50%;
+    border: 1px solid white
 
 }
 
@@ -20,6 +31,8 @@ body{
     display: flex;
     flex-direction: column;
     gap: 5px;
+    position: absolute;
+    left: 0;
 
 
 }

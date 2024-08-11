@@ -11,7 +11,7 @@ carImg.onload = function () {
 
 
 export default class Car {
-    constructor(x, y, width, height, controlType, angle = 0, maxSpeed = 4, color = "blue") {
+    constructor(x, y, width, height, {controlType = 'DUMMY', angle = 0, maxSpeed = 4, color = "blue", label=''} = {}) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -25,7 +25,7 @@ export default class Car {
         this.angle = angle
         this.damage = false
         this.control = controlType
-
+        this.label = label
         this.fitness = 0
 
         this.useBrain = controlType == 'AI'
@@ -113,7 +113,7 @@ export default class Car {
             this.y - Math.cos(Math.PI + this.angle + alpha) * radius
         ))
 
-        return new Polygon(points)
+        return new Polygon(points, this.label)
     }
 
     #move() {
@@ -201,6 +201,7 @@ export default class Car {
             this.width,
             this.height);
         ctx.restore();
+        // this.polygons.draw(ctx);
 
     }
 }

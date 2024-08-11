@@ -42,7 +42,7 @@ export default class Polygon {
         const crossSegment = new Segment(outerPoint, point)
         let intersectionCount = 0;
         for (const seg of this.segments) {
-            const int = getIntersection(crossSegment, seg)
+            const int = crossSegment.intersection(seg)
             if (int) intersectionCount++
         }
         return intersectionCount % 2 == 1
@@ -142,16 +142,35 @@ export default class Polygon {
         return Math.min(...this.points.map((p) => poly.distanceToPoint(p)));
     }
 
+    // static multiUnion(polys) {
+    //     if (polys.length == 0) return []
+    //     let poly = polys.at(0)
+    //     for (let i = 1; i < polys.length; i++) {
+    //         poly = Polygon.union(poly, polys[i])
+    //     }
+    //
+    //     return poly.segments
+    // }
     static multiUnion(polys) {
-        if (polys.length == 0) return []
-        let poly = polys.at(0)
-        for (let i = 1; i < polys.length; i++) {
-            poly = Polygon.union(poly, polys[i])
+        Polygon.multiBreak(polys)
+        const keptSegments = []
+        for (let i = 0; i < polys.length; i++) {
+            for (let seg of polys[i].segments) {
+                let keep = true
+                for (let j = 0; j < polys.length; j++) {
+                    if (i == j) continue
+                    if (polys[j].containsSegment(seg)) {
+                        keep = false
+                        break
+                    }
+                }
+                if (keep)
+                    keptSegments.push(seg)
+            }
         }
+        return keptSegments
 
-        return poly.segments
     }
-
     static union(poly1, poly2) {
         Polygon.break(poly1, poly2)
         let segments = []
@@ -222,12 +241,12 @@ export default class Polygon {
         ctx.fill()
         ctx.stroke()
         // my extra
+        let center = this.centeroid
         if (drawCenter || drawId) {
-            let center = this.centeroid
             if (drawCenter) center.draw(ctx, {color: 'purple'})
-            if (this.label) drawText(ctx, this.label, center.x, center.y)
             if (drawId) drawText(ctx, this.id, center.x, center.y)
         }
+        if (this.label) drawText(ctx, this.label, center.x, center.y, {color:'yellow'})
 
     }
 }

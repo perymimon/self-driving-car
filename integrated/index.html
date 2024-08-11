@@ -6,13 +6,22 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="carCanvas"></canvas>
 <div id="verticalButtons">
     <button id="saveBrain">💾</button>
     <button id="discardBrain">🗑️</button>
     <label>📁<input type="file" id="fileInput" accept='.world'> </label>
+    <button id="resetButton">🔁</button>
+    <label >
+        mutate
+        <input id="mutationInput" type="range" min="0" max="1" step="0.05"/>
+    </label>
+    <label >
+        clones
+        <input id="clonesInput" type="range" min="1" max="1000" step="10"/>
+    </label>
 </div>
-<div>
+<canvas id="carCanvas"></canvas>
+<div id="visualizer">
     <canvas id="networkCanvas"></canvas>
     <canvas id="miniMapCanvas"></canvas>
 </div>

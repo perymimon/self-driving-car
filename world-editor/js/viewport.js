@@ -2,16 +2,17 @@ import Point from "./primitives/point.js";
 import {add, subtract, scale} from "./math/utils.js";
 import Polygon from "./primitives/polygon.js";
 
-export default class Viewport {
+export default class Viewport extends EventTarget{
 
     constructor(canvas, zoom = 1, offset = null) {
+        super()
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
 
         this.zoom = zoom
         this.center = new Point(canvas.width / 2, canvas.height / 2);
         this.offset = offset || scale(this.center, -1)
-
+        this.maxZoom = 10
         this.drag = {
             start: new Point(0, 0),
             end: new Point(0, 0),
@@ -21,7 +22,10 @@ export default class Viewport {
 
         this.#addEventListener()
     }
-
+    #trigger(eventName, detail = {}) {
+        const event = new CustomEvent(eventName, { detail });
+        this.dispatchEvent(event);
+    }
     getRenderBox() {
         let {zoom, center} = this
         let offset = scale(this.getOffset(), -1)
@@ -98,6 +102,7 @@ export default class Viewport {
         if (this.drag.active) {
             this.drag.end = this.getMouse(event)
             this.drag.offset = subtract(this.drag.end, this.drag.start)
+            this.#trigger('change',{})
         }
     }
 
@@ -117,6 +122,7 @@ export default class Viewport {
         let dir = Math.sign(event.deltaY)
         let step = 0.1
         this.zoom += dir * step
-        this.zoom = Math.max(1, Math.min(this.zoom, 5))
+        this.zoom = Math.max(1, Math.min(this.zoom, this.maxZoom))
+        this.#trigger('change',{})
     }
 }

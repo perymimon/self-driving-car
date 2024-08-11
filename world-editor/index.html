@@ -22,10 +22,15 @@
         <label>🎯<input type="radio" name="graph" value="target"/></label>
     </form>
 
-    <button id="generateButton">⚒️</button>
-     <div>
-         <label>🏨<input id="showBuilding" type="checkbox" value="showBuilding"></label>
-     </div>
+    <label class="toolbar">Generates
+        <button id="generateButton">⚒️</button>
+        |
+        <button id="generateRoads">1. 🗺️️</button>
+        <button id="generateBuilding">2.🏨</button>
+        <button id="generateTrees">3.🌲</button>
+        <button id="generateLanes">4.🛣️</button>
+    </label>
+
 
 </div>
 <div class="canvasContainer">
@@ -87,9 +92,12 @@
 
     }
 
-    document.getElementById('generateButton').onclick = function () {
-        world.generate()
-    }
+    /*toolbar*/
+    document.getElementById('generateButton').onclick = () => world.generate()
+    document.getElementById('generateRoads').onclick = () => world.generate({all: false, roads: true})
+    document.getElementById('generateBuilding').onclick = () => world.generate({all: false, buildings: true})
+    document.getElementById('generateTrees').onclick = () => world.generate({all: false, trees: true})
+    document.getElementById('generateLanes').onclick = () => world.generate({all: false, lanes: true})
 
     document.getElementById('disposeButton').onclick = function dispose() {
         world.dispose()
@@ -146,13 +154,13 @@
         let {points, segments} = parseRoads(JSON.parse(osmInput.value))
         world.graph.points = points
         world.graph.segments = segments
-        world.generate()
+        world.generate({buildings: false, trees: false})
         console.log(world.laneGuides)
         modal.close()
     }
 
     document.getElementById('graphTools').onsubmit = (evt) => evt.preventDefault()
-    document.getElementById('graphTools').onchange = function(e) {
+    document.getElementById('graphTools').onchange = function (e) {
         e.preventDefault()
         let formData = new FormData(this);
         let mode = formData.get('graph')
@@ -177,7 +185,7 @@
     function animate() {
         viewPort.reset()
 
-        world.draw(ctx, viewPort, true)
+        world.draw(ctx, viewPort, {showLane:true})
         // viewPort.drawRenderBox(ctx)
         ctx.globalAlpha = 0.3
         for (let mode in tools) {

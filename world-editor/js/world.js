@@ -85,18 +85,28 @@ export default class World {
         return JSON.stringify(this.graph);
     }
 
-    generate() {
+    generate({all = true, buildings = false, trees = false, roads = false, lanes = false} = {}) {
         let {graph, roadRoundness, roadWidth} = this
-        this.envelopes = graph.segments.map(seg =>
-            new Envelope(seg, roadWidth, roadRoundness)
-        )
+        if (all || roads) {
+            this.envelopes = graph.segments.map(seg =>
+                new Envelope(seg, roadWidth, roadRoundness)
+            )
+            this.roadBorders = Polygon.multiUnion(this.envelopes.map(env => env.poly));
+            this.buildings = []
+            this.trees = []
+            this.laneGuides = []
+        }
+        if (all || buildings) {
+            this.buildings = this.#generateBuildings()
+            this.trees = []
+        }
 
-        this.roadBorders = Polygon.multiUnion(this.envelopes.map(env => env.poly));
-
-        this.buildings = this.#generateBuildings()
-        let treeCount = Math.min(10, this.buildings.length / 10)
-        this.trees = this.#generatedTrees(treeCount)
-        this.laneGuides = this.#generateLaneGuides()
+        if (all || trees) {
+            let treeCount = Math.min(10, this.buildings.length / 10)
+            this.trees = trees ? this.#generatedTrees(treeCount) : []
+        }
+        if (all || lanes)
+            this.laneGuides = this.#generateLaneGuides()
     }
 
     #generateLaneGuides() {
@@ -204,7 +214,7 @@ export default class World {
 
     inRenderBox
 
-    draw(ctx, viewPort, {showStartMarkings = true, showItems = true}) {
+    draw(ctx, viewPort, {showStartMarkings = true, showItems = true, showLane = false} = {}) {
         let viewPoint = scale(viewPort.getOffset(), -1)
         for (let env of this.envelopes) {
             env.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
@@ -241,10 +251,10 @@ export default class World {
                 item.draw(ctx, viewPoint, {drawId: true})
             }
         }
-
-        // for( const seg of this.laneGuides){
-        //     seg.draw(ctx, {color:'red'})
-        // }
+        if (showLane)
+            for (const seg of this.laneGuides) {
+                seg.draw(ctx, {color: 'red'})
+            }
 
     }
 

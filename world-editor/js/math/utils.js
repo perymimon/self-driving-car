@@ -205,3 +205,4 @@ export function domainMap(v, domain, limit) {
 export function degToRad(deg) {
     return deg * Math.PI / 180
 }
+

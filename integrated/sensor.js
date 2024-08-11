@@ -1,22 +1,33 @@
 import Segment from "../world-editor/js/primitives/segment.js";
+import Region from "../world-editor/js/math/region.js";
 
 export default class Sensor {
     constructor(car) {
         this.car = car
         this.rayCount = 6
         this.rayLength = 150
+        this.radius = 700
         this.raySpread = Math.PI / 2
 
         this.rays = []
         this.readings = []
+        this.region = new Region(this.car, this.radius, this.rayLength)
+        this.bordersRegion = null
     }
 
+
     update(roadBorders, traffic) {
+        let {region} = this
+        if(region.update(this.car) || !this.bordersRegion){
+            this.bordersRegion = roadBorders.filter(seg=>
+                region.inside(seg.p1) ||region.inside(seg.p2)
+            )
+        }
         this.#castRays()
         this.readings = []
         for (let ray of this.rays) {
             this.readings.push(
-                this.#getReading(ray, roadBorders, traffic)
+                this.#getReading(ray, this.bordersRegion, traffic)
             )
         }
     }
