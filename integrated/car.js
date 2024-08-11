@@ -3,7 +3,7 @@ import Polygon from "../world-editor/js/primitives/polygon.js";
 import Point from "../world-editor/js/primitives/point.js";
 
 const carImg = new Image();
-carImg.src = "/car.png"
+carImg.src = "../car.png"
 const resolver = Promise.withResolvers()
 carImg.onload = function () {
     resolver.resolve()

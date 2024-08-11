@@ -1,5 +1,5 @@
 const carImg = new Image();
-carImg.src = "/car.png"
+carImg.src = "../car.png"
 const resolver = Promise.withResolvers()
 carImg.onload = function(){
     resolver.resolve()
