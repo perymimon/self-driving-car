@@ -63,7 +63,7 @@ function animate(time) {
         if (!(bestCar.y - car.y < -carCanvas.height)) continue
         let lance = random(0, lanes)
         let y = bestCar.y - carCanvas.height * 0.7 - random(0, 10) * 100
-        let newCar = new Car(road.getLaneCenter(lance), y, 30, 50, "DUMMY", 2)
+        let newCar = new Car(road.getLaneCenter(lance), y, 30, 50, "DUMMY", 0, 3 )
         traffic.splice(i, 1, newCar)
     }
 
