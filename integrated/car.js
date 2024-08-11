@@ -11,10 +11,7 @@ carImg.onload = function () {
 
 
 export default class Car {
-    constructor(x, y, width, height, {
-        controlType = 'DUMMY', angle = 0, maxSpeed = 4,
-        color = "blue", label = ''
-    } = {}) {
+    constructor(x, y, width, height, {controlType = 'DUMMY', angle = 0, maxSpeed = 4, color = "blue", label=''} = {}) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -55,7 +52,7 @@ export default class Car {
             maskCtx.globalCompositeOperation = "destination-atop";
             maskCtx.drawImage(carImg, 0, 0, this.width, this.height);
         })
-        debugger
+
 
     }
 
