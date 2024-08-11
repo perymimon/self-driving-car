@@ -11,7 +11,7 @@ export default class Start extends Marking{
     }
 
     draw(ctx, viewPoint) {
-
+        if(!this.img.complete || this.img.naturalHeight == 0) return
         // this.poly.draw(ctx, viewPoint);
         ctx.save()
         ctx.translate(this.center.x, this.center.y)

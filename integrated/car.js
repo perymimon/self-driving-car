@@ -11,7 +11,10 @@ carImg.onload = function () {
 
 
 export default class Car {
-    constructor(x, y, width, height, {controlType = 'DUMMY', angle = 0, maxSpeed = 4, color = "blue", label=''} = {}) {
+    constructor(x, y, width, height, {
+        controlType = 'DUMMY', angle = 0, maxSpeed = 4,
+        color = "blue", label = ''
+    } = {}) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -52,7 +55,7 @@ export default class Car {
             maskCtx.globalCompositeOperation = "destination-atop";
             maskCtx.drawImage(carImg, 0, 0, this.width, this.height);
         })
-
+        debugger
 
     }
 
@@ -143,6 +146,31 @@ export default class Car {
         this.y -= Math.cos(this.angle) * this.speed
     }
 
+    draw(ctx, drawSensor = false) {
+        if (!carImg.complete || carImg.naturalHeight == 0  ) return
+        resolver.drawSensor && this.sensors?.draw(ctx)
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(-this.angle);
+        if (!this.damage) {
+            ctx.drawImage(this.mask,
+                -this.width / 2,
+                -this.height / 2,
+                this.width,
+                this.height);
+            ctx.globalCompositeOperation = "multiply";
+        }
+        ctx.drawImage(carImg,
+            -this.width / 2,
+            -this.height / 2,
+            this.width,
+            this.height);
+        ctx.restore();
+        // this.polygons.draw(ctx);
+
+    }
+
     // draw(ctx) {
     //     ctx.save()
     //     ctx.translate(this.x, this.y)
@@ -181,27 +209,4 @@ export default class Car {
     //
     //
     // }
-    draw(ctx, drawSensor = false) {
-        drawSensor && this.sensors?.draw(ctx)
-
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(-this.angle);
-        if (!this.damage) {
-            ctx.drawImage(this.mask,
-                -this.width / 2,
-                -this.height / 2,
-                this.width,
-                this.height);
-            ctx.globalCompositeOperation = "multiply";
-        }
-        ctx.drawImage(carImg,
-            -this.width / 2,
-            -this.height / 2,
-            this.width,
-            this.height);
-        ctx.restore();
-        // this.polygons.draw(ctx);
-
-    }
 }

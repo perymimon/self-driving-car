@@ -178,6 +178,8 @@ class Car {
     //
     // }
     draw(ctx, drawSensor = false) {
+        if (!carImg.complete || carImg.naturalHeight == 0  ) return
+
         drawSensor && this.sensors?.draw(ctx)
 
         ctx.save();
