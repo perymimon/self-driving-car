@@ -73,31 +73,35 @@
     var viewPort = null
     var tools = {}
 
-    restart(world)
+    restart()
     setMode('graph')
 
-    function restart(world) {
-        viewPort = new ViewPort(editorCanvas, world.zoom, world.offset)
+    function restart(w = world) {
+        viewPort = new ViewPort(editorCanvas, w.zoom, w.offset)
+        disableEditors()
         tools = {
-            graph: {editor: new GraphEditor(viewPort, world.graph)},
-            stop: {editor: new StopEditor(viewPort, world)},
-            cross: {editor: new CrossEditor(viewPort, world)},
-            start: {editor: new StartEditor(viewPort, world)},
-            yield: {editor: new YieldEditor(viewPort, world)},
-            parking: {editor: new ParkingEditor(viewPort, world)},
-            target: {editor: new TargetEditor(viewPort, world)},
-            light: {editor: new LightEditor(viewPort, world)},
+            graph: {editor: new GraphEditor(viewPort, w.graph)},
+            stop: {editor: new StopEditor(viewPort, w)},
+            cross: {editor: new CrossEditor(viewPort, w)},
+            start: {editor: new StartEditor(viewPort, w)},
+            yield: {editor: new YieldEditor(viewPort, w)},
+            parking: {editor: new ParkingEditor(viewPort, w)},
+            target: {editor: new TargetEditor(viewPort, w)},
+            light: {editor: new LightEditor(viewPort, w)},
         }
+    }
 
-
+    function generate(options) {
+        world.generate(options)
+        restart(world)
     }
 
     /*toolbar*/
-    document.getElementById('generateButton').onclick = () => world.generate()
-    document.getElementById('generateRoads').onclick = () => world.generate({all: false, roads: true})
-    document.getElementById('generateBuilding').onclick = () => world.generate({all: false, buildings: true})
-    document.getElementById('generateTrees').onclick = () => world.generate({all: false, trees: true})
-    document.getElementById('generateLanes').onclick = () => world.generate({all: false, lanes: true})
+    document.getElementById('generateButton').onclick = () => generate()
+    document.getElementById('generateRoads').onclick = () => generate({all: false, roads: true})
+    document.getElementById('generateBuilding').onclick = () => generate({all: false, buildings: true})
+    document.getElementById('generateTrees').onclick = () => generate({all: false, trees: true})
+    document.getElementById('generateLanes').onclick = () => generate({all: false, lanes: true})
 
     document.getElementById('disposeButton').onclick = function dispose() {
         world.dispose()
@@ -185,7 +189,7 @@
     function animate() {
         viewPort.reset()
 
-        world.draw(ctx, viewPort, {showLane:true})
+        world.draw(ctx, viewPort, {showLane: true})
         // viewPort.drawRenderBox(ctx)
         ctx.globalAlpha = 0.3
         for (let mode in tools) {
