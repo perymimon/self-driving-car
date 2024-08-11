@@ -21,7 +21,7 @@ export default class MarkingEditor {
     }
     set viewport(viewport) {
         this.#viewport = viewport;
-        viewport.addEventListener('change', evt => {
+        viewport.addEventListener('change', () => {
             this.#inViewSegment = null;
         })
     }

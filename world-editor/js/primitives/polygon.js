@@ -18,7 +18,7 @@ export default class Polygon {
         this.label = label
 
         for (let p of this.points)
-            p.addEventListener('change', e => {
+            p.addEventListener('change', () => {
                 this.#center = null
                 this.#radius = null
             })

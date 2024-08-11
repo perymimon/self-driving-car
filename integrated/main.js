@@ -41,7 +41,7 @@ var traffic = []
 
 restart(world)
 
-function generateCars(N) {
+function generateCars() {
     const starts = world.markings.filter(m => m instanceof Start)
     let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
     let point = start?.center ?? new Point(100, 100)

@@ -154,10 +154,9 @@ export function random(min, max, integer = true) {
 }
 
 export function pseudoRandom(sid) {
-    let hash = 0;
     sid = String(sid / 17)
-    hash = Array.from(sid).reduce((sum, c) => sum * 31 + sid.charCodeAt(c))
-    return Math.abs(Math.cos(hash));
+    let hash = Array.from(sid).reduce((sum, c) => sum * 31 + sid.charCodeAt(c))
+    return Math.abs(Math.cos(Number(hash)));
 }
 
 export function isPointIntoPolygon(point, poly) {

@@ -42,7 +42,6 @@ body, html{
 
 label,button{
     display: inline-block;
-    background-color: white;
     border: none;
     font-size: 20px;
     border-radius: 10px;
@@ -52,7 +51,7 @@ label,button{
     filter: grayscale(1);
     opacity:0.5;
     width: min-content;
-    background: #59593f;
+    background-color: white;
     color: #ffffff;
     input{
         border: none;
