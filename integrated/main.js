@@ -32,7 +32,7 @@ const networkCtx = networkCanvas.getContext('2d');
 const worldString = localStorage.getItem('world')
 let world = worldString ? World.Load(JSON.parse(worldString) ) : new World(new Graph())
 var viewPort = new ViewPort(carCanvas, world.zoom, world.offset)
-var miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
+var miniMap = null
 
 var cars = []
 var bestCar = null
@@ -75,6 +75,7 @@ function restart(world) {
     // .flat()
     // .map(s => [s.p1, s.p2])
     viewPort = new ViewPort(carCanvas, 1, world.offset)
+    miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
 }
 
 animate()
