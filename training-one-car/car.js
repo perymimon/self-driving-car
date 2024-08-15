@@ -51,6 +51,16 @@ class Car {
 
 
     }
+    load(info){
+        this.brain = info.brain
+        this.maxSpeed = info.maxSpeed
+        this.friction = info.friction
+        this.acceleration = info.acceleration
+        this.sensors.rayCount = info.sensors.rayCount
+        this.sensors.raySpread = info.sensors.rayCount
+        this.sensors.rayLength = info.sensors.rayCount
+        this.sensors.rayOffset = info.sensors.rayOffset
+    }
 
     update(roadBorders, traffic) {
         if (this.damage) return false
@@ -66,6 +76,8 @@ class Car {
 
             if (this.useBrain) {
                 const offsets = this.sensors.readings.map(s => s == null ? 0 : 1 - s.offset)
+                offsets.push(this.speed/this.maxSpeed)
+
                 const outputs = NeuralNetwork.feedForward(offsets, this.brain)
                 this.controls.forward = outputs[0]
                 this.controls.left = outputs[1]

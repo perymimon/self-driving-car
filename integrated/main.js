@@ -6,8 +6,9 @@ import Start from "../world-editor/js/markings/start.js";
 import Point from "../world-editor/js/primitives/point.js";
 import MiniMap from "../world-editor/js/visualizer/miniMap.js"
 import Car from "./car.js"
+import {loadJsonFile} from "./operationUtil.js";
 
-const N = 1000
+const N = 1
 const mutate = 0.2
 
 mutationInput.value = mutate
@@ -30,7 +31,9 @@ const networkCtx = networkCanvas.getContext('2d');
 
 
 const worldString = localStorage.getItem('world')
-let world = worldString ? World.Load(JSON.parse(worldString) ) : new World(new Graph())
+var world = worldString ? World.Load(JSON.parse(worldString)) : new World(new Graph())
+var  carString = localStorage.getItem('car')
+var moldCar = carString? JSON.parse(carString) : null
 var viewPort = new ViewPort(carCanvas, world.zoom, world.offset)
 var miniMap = null
 
@@ -46,22 +49,26 @@ function generateCars() {
     let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
     let point = start?.center ?? new Point(100, 100)
     let dir = start?.directionVector ?? new Point(0, -1)
-    let cars = Array.from({length: Number(clonesInput.value)}, (_, inx) =>
-        new Car(point.x, point.y, 30, 50, {
-            controlType: 'AI',
-            angle: Math.PI / 2 - angle(dir),
-            maxSpeed: 4,
-            color: "red",
-            label: String(inx)
-        }))
-    if (localStorage.getItem('bestBrain')) {
-        let bestBrain = JSON.parse(localStorage.getItem('bestBrain'));
-        for (let car of cars) {
-            let brain = structuredClone(bestBrain)
-            car.brain = NeuralNetwork.mutate(brain, Number(mutationInput.value));
+    let cars = Array.from({length: Number(clonesInput.value)}, (_, inx) => {
+            let car = new Car(point.x, point.y, 30, 50, {
+                controlType: 'AI',
+                angle: Math.PI / 2 - angle(dir),
+                maxSpeed: 4,
+                color: "red",
+                label: String(inx)
+            })
+            if (moldCar) car.load(moldCar)
+            return car
         }
-        cars[0].brain = bestBrain
-    }
+    )
+    // if (localStorage.getItem('bestBrain')) {
+    //     let bestBrain = JSON.parse(localStorage.getItem('bestBrain'));
+    //     for (let car of cars) {
+    //         let brain = structuredClone(bestBrain)
+    //         car.brain = NeuralNetwork.mutate(brain, Number(mutationInput.value));
+    //     }
+    //     cars[0].brain = bestBrain
+    // }
 
     return cars
 
@@ -84,31 +91,28 @@ function discard() {
     localStorage.removeItem('bestBrain')
 }
 
-function save() {
+function saveBrain() {
     localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain))
 }
 
-function load(event) {
-    const file = event.target.files[0]
-    if (!file) {
-        alert('No File selected')
-        return
-    }
-    let reader = new FileReader()
-    reader.onload = (evt) => {
-        let fileContent = evt.target.result
-        let jsonData = JSON.parse(fileContent)
-
-        world = World.Load(jsonData)
-        restart(world)
-    }
-    reader.readAsText(file)
-
+async function LoadCar(event) {
+    let carJson = await loadJsonFile(event)
+    event.target.value = ''
+    moldCar = carJson
+    localStorage.setItem('car', JSON.stringify(carJson))
+    restart(world)
 }
 
-document.getElementById('saveBrain').addEventListener('click', save)
+async function loadWorld(event) {
+    let worldJson = await loadJsonFile(event)
+    world = World.Load(worldJson)
+    restart(world)
+}
+
+document.getElementById('saveBrain').addEventListener('click', saveBrain)
 document.getElementById('discardBrain').addEventListener('click', discard)
-document.getElementById('fileInput').addEventListener('change', load)
+document.getElementById('worldFileInput').addEventListener('change', loadWorld)
+document.getElementById('carFileInput').addEventListener('change', LoadCar)
 document.getElementById('resetButton').addEventListener('click', _ => restart(world))
 
 

@@ -20,6 +20,7 @@ export default class Segment {
             Point.load(info.p1),
             Point.load(info.p2)
         )
+        this.oneWay = info.oneWay
         seg.shape = info.shape
         seg.id = info.id
         return seg

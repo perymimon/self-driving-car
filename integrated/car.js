@@ -31,9 +31,9 @@ export default class Car {
         this.useBrain = controlType == 'AI'
 
         if (controlType != "DUMMY") {
-            this.sensors = new Sensor(this)
+            this.sensor = new Sensor(this)
             this.brain = new NeuralNetwork([
-                this.sensors.rayCount, 6, 4
+                this.sensor.rayCount, 6, 4
             ])
         }
         this.controls = new Controls(this.control)
@@ -55,7 +55,17 @@ export default class Car {
 
 
     }
-
+    load(info){
+        this.brain = info.brain
+        this.maxSpeed = info.maxSpeed
+        this.friction = info.friction
+        this.control = info.control
+        this.acceleration = info.acceleration
+        this.sensor.rayCount = info.sensor.rayCount
+        this.sensor.raySpread = info.sensor.rayCount
+        this.sensor.rayLength = info.sensor.rayLength
+        this.sensor.rayOffset = info.sensor.rayOffset
+    }
     update(roadBorders, traffic) {
         if (this.damage) return false
 
@@ -65,11 +75,11 @@ export default class Car {
         this.polygons = this.#createPolygon()
         this.damage = this.#assessDamage(roadBorders, traffic)
 
-        if (this.sensors) {
-            this.sensors?.update(roadBorders, traffic)
+        if (this.sensor) {
+            this.sensor?.update(roadBorders, traffic)
 
             if (this.useBrain) {
-                const offsets = this.sensors.readings.map(s => s == null ? 0 : 1 - s.offset)
+                const offsets = this.sensor.readings.map(s => s == null ? 0 : 1 - s.offset)
                 const outputs = NeuralNetwork.feedForward(offsets, this.brain)
                 this.controls.forward = outputs[0]
                 this.controls.left = outputs[1]
@@ -143,13 +153,15 @@ export default class Car {
         this.y -= Math.cos(this.angle) * this.speed
     }
 
-    draw(ctx, drawSensor = false) {
+    draw(ctx, {drawSensor = false}={}) {
         if (!carImg.complete ) return
-        resolver.drawSensor && this.sensors?.draw(ctx)
+        drawSensor && this.sensor?.draw(ctx)
 
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(-this.angle);
+
+
         if (!this.damage) {
             ctx.drawImage(this.mask,
                 -this.width / 2,

@@ -14,7 +14,15 @@ import Target from "./markings/target.js";
 import Yield from "./markings/yield.js";
 import Point from "./primitives/point.js";
 
-const Markings = {Cross, Light, Parking, Start, Stop, Target, Yield}
+const Markings = {
+    'cross': Cross,
+    'light': Light,
+    'parking': Parking,
+    'start': Start,
+    'stop': Stop,
+    'target': Target,
+    'yield': Yield
+}
 
 export default class World {
     roadWidth = 100
@@ -235,10 +243,10 @@ export default class World {
 
         ctx.globalAlpha = .2
         for (let car of this.cars) {
-            car.draw(ctx)
+            car.draw(ctx, {drawSensor: false})
         }
         ctx.globalAlpha = 1
-        this.bestCar?.draw(ctx, true)
+        this.bestCar?.draw(ctx, {drawSensor: true})
         if (showItems) {
             let items = [...this.buildings, ...this.trees]
                 .filter(item => viewPort.inRenderBox(item.base.points))

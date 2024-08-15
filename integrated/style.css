@@ -8,7 +8,7 @@ body, html{
 
 }
 #carCanvas{
-    background: #679c35;
+    background: radial-gradient(circle farthest-side, #5A5, #096);
 }
 #visualizer{
     display: flex;
