@@ -85,7 +85,7 @@ function restart(world) {
     miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
 }
 
-animate()
+
 
 function discard() {
     localStorage.removeItem('bestBrain')
@@ -116,17 +116,34 @@ document.getElementById('carFileInput').addEventListener('change', LoadCar)
 document.getElementById('resetButton').addEventListener('click', _ => restart(world))
 
 
-function animate(time) {
-    // ctx.clearRect(0, 0, canvas.width, canvas.height)
-    viewPort.reset()
+var animationFrameId = 0
+viewPort.addEventListener('change', ()=>{
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = requestAnimationFrame(animate)
+})
 
+update()
+
+function update(time){
+    let somethingUpdate = false
     for (let car of traffic) {
-        car.update(world.roadBorders, [])
+        somethingUpdate = somethingUpdate || car.update(world.roadBorders, [])
     }
 
     for (let car of cars.filter(car => !car.damage)) {
-        car.update(world.roadBorders, traffic)
+        somethingUpdate = somethingUpdate || car.update(world.roadBorders, traffic)
     }
+    if(somethingUpdate){
+        animate(time)
+        requestAnimationFrame(update)
+    }
+}
+
+
+function animate(time) {
+
+    viewPort.reset()
+
     bestCar = cars.reduce((best, current) => {
         return current.fitness > best.fitness ? current : best;
     }, cars[0]);
@@ -149,5 +166,4 @@ function animate(time) {
 
     networkCtx.clearRect(0, 0, networkCanvas.width, networkCanvas.height)
     if (bestCar) Visualizer.drawNetwork(networkCtx, bestCar.brain)
-    requestAnimationFrame(animate)
 }
