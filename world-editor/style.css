@@ -20,6 +20,9 @@ body,html{
 canvas{
 
 }
+label:has(input[type="radio"]:not(:checked)){
+    filter: grayscale(1);
+}
 label,button{
     display: inline-block;
     background-color: white;

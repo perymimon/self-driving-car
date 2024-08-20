@@ -5,6 +5,10 @@ body {
     color: #333;
 }
 
+label{
+    filter:grayscale(100%);
+}
+
 h1 {
     font-family: 'Raleway', sans-serif;
     color: #444;

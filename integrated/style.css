@@ -33,8 +33,9 @@ body, html{
     gap: 5px;
     position: absolute;
     left: 0;
-
-
+}
+canvas:focus{
+    outline: 4px white inset;
 }
 
 

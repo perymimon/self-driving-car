@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Effects</title>
+</head>
+<body>
+<canvas id="audioCanvas"
+        width="1000"
+        height="255"
+        style="border:1px solid"></canvas>
+
+<script type="module">
+    import {wait} from "../js/utils/codeflow-utils.js";
+    import AudioEngine from "../js/Audio/engineAudio.js";
+    let engine = null
+    var analyzer = null
+    var ctx = audioCanvas.getContext('2d')
+
+    window.addEventListener('click', async () => {
+        // await beep(400)
+        // await wait(600)
+        // await beep(400)
+        // await wait(600)
+        // await beep(400)
+        // await wait(600)
+        // beep(700)
+        var engine = new AudioEngine()
+
+    })
+
+
+
+    animate()
+
+    function animate() {
+        ctx.clearRect(0, 0, audioCanvas.width, audioCanvas.height)
+
+        if (analyzer) {
+            let data = new Uint8Array(analyzer.fftSize)
+            analyzer.getByteTimeDomainData(data)
+            ctx.beginPath()
+            for (let [i, d] of data.entries()) {
+                let x = (i / data.length) * audioCanvas.width
+                let y = d
+                if (i == 0) {
+                    ctx.moveTo(x, y)
+                } else {
+                    ctx.lineTo(x, y)
+                }
+            }
+            ctx.stroke()
+        }
+        requestAnimationFrame(animate)
+    }
+
+
+</script>
+</body>
+</html>
