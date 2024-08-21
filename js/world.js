@@ -47,9 +47,6 @@ export default class World {
 
         this.markings = []
 
-        this.startMarker = null
-        this.stopMarker = null
-
         if (graph)
             this.generate()
     }
@@ -96,7 +93,7 @@ export default class World {
         return JSON.stringify(this.graph);
     }
 
-    generate({all = true, buildings = false, trees = false, roads = false, lanes = false} = {}) {
+    generate({all = true, corridor = false, buildings = false, trees = false, roads = false, lanes = false} = {}) {
         let {graph, roadRoundness, roadWidth} = this
         if (all || roads) {
             this.envelopes = graph.segments.map(seg =>
@@ -118,6 +115,17 @@ export default class World {
         }
         if (all || lanes)
             this.laneGuides = this.#generateLaneGuides()
+
+        if (all || corridor) {
+            let startMarker = this.markings.find(m => m instanceof Start)
+            let targetMarker = this.markings.find(m => m instanceof Target)
+            if (startMarker && targetMarker) {
+                let startPoint = startMarker.center
+                let targetPoint = targetMarker.center
+                this.generateCorridor(startPoint, targetPoint)
+            }
+        }
+
     }
 
     generateCorridor(start, end) {
@@ -259,13 +267,9 @@ export default class World {
 
         if (this.corridor)
             for (let seg of this.corridor) {
-                seg.draw(ctx, {color:'red', width:4});
+                seg.draw(ctx, {color: 'red', width: 4});
             }
-        else if (this.startMarker && this.stopMarker) {
-            let start = this.startMarker.center
-            let stop = this.stopMarker.center
-            this.generateCorridor(start, stop)
-        }
+
 
         ctx.globalAlpha = .2
         for (let car of this.cars) {

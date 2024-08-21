@@ -11,17 +11,21 @@ carImg.onload = function () {
 
 
 export default class Car {
-    constructor(x, y, width, height, {controlType = 'DUMMY', angle = 0, maxSpeed = 4, color = "blue", label=''} = {}) {
+    constructor(x, y, width, height, {
+        controlType = 'DUMMY', angle = 0, maxSpeed = 4, color = "blue", label = '',
+        acceleration = 0.2, maxReverseSpeed = -1.5, friction = 0.05,
+
+    } = {}) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
 
         this.speed = 0
-        this.acceleration = 0.2
+        this.acceleration = acceleration
         this.maxSpeed = maxSpeed
-        this.maxReverseSpeed = -1.5
-        this.friction = 0.05
+        this.maxReverseSpeed = maxReverseSpeed
+        this.friction = friction
         this.angle = angle
         this.damage = false
         this.control = controlType
@@ -55,17 +59,40 @@ export default class Car {
 
 
     }
-    load(info){
+
+    load(info) {
         this.brain = info.brain
-        this.maxSpeed = info.maxSpeed
-        this.friction = info.friction
+        // this.maxSpeed = info.maxSpeed
+        // this.friction = info.friction
         this.control = info.control
         this.acceleration = info.acceleration
         this.sensor.rayCount = info.sensor.rayCount
-        this.sensor.raySpread = info.sensor.rayCount
+        this.sensor.raySpread = info.sensor.raySpread
         this.sensor.rayLength = info.sensor.rayLength
         this.sensor.rayOffset = info.sensor.rayOffset
     }
+
+    static load(info, mutation) {
+        // info.controlType = info.type
+        var {x, y, width, height} = info
+        var car = new Car(x, y, width, height, info)
+        car.brain = structuredClone(info.brain)
+        car.sensor = new Sensor(car, {
+            rayCount: info.sensor.rayCount,
+            raySpread : info.sensor.raySpread,
+            rayLength: info.sensor.rayLength,
+            rayOffset: info.sensor.rayOffset,
+            radius: info.sensor.radius,
+        })
+
+
+        if (mutation)
+            NeuralNetwork.mutate(car.brain, mutation);
+
+        return car
+
+    }
+
     update(roadBorders, traffic) {
         if (this.damage) return false
 
@@ -153,8 +180,8 @@ export default class Car {
         this.y -= Math.cos(this.angle) * this.speed
     }
 
-    draw(ctx, {drawSensor = false}={}) {
-        if (!carImg.complete ) return
+    draw(ctx, {drawSensor = false} = {}) {
+        if (!carImg.complete) return
         drawSensor && this.sensor?.draw(ctx)
 
         ctx.save();

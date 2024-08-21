@@ -2,26 +2,27 @@ import Segment from "../primitives/segment.js";
 import Region from "../math/region.js";
 
 export default class Sensor {
-    constructor(car) {
+    constructor(car, {
+        rayCount = 6, rayLength = 150,
+        raySpread = Math.PI / 2, rayOffset = 0
+    } = {}) {
         this.car = car
-        this.rayCount = 6
-        this.rayLength = 150
-        this.radius = 700
-        this.raySpread = Math.PI / 2
-        this.rayOffset = 0
+        this.rayCount = rayCount
+        this.rayLength = rayLength
+        this.raySpread = raySpread
+        this.rayOffset = rayOffset
 
         this.rays = []
         this.readings = []
-        this.region = new Region(this.car, this.radius, this.rayLength)
+        this.region = new Region(this.car, this.rayLength * 3, this.rayLength)
         this.bordersRegion = null
     }
 
-
     update(roadBorders, traffic) {
         let {region} = this
-        if(region.update(this.car) || !this.bordersRegion){
-            this.bordersRegion = roadBorders.filter(seg=>
-                region.inside(seg.p1) ||region.inside(seg.p2)
+        if (region.update(this.car) || !this.bordersRegion) {
+            this.bordersRegion = roadBorders.filter(seg =>
+                region.inside(seg.p1) || region.inside(seg.p2)
             )
         }
         this.#castRays()

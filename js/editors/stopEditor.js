@@ -7,14 +7,12 @@ export default class StopEditor extends MarkingEditor {
     }
 
     createMarking(center, directionVector){
-        let stop = new Stop(
+        return new Stop(
             center,
             directionVector,
-            this.world.roadWidth/2,
-            this.world.roadWidth/2
-        )
-        this.world.stopMarker = stop
-        return stop;
+            this.world.roadWidth / 2,
+            this.world.roadWidth / 2
+        );
     }
 
 }

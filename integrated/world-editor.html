@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>self driving car - world</title>
+    <link rel="stylesheet" href="world-editor.css">
+</head>
+<body>
+<div id="controls">
+    <button id="disposeButton">🗑️</button>
+    <button id="saveButton">💾</button>
+    <label>📁<input type="file" id="fileInput" accept='.world'> </label>
+    <button id="openOSMModal">🌍</button>
+    |
+    <form id="graphTools" class="toolbar" style="display:inline-block">
+        <label title="graph editor">🌐<input type="radio" name="graph" value="graph"/></label>
+        <label title="start editor">🚗<input type="radio" name="graph" value="start"/></label>
+        <label title="target editor">🎯<input type="radio" name="graph" value="target"/></label>
+        <label title="cross editor">🚶<input type="radio" name="graph" value="cross"/></label>
+        <label title="parking editor">🅿️<input type="radio" name="graph" value="parking"/></label>
+        <label title="light editor">🚦<input type="radio" name="graph" value="light"/></label>
+        <label title="stop editor">🔴<input type="radio" name="graph" value="stop"/></label>
+    </form>
+
+    <label class="toolbar">Generates
+        <button id="generateButton">⚒️</button>
+        |
+        <button id="generateRoads">1. 🗺️️</button>
+        <button id="generateBuilding">2.🏨</button>
+        <button id="generateTrees">3.🌲</button>
+        <button id="generateLanes">4.🛣️</button>
+        <button id="generateCorridor">5. 🧱️</button>
+    </label>
+
+
+</div>
+<div class="canvasContainer">
+    <canvas id="editorCanvas"></canvas>
+</div>
+<!-- The Modal -->
+<dialog id="myModal">
+    <h2>Open Street Map Input</h2>
+    <textarea id="osmInput"></textarea>
+    <div class="toolbar">
+        <button id="processModalBtn">Process</button>
+        <button id="closeModalBtn">Close</button>
+    </div>
+</dialog>
+
+<script type="module" src="./world-editor.js"></script>
+</body>
+</html>

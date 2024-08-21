@@ -1,7 +1,7 @@
 import Point from '../primitives/point.js'
 import Segment from '../primitives/segment.js'
 import Dispatcher from "../bases/dispatcher.js";
-import {getNearestSegment, getShortestPath} from "../utils/math-utils.js";
+import {add, getNearestSegment, getShortestPath, scale} from "../utils/math-utils.js";
 
 export default class Graph extends Dispatcher {
     constructor(points = [], segments = []) {
@@ -90,22 +90,24 @@ export default class Graph extends Dispatcher {
         var {point:projStart} = startSeg.projectPoint(start)
         var {point:projEnd} = endSeg.projectPoint(end)
 
+        var startPoint = add(projStart, scale(startSeg.directionVector(),-100))
+        var endPoint = add(projEnd, scale(endSeg.directionVector(),100))
         var tempSeg = [
-            new Segment(startSeg.p1, projStart),
-            new Segment(projStart, startSeg.p2 ),
-            new Segment(endSeg.p1, projEnd),
-            new Segment(projEnd, endSeg.p2 ),
+            new Segment(startSeg.p1, startPoint),
+            new Segment(startPoint, startSeg.p2 ),
+            new Segment(endSeg.p1, endPoint),
+            new Segment(endPoint, endSeg.p2 ),
         ]
         if(startSeg.equal(endSeg))
-            tempSeg.push(new Segment(projStart, projEnd))
+            tempSeg.push(new Segment(startPoint, endPoint))
 
-        this.points.push(projStart,projEnd)
+        this.points.push(startPoint,endPoint)
         this.segments.push(...tempSeg)
 
-        let path = getShortestPath(projStart, projEnd, this)
+        let path = getShortestPath(startPoint, endPoint, this)
 
-        this.removePoint(projStart)
-        this.removePoint(projEnd)
+        this.removePoint(startPoint)
+        this.removePoint(endPoint)
 
         return path
 

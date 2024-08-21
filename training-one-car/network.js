@@ -21,8 +21,7 @@ class NeuralNetwork {
     static mutate(network, amount = 1) {
 
         for (let level of network.levels) {
-            const newBiases = level.biases.map(b => lerp(b, Math.random() * 2 - 1, amount))
-            level.biases = newBiases
+            level.biases = level.biases.map(b => lerp(b, Math.random() * 2 - 1, amount))
 
             const {weights} = level
 
