@@ -70,7 +70,6 @@ export default class World {
         world.buildingMinLength = info.buildingMinLength
         world.spacing = info.spacing
         world.treeSize = info.treeSize
-        if (info.corridor) world.corridor = info.corridor.map(seg => Segment.load(seg))
         world.envelopes = info.envelopes.map((env) => Envelope.load(env))
         world.roadBorders = info.roadBorders.map(seg => Segment.load(seg))
         world.buildings = info.buildings.map((env) => Building.load(env))
@@ -86,6 +85,13 @@ export default class World {
         })
         world.zoom = info.zoom
         world.offset = info.offset
+        // if (info.corridor) world.corridor = {
+        //     borders: info.corridor.borders.map(seg => Segment.load(seg)),
+        //     skeleton: info.corridor.skeleton.map(seg => Segment.load(seg))
+        // }
+        if (info.corridor)
+            world.generate({all:false,corridor:true})
+
         return world
     }
 
@@ -137,7 +143,11 @@ export default class World {
             return seg1
         })
         let tmpEnvelope = segs.map(s => new Envelope(s, this.roadWidth, this.roadRoundness))
-        this.corridor = Polygon.multiUnion(tmpEnvelope.map(env => env.poly))
+        let segments = Polygon.multiUnion(tmpEnvelope.map(env => env.poly))
+        this.corridor = {
+            borders: segments,
+            skeleton: segs
+        }
     }
 
     #generateLaneGuides() {
@@ -245,7 +255,10 @@ export default class World {
 
     inRenderBox
 
-    draw(ctx, viewPort, {showStartMarkings = true, showItems = 1000, showLane = false} = {}) {
+    draw(ctx, viewPort, {
+        showStartMarkings = true, showItems = 1000, showLane = false,
+        drawSensor = true
+    } = {}) {
         let viewPoint = scale(viewPort.getOffset(), -1)
 
         for (let env of this.envelopes) {
@@ -266,7 +279,7 @@ export default class World {
         }
 
         if (this.corridor)
-            for (let seg of this.corridor) {
+            for (let seg of this.corridor.borders) {
                 seg.draw(ctx, {color: 'red', width: 4});
             }
 
@@ -276,7 +289,7 @@ export default class World {
             car.draw(ctx, {drawSensor: false})
         }
         ctx.globalAlpha = 1
-        this.bestCar?.draw(ctx, {drawSensor: true})
+        this.bestCar?.draw(ctx, {drawSensor})
         if (showItems) {
             let items = [...this.buildings, ...this.trees]
                 // .filter(item => viewPort.inRenderBox(item.base.points))

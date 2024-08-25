@@ -12,14 +12,26 @@ body, html{
 }
 #visualizer{
     display: flex;
+    justify-content: flex-end;
     flex-direction: column;
     gap: 0.5em;
     position: absolute;
     inset: 0;
     left: auto;
+    opacity:0.5;
+    margin-inline: .5em;
+
 }
+
+#statistics{
+    background: black;
+    border-radius: 10px;
+    opacity:50%;
+    flex: 1;
+}
+
 #networkCanvas,#miniMapCanvas{
-    background: rgba(149, 120, 149, 0.46);
+    background: rgb(44, 42, 44);
 
 }
 #miniMapCanvas{
