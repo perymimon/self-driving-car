@@ -1,6 +1,6 @@
 import Envelope from "./primitives/envelope.js";
 import Polygon from "./primitives/polygon.js";
-import {add, distance, eps, lerp, scale} from "./utils/math-utils.js";
+import {add, angle, distance, eps, lerp, scale} from "./utils/math-utils.js";
 import Segment from "./primitives/segment.js";
 import Tree from "./items/tree.js";
 import Building from "./items/building.js";
@@ -13,6 +13,7 @@ import Stop from "./markings/stop.js";
 import Target from "./markings/target.js";
 import Yield from "./markings/yield.js";
 import Point from "./primitives/point.js";
+import Car from "./items/car.js";
 
 const Markings = {
     'cross': Cross,
@@ -90,7 +91,7 @@ export default class World {
         //     skeleton: info.corridor.skeleton.map(seg => Segment.load(seg))
         // }
         if (info.corridor)
-            world.generate({all:false,corridor:true})
+            world.generate({all: false, corridor: true})
 
         return world
     }
@@ -132,6 +133,35 @@ export default class World {
             }
         }
 
+    }
+
+    addGenerateCars({N = 1, type = 'AI', mutation = 0, carMold = null} = {}) {
+        const starts = this.markings.filter(m => m instanceof Start)
+        let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
+        let point = start?.center ?? new Point(100, 100)
+        let dir = start?.directionVector ?? new Point(0, -1)
+        // let bestBrain =
+        let cars = Array.from({length: Number(N)}, (_, i) => {
+                var car = null;
+                var brain = JSON.parse(localStorage.getItem('bestBrain'))
+                car = Car.load({
+                    ...carMold,
+                    brain: brain ?? carMold?.brain,
+                    x: point.x,
+                    y: point.y,
+                    width: 30,
+                    height: 50,
+                    controlType: type,
+                    angle: Math.PI / 2 - angle(dir),
+                    maxSpeed: 4,
+                    color: "red",
+                    label: String(i)
+                }, i == 0 ? 0 : mutation)
+
+                return car
+            }
+        )
+        this.cars.push(...cars)
     }
 
     generateCorridor(start, end) {

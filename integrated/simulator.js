@@ -1,11 +1,7 @@
 import Graph from '../js/math/graph.js'
 import ViewPort from "../js/viewport.js";
 import World from "../js/world.js"
-import {angle} from "../js/utils/math-utils.js";
-import Start from "../js/markings/start.js";
-import Point from "../js/primitives/point.js";
 import MiniMap from "../js/visualizer/miniMap.js"
-import Car from "../js/items/car.js"
 import {fetchLastFile, readJsonFile} from "./operationUtil.js";
 
 const N = 1
@@ -31,49 +27,23 @@ const networkCtx = networkCanvas.getContext('2d');
 
 var worldJson = await fetchLastFile('world', './saved/small_with_target.world')
 var world = World.Load(worldJson) ?? new World(new Graph())
-var moldCar = await fetchLastFile('car', './saved/right_hand_rule.car')
+var carMold = await fetchLastFile('car', './saved/right_hand_rule.car')
 var viewPort = new ViewPort(carCanvas, world.zoom, world.offset)
 var miniMap = null
 
-var cars = []
 var bestCar = null
 var traffic = []
 
 reload(world)
 
-function generateCars(N = 1, type = 'AI', mutation = 0) {
-    const starts = world.markings.filter(m => m instanceof Start)
-    let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
-    let point = start?.center ?? new Point(100, 100)
-    let dir = start?.directionVector ?? new Point(0, -1)
-    // let bestBrain =
-    return Array.from({length: Number(N)}, (_, i) => {
-            var car = null;
-        var brain = JSON.parse(localStorage.getItem('bestBrain'))
-            car = Car.load({
-                ...moldCar,
-                brain: brain ?? moldCar.brain,
-                x: point.x,
-                y: point.y,
-                width: 30,
-                height: 50,
-                controlType: type,
-                angle: Math.PI / 2 - angle(dir),
-                maxSpeed: 4,
-                color: "red",
-                label: String(i)
-            }, i == 0 ? 0 : mutation)
-
-            return car
-        }
-    )
-}
 
 function reload(world) {
     let N = Number(clonesInput.value)
     let mutation = Number(mutationInput.value)
-    cars = generateCars(1, 'KEYS').concat(generateCars(N, 'AI', mutation))
-    bestCar = cars.at(0)
+    world.cars.length = 0
+    world.addGenerateCars({N:1, type:'KEYS', carMold:carMold, mutation})
+    world.addGenerateCars({N, type:'AI', carMold:carMold, mutation})
+    bestCar = world.cars.at(0)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
     miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
 }
@@ -88,7 +58,7 @@ function update(time) {
         somethingUpdate = car.update(borders, []) || somethingUpdate
     }
 
-    for (let car of cars.filter(car => !car.damage)) {
+    for (let car of world.cars.filter(car => !car.damage)) {
         somethingUpdate = car.update(borders, traffic) || somethingUpdate
     }
     if (somethingUpdate) {
@@ -108,9 +78,9 @@ function animate(time) {
 
     viewPort.reset()
 
-    bestCar = cars.reduce((best, current) => {
+    bestCar = world.cars.reduce((best, current) => {
         return current.fitness > best.fitness ? current : best;
-    }, cars[0]);
+    }, world.cars[0]);
 
     if (bestCar && !bestCar.damage) {
         viewPort.offset.x = -bestCar.x
@@ -119,11 +89,10 @@ function animate(time) {
 
     viewPort.reset()
 
-    world.cars = cars
     world.bestCar = bestCar
 
     world.draw(carCtx, viewPort, {showStartMarkings: false})
-    miniMap.update(viewPort, cars)
+    miniMap.update(viewPort, world.cars)
     // carCtx.restore()
 
     networkCtx.lineDashOffset = -time / 100
@@ -157,7 +126,7 @@ async function loadWorld(event) {
 async function LoadCar(event) {
     const file = event.target.files[0]
     event.target.value = ''
-    moldCar = await readJsonFile(file, 'carFile')
+    carMold = await readJsonFile(file, 'carFile')
     // localStorage.setItem('car', JSON.stringify(carJson))
     reload(world)
 }

@@ -7,6 +7,7 @@ import Point from "../js/primitives/point.js";
 import MiniMap from "../js/visualizer/miniMap.js"
 import Car from "../js/items/car.js"
 import Segment from "../js/primitives/segment.js";
+import {fetchLastFile} from "./operationUtil.js";
 
 const N = 100,
     mutation = 0.1
@@ -25,10 +26,9 @@ statistics.style.width = rightPanelWidth + "px"
 
 const carCtx = carCanvas.getContext('2d');
 
-const worldString = localStorage.getItem('world')
-var world = worldString ? World.Load(JSON.parse(worldString)) : new World(new Graph())
-var carString = localStorage.getItem('car')
-var moldCar = carString ? JSON.parse(carString) : null
+var worldJson = await fetchLastFile('world', './saved/small_with_target.world')
+var world = World.Load(worldJson) ?? new World(new Graph())
+var carMold = await fetchLastFile('car', './saved/right_hand_rule.car')
 var viewPort = new ViewPort(carCanvas, world.zoom, world.offset)
 var miniMap = null
 
@@ -38,34 +38,12 @@ var frameCount = 0
 
 reload(world)
 
-function generateCars(N = 1, type = 'AI', mutation = 0) {
-    const starts = world.markings.filter(m => m instanceof Start)
-    let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
-    let point = start?.center ?? new Point(100, 100)
-    let dir = start?.directionVector ?? new Point(0, -1)
-    return Array.from({length: Number(N)}, (_, i) => {
-
-            return Car.load({
-                ...moldCar,
-                brain: JSON.parse(localStorage.getItem('bestBrain')) ?? moldCar.brain,
-                x: point.x,
-                y: point.y,
-                width: 30,
-                height: 50,
-                controlType: type,
-                angle: Math.PI / 2 - angle(dir),
-                maxSpeed: 4,
-                color: type == 'AI' ? "red" : 'blue',
-                label: String(i)
-            }, i == 0 ? 0 : mutation)
-
-        }
-    )
-}
 
 function reload(world) {
-    cars = generateCars(1, 'KEYS').concat(generateCars(N, 'AI', mutation))
-    myCar = cars.at(0)
+    world.cars.length = 0
+    world.addGenerateCars({N:1, type:'KEYS', carMold, mutation})
+    world.addGenerateCars({N, type:'AI', carMold, mutation})
+    myCar = world.cars.at(0)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
     miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
 }
@@ -73,7 +51,7 @@ function reload(world) {
 
 update()
 
-for(let car of cars){
+for(let car of world.cars){
     let div = document.createElement('div');
     div.id = car.id
     div.innerText = car.id
@@ -83,9 +61,9 @@ for(let car of cars){
 function update(time) {
     let somethingUpdate = false
     let borders = world.corridor.borders || world.roadBorders
-    let myCar = cars[0]
+    let myCar = world.cars[0]
 
-    for (let car of cars.filter(car => !car.damage)) {
+    for (let car of world.cars.filter(car => !car.damage)) {
         somethingUpdate = car.update(borders, []) || somethingUpdate
 
     }
@@ -110,7 +88,7 @@ viewPort.addEventListener('change', () => {
 function animate() {
     ++frameCount
     viewPort.reset()
-    myCar = cars.at(0)
+    myCar = world.cars.at(0)
     // bestCar = cars.reduce((best, current) => {
     //     return current.fitness > best.fitness ? current : best;
     // }, cars[0]);
@@ -123,11 +101,10 @@ function animate() {
     viewPort.reset()
 
 
-    world.cars = cars
     world.bestCar = myCar
 
     world.draw(carCtx, viewPort, {showStartMarkings: false, drawSensor: false})
-    miniMap.update(viewPort, cars)
+    miniMap.update(viewPort, world.cars)
 
 
 }

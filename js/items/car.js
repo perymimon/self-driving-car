@@ -87,7 +87,6 @@ export default class Car {
             radius: info.sensor.radius,
         })
 
-
         if (mutation)
             NeuralNetwork.mutate(car.brain, mutation);
 
