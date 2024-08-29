@@ -1,7 +1,7 @@
 import {getNearestSegment, inRange} from "../utils/math-utils.js";
 
 export default class MarkingEditor {
-    #inViewSegment = null
+    #segmentsInView = null
     #viewport = null
 
     constructor(viewport, world, targetSegments) {
@@ -24,7 +24,7 @@ export default class MarkingEditor {
     set viewport(viewport) {
         this.#viewport = viewport;
         viewport.addEventListener('change', () => {
-            this.#inViewSegment = null;
+            this.#segmentsInView = null;
         })
     }
 
@@ -37,11 +37,11 @@ export default class MarkingEditor {
         return center
     }
 
-    get inViewSegment() {
-        if (this.#inViewSegment) return this.#inViewSegment;
-        return this.#inViewSegment = this.targetSegments.filter(seg => {
-            return this.viewport.inRenderBox([seg.p1, seg.p2])
-        });
+    get segmentsInView() {
+        if (this.#segmentsInView) return this.#segmentsInView;
+        return this.#segmentsInView = this.targetSegments.filter(
+            seg => this.viewport.inView([seg.p1, seg.p2])
+        );
     }
 
     #addEventListeners() {
@@ -72,7 +72,7 @@ export default class MarkingEditor {
 
         let seg = getNearestSegment(
             this.mouse,
-            this.inViewSegment,
+            this.segmentsInView,
             10 * this.viewport.zoom
         )
         if (seg) {

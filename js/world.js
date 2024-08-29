@@ -33,6 +33,7 @@ export default class World {
     buildingMinLength = 150
     spacing = 50
     treeSize = 160
+    #lastViewPoint = new Point(0, 0)
 
     constructor(graph) {
         this.graph = graph || new Graph();
@@ -135,33 +136,29 @@ export default class World {
 
     }
 
-    addGenerateCars({N = 1, type = 'AI', mutation = 0, carMold = null} = {}) {
+    addGenerateCars({N = 1, type = 'AI', mutation = 0, carMold = null, color = 'red'} = {}) {
         const starts = this.markings.filter(m => m instanceof Start)
         let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
         let point = start?.center ?? new Point(100, 100)
         let dir = start?.directionVector ?? new Point(0, -1)
-        // let bestBrain =
-        let cars = Array.from({length: Number(N)}, (_, i) => {
-                var car = null;
-                var brain = JSON.parse(localStorage.getItem('bestBrain'))
-                car = Car.load({
-                    ...carMold,
-                    brain: brain ?? carMold?.brain,
-                    x: point.x,
-                    y: point.y,
-                    width: 30,
-                    height: 50,
-                    controlType: type,
-                    angle: Math.PI / 2 - angle(dir),
-                    maxSpeed: 4,
-                    color: "red",
-                    label: String(i)
-                }, i == 0 ? 0 : mutation)
-
-                return car
-            }
-        )
-        this.cars.push(...cars)
+        let cars = []
+        var brain = JSON.parse(localStorage.getItem('bestBrain'))
+        for (let i of Array(N).keys()) {
+            cars.push(Car.load({
+                ...carMold,
+                brain: brain ?? carMold?.brain,
+                x: point.x,
+                y: point.y,
+                width: 30,
+                height: 50,
+                controlType: type,
+                angle: Math.PI / 2 - angle(dir),
+                maxSpeed: 4,
+                color,
+                label: String(i)
+            }, i == 0 ? 0 : mutation))
+            this.cars.push(...cars)
+        }
     }
 
     generateCorridor(start, end) {
@@ -320,24 +317,26 @@ export default class World {
         }
         ctx.globalAlpha = 1
         this.bestCar?.draw(ctx, {drawSensor})
-        if (showItems) {
-            let items = [...this.buildings, ...this.trees]
-                // .filter(item => viewPort.inRenderBox(item.base.points))
-                .filter(item => item.base.distanceToPoint(viewPoint) < showItems)
-                .sort((a, b) =>
-                    b.base.distanceToPoint(viewPoint) -
-                    a.base.distanceToPoint(viewPoint)
-                )
-            // ITEMS IS BUILDINGS AND TREES
-            for (let item of items) {
-                item.draw(ctx, viewPoint, {drawId: true})
+        if(!viewPoint.equal(this.#lastViewPoint)) {
+            if (showItems) {
+                let items = [...this.buildings, ...this.trees]
+                    // .filter(item => viewPort.inRenderBox(item.base.points))
+                    .filter(item => item.base.distanceToPoint(viewPoint) < showItems)
+                    .sort((a, b) =>
+                        b.base.distanceToPoint(viewPoint) -
+                        a.base.distanceToPoint(viewPoint)
+                    )
+                // ITEMS IS BUILDINGS AND TREES
+                for (let item of items) {
+                    item.draw(ctx, viewPoint, {drawId: true})
+                }
             }
+            if (showLane)
+                for (const seg of this.laneGuides) {
+                    seg.draw(ctx, {color: 'red'})
+                }
         }
-        if (showLane)
-            for (const seg of this.laneGuides) {
-                seg.draw(ctx, {color: 'red'})
-            }
-
+        this.#lastViewPoint = viewPoint
     }
 
 }

@@ -12,6 +12,7 @@ carImg.onload = function () {
 
 export default class Car {
     static index = 0
+
     constructor(x, y, width, height, {
         controlType = 'DUMMY', angle = 0, maxSpeed = 4, color = "blue", label = '',
         acceleration = 0.2, maxReverseSpeed = -1.5, friction = 0.05,
@@ -22,6 +23,9 @@ export default class Car {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.color = color
+        this.type = controlType
+        this.control = controlType
 
         this.speed = 0
         this.acceleration = acceleration
@@ -30,7 +34,6 @@ export default class Car {
         this.friction = friction
         this.angle = angle
         this.damage = false
-        this.control = controlType
         this.label = label
         this.fitness = 0
 
@@ -79,9 +82,10 @@ export default class Car {
         var {x, y, width, height} = info
         var car = new Car(x, y, width, height, info)
         car.brain = structuredClone(info.brain)
+        // if (info.sensor)
         car.sensor = new Sensor(car, {
             rayCount: info.sensor.rayCount,
-            raySpread : info.sensor.raySpread,
+            raySpread: info.sensor.raySpread,
             rayLength: info.sensor.rayLength,
             rayOffset: info.sensor.rayOffset,
             radius: info.sensor.radius,
@@ -96,7 +100,10 @@ export default class Car {
 
     update(roadBorders, traffic) {
         if (this.damage) return false
-
+        if(this.speed == 0 && this.useBrain) setTimeout(_=>{
+            if(this.speed == 0)
+                this.damage = true
+        }, 500)
         this.#move()
         this.fitness += this.speed
 

@@ -49,7 +49,7 @@ export default class Viewport extends EventTarget{
         center.draw(ctx)
     }
 
-    inRenderBox(points = []) {
+    inView(points = []) {
         let {left, top, bottom, right} = this.getRenderBox()
         return points.some( point => {
             if (point.x < left) return false
