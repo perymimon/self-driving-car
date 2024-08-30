@@ -31,7 +31,7 @@ body, html{
 }
 
 .stat{
-    font-size:xx-large
+    font-size:large
 }
 
 #networkCanvas,#miniMapCanvas{
@@ -83,4 +83,16 @@ label,button{
         filter: grayscale(0);
         background: #939191;
     }
+}
+
+#counter {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    font-size: 40vmin;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: arial, serif;
+    opacity: 0.5;
 }

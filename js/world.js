@@ -87,10 +87,6 @@ export default class World {
         })
         world.zoom = info.zoom
         world.offset = info.offset
-        // if (info.corridor) world.corridor = {
-        //     borders: info.corridor.borders.map(seg => Segment.load(seg)),
-        //     skeleton: info.corridor.skeleton.map(seg => Segment.load(seg))
-        // }
         if (info.corridor)
             world.generate({all: false, corridor: true})
 
@@ -136,7 +132,7 @@ export default class World {
 
     }
 
-    addGenerateCars({N = 1, type = 'AI', mutation = 0, carMold = null, color = 'red'} = {}) {
+    addGenerateCars({N = 1, type = 'AI', mutation = 0, carMold = null, color = 'red', name = ''} = {}) {
         const starts = this.markings.filter(m => m instanceof Start)
         let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
         let point = start?.center ?? new Point(100, 100)
@@ -144,7 +140,7 @@ export default class World {
         let cars = []
         var brain = JSON.parse(localStorage.getItem('bestBrain'))
         for (let i of Array(N).keys()) {
-            cars.push(Car.load({
+            let car = Car.load({
                 ...carMold,
                 brain: brain ?? carMold?.brain,
                 x: point.x,
@@ -156,21 +152,28 @@ export default class World {
                 maxSpeed: 4,
                 color,
                 label: String(i)
-            }, i == 0 ? 0 : mutation))
-            this.cars.push(...cars)
+            }, i == 0 ? 0 : mutation)
+
+            car.name = name.replace('{i}', String(i))
+            cars.push(car)
+
         }
+        this.cars.push(...cars)
     }
 
     generateCorridor(start, end) {
-        var path = this.graph.getShortestPath(start, end)
+        var path = this.graph.getShortestPath(start, end, true)
 
         let segs = []
-        path.reduce((seg0, seg1) => {
+        for(let i of path.keys()){
+            let {[i]:seg0, [i+1]:seg1} = path
+            if(!seg1) break
             segs.push(new Segment(seg0, seg1))
-            return seg1
-        })
+        }
+
         let tmpEnvelope = segs.map(s => new Envelope(s, this.roadWidth, this.roadRoundness))
         let segments = Polygon.multiUnion(tmpEnvelope.map(env => env.poly))
+        segs.pop() // pop the last extra padding segment
         this.corridor = {
             borders: segments,
             skeleton: segs
@@ -317,6 +320,7 @@ export default class World {
         }
         ctx.globalAlpha = 1
         this.bestCar?.draw(ctx, {drawSensor})
+
         if(!viewPoint.equal(this.#lastViewPoint)) {
             if (showItems) {
                 let items = [...this.buildings, ...this.trees]

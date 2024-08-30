@@ -6,6 +6,7 @@ import MiniMap from "../js/visualizer/miniMap.js"
 import Segment from "../js/primitives/segment.js";
 import {fetchLastFile} from "./operationUtil.js";
 import {arrayOrderHash} from "../js/utils/codeflow-utils.js";
+import {Counter} from "./counter.js";
 
 const rightPanelWidth = 300;
 
@@ -28,7 +29,6 @@ var viewPort = new ViewPort(carCanvas, world.zoom, world.offset)
 var miniMap = null
 
 var myCar = null
-var frameCount = 0
 
 var hashCarStatsOrder = -1;
 
@@ -36,60 +36,69 @@ reload(world)
 
 function reload(world) {
     world.cars.length = 0
-    world.addGenerateCars({type: 'KEYS', carMold, color: 'gray'})
-    world.addGenerateCars({N:30, type: 'AI', carMold, mutation:0.1})
+    world.addGenerateCars({type: 'KEYS', carMold, color: 'gray', name: 'Me'})
+    world.addGenerateCars({N: 30, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
     myCar = world.cars.at(0)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
     miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
     updateBoard()
-
+    world.bestCar = myCar
 }
 
 function updateBoard() {
-
     var carEl = []
-    for (let car of world.cars) {
-
-        let div = document.getElementById(car.id) || ( _=>{
+    for (let [i, car] of world.cars.entries()) {
+        let div = document.getElementById(car.id) || (_ => {
             let div = document.createElement('div')
             div.id = car.id
             div.style.color = car.color
             div.classList.add('stat')
             return div
         })();
-        if(div.progress != car.progress){
-            div.progress = car.progress
-            div.innerText = car.id + ': ' + (car.progress * 100).toFixed(1) + '%'
-        }
+
+        let text = `${i + 1}:${car.damage ? '☠️️' : '🚨'} ${car.name} `
+        // (car.progress * 100).toFixed(1) + '% '
+        if (car.finishTime) text += `<span style="float:right">${(car.finishTime / 60).toFixed(1)}s</span>`
+
+        if (text != div.innerHTML)
+            div.innerHTML = text
 
         carEl.push(div)
 
     }
-    let newHashOrder = arrayOrderHash(world.cars,'id')
-    if(newHashOrder !== hashCarStatsOrder) {
+
+    let newHashOrder = arrayOrderHash(world.cars, 'id')
+    if (newHashOrder !== hashCarStatsOrder) {
         statistics.replaceChildren(...carEl)
         hashCarStatsOrder = newHashOrder
     }
 
 }
 
+var started = false
+new Counter(1000, [3, 2, 1, 'go!']).go(counter).then(_ => {
+    started = true
+})
+var frameCount = 0
+
 update()
 
-function update(time) {
-    let somethingUpdate = false
-    let borders = world.corridor.borders || world.roadBorders
-    let myCar = world.cars[0]
+async function update(time) {
+    let somethingUpdate = !started
 
-    for (let car of world.cars.filter(car => !car.damage)) {
-        somethingUpdate = car.update(borders, []) || somethingUpdate
+    if (started) {
+        let borders = world.corridor.borders || world.roadBorders
 
+        for (let car of world.cars.filter(car => !car.damage)) {
+            somethingUpdate = car.update(borders, []) || somethingUpdate
+
+        }
+        for (let car of world.cars) {
+            updateCarProgress(car)
+        }
+        world.cars.sort((carA, carB) => carB.progress - carA.progress)
+        updateBoard()
     }
-    for (let car of world.cars) {
-        updateCarProgress(car)
-    }
-    world.cars.sort((carA, carB) => carB.progress - carA.progress)
-    updateBoard()
-
 
     if (somethingUpdate) {
         animate(time)
@@ -108,7 +117,6 @@ viewPort.addEventListener('change', () => {
 function animate() {
     ++frameCount
     viewPort.reset()
-    myCar = world.cars.at(0)
 
     if (myCar && !myCar.damage) {
         viewPort.offset.x = -myCar.x
@@ -117,8 +125,6 @@ function animate() {
 
     viewPort.reset()
 
-
-    world.bestCar = myCar
 
     world.draw(carCtx, viewPort, {showStartMarkings: false, drawSensor: false})
     miniMap.update(viewPort, world.cars)
@@ -136,17 +142,19 @@ function updateCarProgress(car) {
             if (seg == carSeg) {
                 let proj = seg.projectPoint(car)
                 let partSeg = new Segment(seg.p1, proj.point)
-                partSeg.draw(carCtx, {color: "red", width: 5})
+                // partSeg.draw(carCtx, {color: "red", width: 5})
                 car.progress += partSeg.length()
                 break
+            } else {
+                car.progress += seg.length()
+                // seg.draw(carCtx, {color: "red", width: 5})
             }
-            seg.draw(carCtx, {color: "red", width: 5})
-            car.progress += seg.length()
+
 
         }
         const totalDistance = world.corridor.skeleton.reduce((acc, b) => acc + b.length(), 0)
         car.progress /= totalDistance
-        if (car.progress > 1) {
+        if (car.progress >= 1) {
             car.progress = 1
             car.finishTime = frameCount
         }
