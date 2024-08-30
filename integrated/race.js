@@ -7,6 +7,7 @@ import Segment from "../js/primitives/segment.js";
 import {fetchLastFile} from "./operationUtil.js";
 import {arrayOrderHash} from "../js/utils/codeflow-utils.js";
 import {Counter} from "./counter.js";
+import AudioEngine from "../js/Audio/engineAudio.js";
 
 const rightPanelWidth = 300;
 
@@ -76,8 +77,9 @@ function updateBoard() {
 }
 
 var started = false
-new Counter(1000, [3, 2, 1, 'go!']).go(counter).then(_ => {
+new Counter(1000).go(counter).then(_ => {
     started = true
+    myCar.engine = new AudioEngine();
 })
 var frameCount = 0
 

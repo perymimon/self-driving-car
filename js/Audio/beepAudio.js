@@ -8,7 +8,7 @@ export async function beep(frequency) {
     osc.frequency.setValueAtTime(frequency, 0)
     osc.connect(envelope)
     osc.start()
-    osc.stop(0.4)
+    osc.stop(0.5)
 
     envelope.gain.value = 0 // volume
     // envelope.gain.exponentialRampToValueAtTime(1, 0.1)
@@ -16,9 +16,9 @@ export async function beep(frequency) {
     envelope.gain.linearRampToValueAtTime(0, 0.4)
     envelope.connect(audioCtx.destination)
 
-    analyzer = audioCtx.createAnalyser()
-    analyzer.fftSize = 2 ** 15
-    envelope.connect(analyzer)
+    // let analyzer = audioCtx.createAnalyser()
+    // analyzer.fftSize = 2 ** 15
+    // envelope.connect(analyzer)
 
     let {resolve, promise} = Promise.withResolvers()
     osc.addEventListener('ended', resolve)

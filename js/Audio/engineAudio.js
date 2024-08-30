@@ -7,10 +7,6 @@ export default class AudioEngine {
         osc.frequency.setValueAtTime(200, 0)
         osc.start()
 
-        var masterGain = osc.connect(audioCtx.createGain())
-        masterGain.gain.value = 0.2 // volume
-        masterGain.connect(audioCtx.destination)
-
         var lfo = audioCtx.createOscillator()
         lfo.frequency.setValueAtTime(30, 0)
         lfo.start()
@@ -18,6 +14,10 @@ export default class AudioEngine {
         var mod = lfo.connect(audioCtx.createGain())
         mod.gain.value = 60
         mod.connect(osc.frequency)
+
+        var masterGain = osc.connect(audioCtx.createGain())
+        masterGain.gain.value = 0.2 // volume
+        masterGain.connect(audioCtx.destination)
 
 
         this.volume = masterGain.gain

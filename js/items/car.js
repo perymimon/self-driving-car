@@ -39,7 +39,7 @@ export default class Car {
         this.fitness = 0
 
         this.useBrain = controlType == 'AI'
-
+        this.engine = null
         if (controlType != "DUMMY") {
             this.sensor = new Sensor(this)
             this.brain = new NeuralNetwork([
@@ -110,7 +110,9 @@ export default class Car {
 
         this.polygons = this.#createPolygon()
         this.damage = this.#assessDamage(roadBorders, traffic)
-
+        if(this.damage){
+            this.speed = 0
+        }
         if (this.sensor) {
             this.sensor?.update(roadBorders, traffic)
 
@@ -123,6 +125,14 @@ export default class Car {
                 this.controls.reverse = outputs[3]
             }
         }
+
+        if(this.engine){
+            let percent = Math.abs(this.speed / this.maxSpeed)
+            this.engine.setVolume(percent)
+            this.engine.setPitch(percent)
+
+        }
+
         return true
     }
 
