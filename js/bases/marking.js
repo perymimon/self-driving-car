@@ -1,5 +1,5 @@
 import Segment from "../primitives/segment.js";
-import {translate, angle} from "../utils/math-utils.js";
+import {translate, angle} from "../utils/algebra-math-utils.js";
 import Envelope from "../primitives/envelope.js";
 
 

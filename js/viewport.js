@@ -1,5 +1,5 @@
 import Point from "./primitives/point.js";
-import {add, subtract, scale} from "./utils/math-utils.js";
+import {add, subtract, scale} from "./utils/algebra-math-utils.js";
 import Polygon from "./primitives/polygon.js";
 
 export default class Viewport extends EventTarget{

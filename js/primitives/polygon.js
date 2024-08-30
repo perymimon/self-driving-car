@@ -1,5 +1,5 @@
 import Segment from "./segment.js";
-import {average, distance} from "../utils/math-utils.js"
+import {average, distance} from "../utils/algebra-math-utils.js"
 import Point from "./point.js";
 import {drawText, getRandomColor, style} from "../utils/canvas-utils.js";
 

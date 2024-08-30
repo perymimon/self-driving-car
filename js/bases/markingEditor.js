@@ -1,4 +1,4 @@
-import {getNearestSegment, inRange} from "../utils/math-utils.js";
+import {getNearestSegment, inRange} from "../utils/algebra-math-utils.js";
 
 export default class MarkingEditor {
     #segmentsInView = null

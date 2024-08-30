@@ -1,5 +1,5 @@
 import Point from "../primitives/point.js";
-import {degToRad, domainMap} from "../utils/math-utils.js";
+import {degToRad, domainMap} from "../utils/algebra-math-utils.js";
 import Segment from "../primitives/segment.js";
 
 export function parseRoads(data) {

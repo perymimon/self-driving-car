@@ -1,4 +1,4 @@
-import {getNearestPoint} from "../utils/math-utils.js";
+import {getNearestPoint} from "../utils/algebra-math-utils.js";
 import Segment from "../primitives/segment.js";
 import Dispatcher from "../bases/dispatcher.js";
 

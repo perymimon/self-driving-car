@@ -1,4 +1,4 @@
-import {add, lerp, lerp2D, pseudoRandom, scale, subtract, translate} from "../utils/math-utils.js";
+import {add, lerp, lerp2D, pseudoRandom, scale, subtract, translate} from "../utils/algebra-math-utils.js";
 import Polygon from "../primitives/polygon.js";
 
 export default class Tree {

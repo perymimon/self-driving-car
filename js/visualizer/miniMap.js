@@ -1,4 +1,4 @@
-import {scale} from "../utils/math-utils.js";
+import {scale} from "../utils/algebra-math-utils.js";
 import Point from "../primitives/point.js";
 
 export default class MiniMap {

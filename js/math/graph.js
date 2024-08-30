@@ -1,7 +1,7 @@
 import Point from '../primitives/point.js'
 import Segment from '../primitives/segment.js'
 import Dispatcher from "../bases/dispatcher.js";
-import {add, getNearestSegment, getShortestPath, scale} from "../utils/math-utils.js";
+import {add, getNearestSegment, getShortestPath, scale} from "../utils/algebra-math-utils.js";
 
 export default class Graph extends Dispatcher {
     constructor(points = [], segments = []) {
@@ -83,26 +83,32 @@ export default class Graph extends Dispatcher {
         }))
     }
 
-    getShortestPath(start, end) {
+    getShortestPath(start, end, extendTheEdges = true) {
         var startSeg = getNearestSegment(start, this.segments)
         var endSeg = getNearestSegment(end, this.segments)
 
-        var {point:projStart} = startSeg.projectPoint(start)
-        var {point:projEnd} = endSeg.projectPoint(end)
+        var {point: projStart} = startSeg.projectPoint(start)
+        var {point: projEnd} = endSeg.projectPoint(end)
+        var startPoint = projStart
+        var endPoint = projEnd
+        var tempSegs = []
+        if (startSeg.equal(endSeg))
+            tempSegs.push(new Segment(startPoint, endPoint))
 
-        var startPoint = add(projStart, scale(startSeg.directionVector(),-100))
-        var endPoint = add(projEnd, scale(endSeg.directionVector(),100))
-        var tempSeg = [
-            new Segment(startSeg.p1, startPoint),
-            new Segment(startPoint, startSeg.p2 ),
-            new Segment(endSeg.p1, endPoint),
-            new Segment(endPoint, endSeg.p2 ),
-        ]
-        if(startSeg.equal(endSeg))
-            tempSeg.push(new Segment(startPoint, endPoint))
+        if (extendTheEdges) {
+            startPoint = add(projStart, scale(startSeg.directionVector(), -10))
+            endPoint = add(projEnd, scale(endSeg.directionVector(), 100))
+            tempSegs.push(
+                new Segment(startSeg.p1, startPoint),
+                new Segment(startPoint, startSeg.p2),
+                new Segment(endSeg.p1, endPoint),
+                new Segment(endPoint, endSeg.p2),
+            )
+        }
 
-        this.points.push(startPoint,endPoint)
-        this.segments.push(...tempSeg)
+
+        this.points.push(startPoint, endPoint)
+        this.segments.push(...tempSegs)
 
         let path = getShortestPath(startPoint, endPoint, this)
 

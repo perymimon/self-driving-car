@@ -1,6 +1,7 @@
 import Sensor from "./sensor.js";
 import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
+import {closeToZero, reduceToZero} from "../utils/math-utils.js";
 
 const carImg = new Image();
 carImg.src = "../car.png"
@@ -100,10 +101,10 @@ export default class Car {
 
     update(roadBorders, traffic) {
         if (this.damage) return false
-        if(this.speed == 0 && this.useBrain) setTimeout(_=>{
-            if(this.speed == 0)
+        if(closeToZero(this.speed) && this.useBrain) setTimeout(_=>{
+            if(closeToZero(this.speed))
                 this.damage = true
-        }, 500)
+        }, 200)
         this.#move()
         this.fitness += this.speed
 
@@ -171,9 +172,7 @@ export default class Car {
         this.speed = Math.min(this.speed, this.maxSpeed)
         this.speed = Math.max(this.speed, this.maxReverseSpeed)
 
-        this.speed = Math.sign(this.speed) * (Math.abs(this.speed) - this.friction)
-        if (Math.abs(this.speed) < this.friction)
-            this.speed = 0;
+        this.speed = reduceToZero(this.speed, this.friction)
         if (this.speed === 0) return
 
         const flip = this.speed > 0 ? 1 : -1

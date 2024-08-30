@@ -1,4 +1,4 @@
-import {average, getFake3dPoint} from "../utils/math-utils.js";
+import {average, getFake3dPoint} from "../utils/algebra-math-utils.js";
 import Polygon from "../primitives/polygon.js";
 
 export default class Building {

@@ -1,6 +1,6 @@
 import Envelope from "./primitives/envelope.js";
 import Polygon from "./primitives/polygon.js";
-import {add, angle, distance, eps, lerp, scale} from "./utils/math-utils.js";
+import {add, angle, distance, eps, lerp, scale} from "./utils/algebra-math-utils.js";
 import Segment from "./primitives/segment.js";
 import Tree from "./items/tree.js";
 import Building from "./items/building.js";
