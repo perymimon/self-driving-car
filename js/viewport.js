@@ -1,8 +1,8 @@
 import Point from "./primitives/point.js";
-import {add, subtract, scale} from "./utils/algebra-math-utils.js";
+import {add, scale, subtract} from "./utils/algebra-math-utils.js";
 import Polygon from "./primitives/polygon.js";
 
-export default class Viewport extends EventTarget{
+export default class Viewport extends EventTarget {
 
     constructor(canvas, zoom = 1, offset = null) {
         super()
@@ -22,16 +22,18 @@ export default class Viewport extends EventTarget{
 
         this.#addEventListener()
     }
+
     #trigger(eventName, detail = {}) {
-        const event = new CustomEvent(eventName, { detail });
+        const event = new CustomEvent(eventName, {detail});
         this.dispatchEvent(event);
     }
+
     getRenderBox() {
         let {zoom, center} = this
         let offset = scale(this.getOffset(), -1)
         let left = offset.x - zoom * center.x
         let right = offset.x + zoom * center.x
-        let top =  offset.y - zoom * center.y
+        let top = offset.y - zoom * center.y
         let bottom = offset.y + zoom * center.y
         return {left, top, bottom, right}
     }
@@ -51,7 +53,7 @@ export default class Viewport extends EventTarget{
 
     inView(points = []) {
         let {left, top, bottom, right} = this.getRenderBox()
-        return points.some( point => {
+        return points.some(point => {
             if (point.x < left) return false
             if (point.y < top) return false
             if (point.x > right) return false
@@ -69,7 +71,10 @@ export default class Viewport extends EventTarget{
     }
 
     getOffset() {
-        return add(this.offset, this.drag.offset);
+        let currentOffset = add(this.offset, this.drag.offset);
+        // this.sameOffset = this.lastOffset ? currentOffset.equal(this.lastOffset) : false
+        // this.lastOffset = currentOffset
+        return currentOffset;
     }
 
     reset() {
@@ -102,7 +107,7 @@ export default class Viewport extends EventTarget{
         if (this.drag.active) {
             this.drag.end = this.getMouse(event)
             this.drag.offset = subtract(this.drag.end, this.drag.start)
-            this.#trigger('change',{})
+            this.#trigger('change', {})
         }
     }
 
@@ -123,6 +128,6 @@ export default class Viewport extends EventTarget{
         let step = 0.1
         this.zoom += dir * step
         this.zoom = Math.max(1, Math.min(this.zoom, this.maxZoom))
-        this.#trigger('change',{})
+        this.#trigger('change', {})
     }
 }

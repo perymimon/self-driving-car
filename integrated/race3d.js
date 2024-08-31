@@ -8,11 +8,16 @@ import {fetchLastFile} from "./operationUtil.js";
 import {arrayOrderHash} from "../js/utils/codeflow-utils.js";
 import {Counter} from "./counter.js";
 import AudioEngine from "../js/Audio/engineAudio.js";
+import Camera from "../js/camera.js";
 const rightPanelWidth = 300;
 
 const carCanvas = document.querySelector('#carCanvas');
 carCanvas.width = window.innerWidth;
-carCanvas.height = window.innerHeight;
+carCanvas.height = window.innerHeight / 2;
+
+const cameraCanvas = document.querySelector('#cameraCanvas');
+cameraCanvas.width = window.innerWidth;
+cameraCanvas.height = window.innerHeight / 2;
 
 const miniMapCanvas = document.querySelector('#miniMapCanvas');
 miniMapCanvas.width = rightPanelWidth
@@ -21,6 +26,7 @@ miniMapCanvas.height = rightPanelWidth;
 statistics.style.width = rightPanelWidth + "px"
 
 const carCtx = carCanvas.getContext('2d');
+const cameraCtx = cameraCanvas.getContext('2d');
 
 var worldJson = await fetchLastFile('world', './saved/small_with_target.world')
 var world = World.Load(worldJson) ?? new World(new Graph())
@@ -28,6 +34,7 @@ var carMold = await fetchLastFile('car', './saved/right_hand_rule.car')
 var viewPort = new ViewPort(carCanvas, world.zoom, world.offset)
 var miniMap = null
 var myCar = null
+var camera = null
 
 var hashCarStatsOrder = -1;
 
@@ -38,6 +45,7 @@ function reload(world) {
     world.addGenerateCars({type: 'KEYS', carMold, color: 'gray', name: 'Me'})
     world.addGenerateCars({N: 30, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
     myCar = world.cars.at(0)
+    camera = new Camera(myCar)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
     miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
     updateBoard()
@@ -115,16 +123,19 @@ viewPort.addEventListener('change', () => {
 
 
 function animate() {
-    ++frameCount
+    frameCount++
 
     if (myCar && !myCar.damage) {
         viewPort.offset.x = -myCar.x
         viewPort.offset.y = -myCar.y
     }
-
     viewPort.reset()
+
     world.draw(carCtx, viewPort, {showStartMarkings: false, drawSensor: false})
     miniMap.update(viewPort, world.cars)
+    camera.move(myCar)
+    camera.draw(carCtx)
+    camera.render(cameraCtx, world)
 }
 
 function updateCarProgress(car) {

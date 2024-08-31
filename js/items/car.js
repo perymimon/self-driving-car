@@ -137,6 +137,7 @@ export default class Car {
     }
 
     #assessDamage(roadBorders, traffic) {
+        return false
         for (let seg of roadBorders) {
             if (this.polygons.intersectSeg(seg))
                 return true

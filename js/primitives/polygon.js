@@ -29,7 +29,11 @@ export default class Polygon {
             info.points.map(i => new Point(i.x, i.y)),
         )
     }
-
+    containsPoly(poly){
+        // one point inside is ok
+        // return poly.points.filter(p => this.containsPoint(p)).length > 0
+        return poly.points.some(p => this.containsPoint(p))
+    }
     containsSegment(seg) {
         const midPoint = average(seg.p1, seg.p2)
         return this.containsPoint(midPoint, seg.p2)
@@ -197,19 +201,20 @@ export default class Polygon {
         }
     }
 
-    static break(poly1, poly2) {
+    static break(poly1, poly2, markIntersection = false) {
         if (poly1.radius + poly2.radius < distance(poly1.centeroid, poly2.centeroid))
             return
         const segs1 = poly1.segments
         const segs2 = poly2.segments
-        let counter = 0
         for (let i = 0; i < segs1.length; i++) {
             for (let j = 0; j < segs2.length; j++) {
                 let seg1 = segs1[i], seg2 = segs2[j];
-                counter++
                 let int = seg1.intersection(seg2)
                 if (int && ![0, 1].includes(int.offset)) {
                     let point = new Point(int.x, int.y)
+                    if(markIntersection){
+                        point.intersection = true
+                    }
                     let aux1 = seg1.p2
                     seg1.p2 = point
                     segs1.splice(i + 1, 0, new Segment(point, aux1))
@@ -219,7 +224,6 @@ export default class Polygon {
                 }
             }
         }
-        // console.log(counter)
     }
 
     draw(ctx, {
