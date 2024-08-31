@@ -16,7 +16,7 @@ export default class Car {
 
     constructor(x, y, width, height, {
         controlType = 'DUMMY', angle = 0, maxSpeed = 4, color = "blue", label = '',
-        acceleration = 0.2, maxReverseSpeed = -1.5, friction = 0.05,
+        acceleration = 0.25, maxReverseSpeed = -1.5, friction = 0.05,
 
     } = {}) {
         this.id = ++Car.index

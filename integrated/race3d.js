@@ -13,7 +13,7 @@ const rightPanelWidth = 300;
 
 const carCanvas = document.querySelector('#carCanvas');
 carCanvas.width = window.innerWidth;
-carCanvas.height = window.innerHeight / 2;
+carCanvas.height = window.innerHeight / 2 ;
 
 const cameraCanvas = document.querySelector('#cameraCanvas');
 cameraCanvas.width = window.innerWidth;
@@ -23,7 +23,6 @@ const miniMapCanvas = document.querySelector('#miniMapCanvas');
 miniMapCanvas.width = rightPanelWidth
 miniMapCanvas.height = rightPanelWidth;
 
-statistics.style.width = rightPanelWidth + "px"
 
 const carCtx = carCanvas.getContext('2d');
 const cameraCtx = cameraCanvas.getContext('2d');
@@ -48,7 +47,7 @@ function reload(world) {
     camera = new Camera(myCar)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
     miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
-    updateBoard()
+    // updateBoard()
     world.bestCar = myCar
 }
 
@@ -105,7 +104,7 @@ async function update(time) {
             updateCarProgress(car)
         }
         world.cars.sort((carA, carB) => carB.progress - carA.progress)
-        updateBoard()
+        // updateBoard()
     }
 
     if (somethingUpdate) {
@@ -135,7 +134,7 @@ function animate() {
     miniMap.update(viewPort, world.cars)
     camera.move(myCar)
     camera.draw(carCtx)
-    camera.render(cameraCtx, world)
+    camera.render(cameraCtx, world, carCtx)
 }
 
 function updateCarProgress(car) {

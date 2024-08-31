@@ -1,8 +1,8 @@
 import Point from "./primitives/point.js";
 import Polygon from "./primitives/polygon.js";
+import Polygone from "./primitives/polygon.js";
 import {cross, distance, subtract} from "./utils/algebra-math-utils.js";
 import Segment from "./primitives/segment.js";
-import Polygone from "./primitives/polygon.js";
 
 export default class Camera {
     constructor({x, y, angle}, range = 1000) {
@@ -49,9 +49,9 @@ export default class Camera {
     #projectPoint(ctx, p) {
         let seg = new Segment(this.center, this.tip)
         let {point: p1} = seg.projectPoint(p)
-        let crossProduct = cross(subtract(p1, this), subtract(p, this)) //todo: more research
-        let x = Math.sign(crossProduct) * distance(p, p1) / distance(this, p1)
-        let y = -this.z / distance(this, p1)
+        let c = cross(subtract(p1, this), subtract(p, this)) //todo: more research
+        let x = Math.sign(c) * (distance(p, p1) / distance(this, p1))
+        let y = (p.z - this.z) / distance(this, p1)
 
         let w2 = ctx.canvas.width / 2
         let h2 = ctx.canvas.height / 2
@@ -63,16 +63,14 @@ export default class Camera {
     #filter(polys) {
         let filteredPolys = []
         for (let poly of polys) {
-            if (!this.poly.containsPoly(poly))
-                continue
             if (poly.intersectPoly(this.poly)) {
                 let copy1 = new Polygon(poly.points)
                 let copy2 = new Polygon(this.poly.points)
                 Polygone.break(copy1, copy2, true)
-                let points = copy1.segments.map(s=> s.p1)
+                let points = copy1.segments.map(s => s.p1)
                     .filter(p => p.intersection || this.poly.containsPoint(p))
                 filteredPolys.push(new Polygone(points))
-            } else {
+            } else if (this.poly.containsPoly(poly)) {
                 filteredPolys.push(poly)
             }
 
@@ -80,22 +78,56 @@ export default class Camera {
         return filteredPolys
     }
 
-    render(ctx, world) {
-        const polys = this.#filter(world.buildings.map(b => b.base))
+    #extrude(polys, height = 10) {
+        let extrudedPolys = []
+        for (let poly of polys) {
+            let ceiling = new Polygon(poly.points.map(p => new Point(p.x, p.y, -height)))
+            let sides = []
+            for (let i of poly.points.keys()) {
+                let nextI = (i + 1) % poly.points.length
+                sides.push(new Polygon([
+                    poly.points[i],
+                    poly.points[nextI],
+                    ceiling.points[nextI],
+                    ceiling.points[i]
+                ]))
+            }
+            extrudedPolys.push(...sides, ceiling)
+        }
+        return extrudedPolys
+    }
 
-        var projPolys = polys.map(
+    #filterExtrude(polyes, height) {
+        let filtered = this.#filter(polyes)
+        let extruded = this.#extrude(filtered, height)
+        return extruded
+    }
+
+    render(ctx, world, carCtx) {
+        const buildings = this.#filterExtrude(world.buildings.map(b => b.base), 200)
+        const cars = this.#filterExtrude(world.cars.map(car => car.polygons), 10)
+        const trees = this.#filterExtrude(world.trees.map(tree => tree.base), 60, {color: 'green'})
+        const roadPolys = world.corridor.borders.map((seg, i) => {
+            return new Polygon([seg.p2, seg.p1], i)
+        })
+
+        const roads = this.#filterExtrude(roadPolys, 10)
+
+        var polys = [...buildings, ...cars, /*...trees,*/ ...roads]
+
+        var projectedPolys = polys.map(
             poly => new Polygon(
                 poly.points.map(p => this.#projectPoint(ctx, p))
             )
         )
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-        for (let poly of projPolys) {
-            poly.draw(ctx)
+        for (let poly of projectedPolys) {
+            poly.draw(ctx/*, {drawCenter:false, fill:'gray', stroke:'red'}*/)
         }
-        // for (let poly of polys){
-        //     poly.draw(ctx)
-        // }
+        for (let poly of polys) {
+            poly.draw(carCtx)
+        }
 
     }
 }

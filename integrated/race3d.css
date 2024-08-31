@@ -11,6 +11,9 @@ body, html{
 #carCanvas{
     background: radial-gradient(circle farthest-side, #5A5, #096);
 }
+#cameraCanvas{
+    background: gray;
+}
 #visualizer{
     display: flex;
     justify-content: flex-end;

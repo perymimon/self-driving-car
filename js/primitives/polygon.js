@@ -13,7 +13,7 @@ export default class Polygon {
         this.segments = []
         for (var i = 1; i < points.length; i++)
             this.segments.push(new Segment(points[i - 1], points[i]));
-        this.segments.push(new Segment(points[i - 1], points[0]));
+        this.segments.push(new Segment(points.at(-1), points[0]));
         this.id = Polygon.count++
         this.label = label
 
@@ -29,11 +29,13 @@ export default class Polygon {
             info.points.map(i => new Point(i.x, i.y)),
         )
     }
-    containsPoly(poly){
+
+    containsPoly(poly) {
         // one point inside is ok
         // return poly.points.filter(p => this.containsPoint(p)).length > 0
         return poly.points.some(p => this.containsPoint(p))
     }
+
     containsSegment(seg) {
         const midPoint = average(seg.p1, seg.p2)
         return this.containsPoint(midPoint, seg.p2)
@@ -42,7 +44,7 @@ export default class Polygon {
     containsPoint(point, spacing = 0) {
         if (distance(point, this.centeroid) > (this.radius + spacing))
             return false
-        const outerPoint = new Point(-10000, -10000)
+        const outerPoint = new Point(-1_000_000, -1_000_000)
         const crossSegment = new Segment(outerPoint, point)
         let intersectionCount = 0;
         for (const seg of this.segments) {
@@ -113,24 +115,31 @@ export default class Polygon {
         let signedArea = 0;
 
         const numPoints = points.length;
-
-        for (let i = 0; i < numPoints; i++) {
-            const x0 = points[i].x;
-            const y0 = points[i].y;
-            const x1 = points[(i + 1) % numPoints].x;
-            const y1 = points[(i + 1) % numPoints].y;
-
-            const a = x0 * y1 - x1 * y0;
-            signedArea += a;
-            xSum += (x0 + x1) * a;
-            ySum += (y0 + y1) * a;
+        if (numPoints == 1) {
+            this.#center = points.at(0);
+        } else if (numPoints == 2) {
+            let [p1, p2] = points
+            this.#center = average(p1, p2);
         }
+        else {
+            for (let i = 0; i < numPoints; i++) {
+                const x0 = points[i].x;
+                const y0 = points[i].y;
+                const x1 = points[(i + 1) % numPoints].x;
+                const y1 = points[(i + 1) % numPoints].y;
 
-        signedArea *= 0.5;
-        const Cx = xSum / (6 * signedArea);
-        const Cy = ySum / (6 * signedArea);
+                const a = x0 * y1 - x1 * y0;
+                signedArea += a;
+                xSum += (x0 + x1) * a;
+                ySum += (y0 + y1) * a;
+            }
 
-        this.#center = new Point(Cx, Cy);
+            signedArea *= 0.5;
+            const Cx = xSum / (6 * signedArea);
+            const Cy = ySum / (6 * signedArea);
+
+            this.#center = new Point(Cx, Cy);
+        }
         return this.#center
     }
 
@@ -175,6 +184,7 @@ export default class Polygon {
         return keptSegments
 
     }
+
     static union(poly1, poly2) {
         Polygon.break(poly1, poly2)
         let segments = []
@@ -212,7 +222,7 @@ export default class Polygon {
                 let int = seg1.intersection(seg2)
                 if (int && ![0, 1].includes(int.offset)) {
                     let point = new Point(int.x, int.y)
-                    if(markIntersection){
+                    if (markIntersection) {
                         point.intersection = true
                     }
                     let aux1 = seg1.p2
@@ -250,7 +260,7 @@ export default class Polygon {
             if (drawCenter) center.draw(ctx, {color: 'purple'})
             if (drawId) drawText(ctx, this.id, center.x, center.y)
         }
-        if (this.label) drawText(ctx, this.label, center.x, center.y, {color:'yellow'})
+        if (this.label) drawText(ctx, this.label, center.x, center.y, {color: 'yellow'})
 
     }
 }

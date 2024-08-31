@@ -1,11 +1,13 @@
 export default class Point  extends EventTarget{
     #x =0
     #y = 0
+    #z = 0
     static count = 0
-    constructor(x, y) {
+    constructor(x, y, z=0) {
         super()
         this.#x = x;
         this.#y = y;
+        this.#z = z
         this.id = Point.count++
     }
     set x(v){
@@ -22,6 +24,14 @@ export default class Point  extends EventTarget{
     get y(){
         return this.#y
     }
+    set z(v){
+        this.#z = v
+        this.#trigger('change',{key:'z',value:v})
+    }
+    get z(){
+        return this.#z
+    }
+
     toJSON(){
         let {x, y} = this
         return {x,y}
