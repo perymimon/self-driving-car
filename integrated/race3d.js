@@ -13,18 +13,18 @@ const rightPanelWidth = 300;
 
 const carCanvas = document.querySelector('#carCanvas');
 carCanvas.width = window.innerWidth;
-carCanvas.height = window.innerHeight / 2 ;
+carCanvas.height = 0
 
 const cameraCanvas = document.querySelector('#cameraCanvas');
-cameraCanvas.width = window.innerWidth;
-cameraCanvas.height = window.innerHeight / 2;
+cameraCanvas.width = window.innerWidth
+cameraCanvas.height = window.innerHeight
 
 const miniMapCanvas = document.querySelector('#miniMapCanvas');
 miniMapCanvas.width = rightPanelWidth
 miniMapCanvas.height = rightPanelWidth;
 
 
-const carCtx = carCanvas.getContext('2d');
+// const carCtx = carCanvas.getContext('2d');
 const cameraCtx = cameraCanvas.getContext('2d');
 
 var worldJson = await fetchLastFile('world', './saved/small_with_target.world')
@@ -47,7 +47,6 @@ function reload(world) {
     camera = new Camera(myCar)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
     miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
-    // updateBoard()
     world.bestCar = myCar
 }
 
@@ -104,7 +103,7 @@ async function update(time) {
             updateCarProgress(car)
         }
         world.cars.sort((carA, carB) => carB.progress - carA.progress)
-        // updateBoard()
+        updateBoard()
     }
 
     if (somethingUpdate) {
@@ -130,11 +129,11 @@ function animate() {
     }
     viewPort.reset()
 
-    world.draw(carCtx, viewPort, {showStartMarkings: false, drawSensor: false})
+    // world.draw(carCtx, viewPort, {showStartMarkings: false, drawSensor: false})
     miniMap.update(viewPort, world.cars)
     camera.move(myCar)
-    camera.draw(carCtx)
-    camera.render(cameraCtx, world, carCtx)
+    // camera.draw(carCtx)
+    camera.render(cameraCtx, world)
 }
 
 function updateCarProgress(car) {

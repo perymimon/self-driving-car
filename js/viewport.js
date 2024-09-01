@@ -11,6 +11,7 @@ export default class Viewport extends EventTarget {
 
         this.zoom = zoom
         this.center = new Point(canvas.width / 2, canvas.height / 2);
+        console.log('center', this.center)
         this.offset = offset || scale(this.center, -1)
         this.maxZoom = 10
         this.drag = {

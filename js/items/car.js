@@ -15,7 +15,7 @@ export default class Car {
     static index = 0
 
     constructor(x, y, width, height, {
-        controlType = 'DUMMY', angle = 0, maxSpeed = 4, color = "blue", label = '',
+        controlType = 'DUMMY', angle = 0, maxSpeed = 3, color = "blue", label = '',
         acceleration = 0.25, maxReverseSpeed = -1.5, friction = 0.05,
 
     } = {}) {
@@ -54,6 +54,8 @@ export default class Car {
         this.mask.height = height;
 
         const maskCtx = this.mask.getContext("2d");
+        this.update([],[])
+
         resolver.promise.then(() => {
             maskCtx.fillStyle = color;
             maskCtx.rect(0, 0, this.width, this.height);

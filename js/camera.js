@@ -1,23 +1,28 @@
 import Point from "./primitives/point.js";
 import Polygon from "./primitives/polygon.js";
 import Polygone from "./primitives/polygon.js";
-import {cross, distance, subtract} from "./utils/algebra-math-utils.js";
+import {cross, distance, lerp, subtract} from "./utils/algebra-math-utils.js";
 import Segment from "./primitives/segment.js";
 
 export default class Camera {
-    constructor({x, y, angle}, range = 1000) {
+    constructor({x, y, angle, speed = 0}, range = 1500, distanceBehind = 125) {
 
         this.range = range;
-        this.move({x, y, angle});
+        this.distanceBehind = distanceBehind;
+        // this.x = x
+        // this.y = y
+        // this.angle = angle
+        this.move({x, y, angle, speed});
 
     }
 
-    move({x, y, angle}) {
-        this.x = x;
-        this.y = y;
-        this.z = -20
-        this.angle = angle;
-        this.center = new Point(x, y);
+    move({x, y, angle, speed}) {
+        let t = 0.06
+        this.x = lerp(this.x ?? x, x + this.distanceBehind * Math.sin(angle), t)
+        this.y = lerp(this.y ?? y, y + this.distanceBehind * Math.cos(angle), t)
+        this.z = lerp(this.z ?? -30, -30 + speed *2* Math.random(),0.05)
+        this.angle = lerp(this.angle ?? angle, angle, t)
+        this.center = new Point(this.x, this.y);
         this.tip = new Point(//todo: need to research it more
             this.x - this.range * Math.sin(this.angle),
             this.y - this.range * Math.cos(this.angle),
@@ -36,15 +41,30 @@ export default class Camera {
         ])
     }
 
-    draw(ctx) {
-        // this.center.draw(ctx, {color: 'red'});
-        // this.tip.draw(ctx, {color: 'black'});
-        // this.left.draw(ctx, {color: 'green'});
-        // this.right.draw(ctx, {color: 'red'});
-        this.poly.draw(ctx)
+    moveSimple({x, y, angle}) {
+        this.x = x + this.distanceBehind * Math.sin(angle);
+        this.y = y + this.distanceBehind * Math.cos(angle)
+        this.z = -30
+        this.angle = angle;
+        this.center = new Point(this.x, this.y);
+        this.tip = new Point(//todo: need to research it more
+            this.x - this.range * Math.sin(this.angle),
+            this.y - this.range * Math.cos(this.angle),
+        )
+        this.left = new Point(//todo: need to research it more
+            this.x - this.range * Math.sin(this.angle - Math.PI / 4),
+            this.y - this.range * Math.cos(this.angle - Math.PI / 4),
+        )
+        this.right = new Point(
+            this.x - this.range * Math.sin(this.angle + Math.PI / 4),
+            this.y - this.range * Math.cos(this.angle + Math.PI / 4),
+        )
 
-
+        this.poly = new Polygon([
+            this.center, this.left, this.right
+        ])
     }
+
 
     #projectPoint(ctx, p) {
         let seg = new Segment(this.center, this.tip)
@@ -105,15 +125,16 @@ export default class Camera {
 
     render(ctx, world, carCtx) {
         const buildings = this.#filterExtrude(world.buildings.map(b => b.base), 200)
-        const cars = this.#filterExtrude(world.cars.map(car => car.polygons), 10)
-        const trees = this.#filterExtrude(world.trees.map(tree => tree.base), 60, {color: 'green'})
+        // const cars = this.#filterExtrude(world.cars.map(car => car.polygons), 10)
+        // const trees = this.#filterExtrude(world.trees.map(tree => tree.base), 60, {color: 'green'})
+        const bestCar = this.#filterExtrude([world.bestCar.polygons], 10, {color: 'green'})
         const roadPolys = world.corridor.borders.map((seg, i) => {
             return new Polygon([seg.p2, seg.p1], i)
         })
 
         const roads = this.#filterExtrude(roadPolys, 10)
 
-        var polys = [...buildings, ...cars, /*...trees,*/ ...roads]
+        var polys = [...buildings, ...bestCar, /*...cars, /*...trees,*/ ...roads]
 
         var projectedPolys = polys.map(
             poly => new Polygon(
@@ -125,9 +146,20 @@ export default class Camera {
         for (let poly of projectedPolys) {
             poly.draw(ctx/*, {drawCenter:false, fill:'gray', stroke:'red'}*/)
         }
-        for (let poly of polys) {
-            poly.draw(carCtx)
-        }
+        // for (let poly of polys) {
+        //     poly.draw(carCtx)
+        // }
+
 
     }
+    draw(ctx) {
+        // this.center.draw(ctx, {color: 'red'});
+        // this.tip.draw(ctx, {color: 'black'});
+        // this.left.draw(ctx, {color: 'green'});
+        // this.right.draw(ctx, {color: 'red'});
+        this.poly.draw(ctx)
+
+
+    }
+
 }

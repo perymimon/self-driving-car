@@ -1,6 +1,5 @@
 import {add, average, distance, dot, getIntersection, magnitude, normalize, scale, subtract} from "../utils/algebra-math-utils.js";
 import Point from "./point.js";
-
 export default class Segment {
     static counter = 0
     #radius = 0

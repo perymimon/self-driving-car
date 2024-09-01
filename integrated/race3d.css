@@ -16,22 +16,26 @@ body, html{
 }
 #visualizer{
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     flex-direction: column;
     gap: 0.5em;
     position: absolute;
     inset: 0;
     left: auto;
-    opacity:0.5;
+    opacity: 0.5;
     margin-inline: .5em;
-
+    width: 14em;
+    margin: 1em;
 }
 
 #statistics{
-    background: black;
+    background: #6c6c6c;
     border-radius: 10px;
-    flex: 1;
-    overflow-y: scroll;
+    overflow-y: hidden;
+    height:15em;
+    padding: .5em;
+    text-shadow: white 1px 1px 1px;
+
 }
 
 .stat{
