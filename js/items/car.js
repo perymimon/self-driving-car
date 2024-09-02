@@ -4,6 +4,9 @@ import Point from "../primitives/point.js";
 import {closeToZero, reduceToZero} from "../utils/math-utils.js";
 import NeuralNetwork from "../items/network.js"
 import keyboardControls from "../controles/keyboardControls.js"
+import DummyControls from "../controles/dummyControls.js";
+import KeyboardControls from "../controles/keyboardControls.js";
+
 const carImg = new Image();
 carImg.src = "../car.png"
 const resolver = Promise.withResolvers()
@@ -26,8 +29,10 @@ export default class Car {
         this.width = width;
         this.height = height;
         this.color = color
+
         this.type = controlType
         this.control = controlType
+        this.controlType = controlType
 
         this.speed = 0
         this.acceleration = acceleration
@@ -41,21 +46,30 @@ export default class Car {
 
         this.useBrain = controlType == 'AI'
         this.engine = null
+
         if (controlType != "DUMMY") {
             this.sensor = new Sensor(this)
-            this.brain = new NeuralNetwork([
-                this.sensor.rayCount, 6, 4
-            ])
         }
-        this.controls = new keyboardControls(this.control)
 
+        switch (controlType) {
+            case 'DUMMY':
+                this.controls = new DummyControls()
+                break
+            case 'AI':
+                this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4])
+                break
+            case 'KEYS':
+                this.controls = new KeyboardControls()
+                break
+
+        }
 
         this.mask = document.createElement("canvas");
         this.mask.width = width;
         this.mask.height = height;
 
         const maskCtx = this.mask.getContext("2d");
-        this.update([],[])
+        this.update([], [])
 
         resolver.promise.then(() => {
             maskCtx.fillStyle = color;
@@ -104,8 +118,8 @@ export default class Car {
 
     update(roadBorders, traffic) {
         if (this.damage) return false
-        if(closeToZero(this.speed) && this.useBrain) setTimeout(_=>{
-            if(closeToZero(this.speed))
+        if (closeToZero(this.speed) && this.useBrain) setTimeout(_ => {
+            if (closeToZero(this.speed))
                 this.damage = true
         }, 200)
         this.#move()
@@ -113,7 +127,7 @@ export default class Car {
 
         this.polygons = this.#createPolygon()
         this.damage = this.#assessDamage(roadBorders, traffic)
-        if(this.damage){
+        if (this.damage) {
             this.speed = 0
         }
         if (this.sensor) {
@@ -129,7 +143,7 @@ export default class Car {
             }
         }
 
-        if(this.engine){
+        if (this.engine) {
             let percent = Math.abs(this.speed / this.maxSpeed)
             this.engine.setVolume(percent)
             this.engine.setPitch(percent)
@@ -183,18 +197,23 @@ export default class Car {
         if (this.controls.reverse) {
             this.speed -= this.acceleration
         }
+
         this.speed = Math.min(this.speed, this.maxSpeed)
         this.speed = Math.max(this.speed, this.maxReverseSpeed)
 
         this.speed = reduceToZero(this.speed, this.friction)
         if (this.speed === 0) return
 
-        const flip = this.speed > 0 ? 1 : -1
-        if (this.controls.left) {
-            this.angle += 0.02 * flip
-        }
-        if (this.controls.right) {
-            this.angle -= 0.02 * flip
+        if (this.controls.tilt) {
+            this.angle -= this.controls.tilt * 0.03
+        } else {
+            const flip = this.speed > 0 ? 1 : -1
+            if (this.controls.left) {
+                this.angle += 0.03 * flip
+            }
+            if (this.controls.right) {
+                this.angle -= 0.03 * flip
+            }
         }
         // console.table(this)
         this.x -= Math.sin(this.angle) * this.speed

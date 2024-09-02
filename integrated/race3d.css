@@ -14,6 +14,7 @@ body, html{
 #cameraCanvas{
     background: gray;
 }
+
 #visualizer{
     display: flex;
     justify-content: space-between;
@@ -27,6 +28,13 @@ body, html{
     width: 14em;
     margin: 1em;
 }
+/* hide visualizer when screen is very small*/
+@media only screen and (max-width: 50em) {
+    #visualizer {
+        display: none;
+    }
+}
+
 
 #statistics{
     background: #6c6c6c;

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phone Tilt Experiment</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            height: 100vh;
+            justify-content: center;
+        }
+
+        canvas {
+            background: orange;
+        }
+
+        .super-title {
+            position: absolute;
+            left: 10px
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="700" height="500"></canvas>
+<script type="module">
+    // myCanvas.width = window.innerWidth
+    // myCanvas.height = window.innerHeight
+    import PhoneControls from '../js/controles/phoneControls.js'
+
+    const ctx = myCanvas.getContext('2d')
+    let rotation = 0
+    let controls = new PhoneControls(myCanvas)
+    animate()
+
+    function animate() {
+        ctx.clearRect(0, 0, myCanvas.width, myCanvas.height)
+        rotation = -controls.tilt
+
+
+        ctx.beginPath()
+        ctx.ellipse(
+            myCanvas.width / 2,
+            myCanvas.height / 2,
+            100, 50,
+            0,
+            0, Math.PI * 2
+        )
+        ctx.stroke()
+        requestAnimationFrame(animate)
+    }
+
+
+</script>
+</body>
+</html>

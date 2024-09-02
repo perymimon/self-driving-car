@@ -1,17 +1,10 @@
 export default class KeyboardControls {
-    constructor(type) {
+    constructor() {
         this.forward = false
         this.left = false
         this.right = false
         this.reverse = false
-        switch(type){
-            case "KEYS":
-                this.#addKeyboardListeners()
-                break
-            case "DUMMY":
-                this.forward = true
-                break
-        }
+        this.#addKeyboardListeners()
 
     }
 
