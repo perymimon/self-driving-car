@@ -1,6 +1,6 @@
 import {eps} from "./algebra-math-utils.js";
 
-export function closeToZero(value){
+export function isZero(value){
     return Math.abs(value) < eps;
 }
 

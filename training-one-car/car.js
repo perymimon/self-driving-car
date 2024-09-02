@@ -20,7 +20,6 @@ class Car {
         this.friction = 0.05
         this.angle = angle
         this.damage = false
-        this.control = controlType
 
         this.fitness = 0
 
