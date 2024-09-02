@@ -1,4 +1,6 @@
-class NeuralNetwork {
+import {lerp} from "../utils/algebra-math-utils.js"
+
+export default class NeuralNetwork {
     constructor(neuronsPerLevel = []) {
         this.levels = []
         for (let i = 0; i < neuronsPerLevel.length - 1; i++) {

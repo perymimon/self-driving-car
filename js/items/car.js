@@ -2,7 +2,8 @@ import Sensor from "./sensor.js";
 import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
 import {closeToZero, reduceToZero} from "../utils/math-utils.js";
-
+import NeuralNetwork from "../items/network.js"
+import keyboardControls from "../controles/keyboardControls.js"
 const carImg = new Image();
 carImg.src = "../car.png"
 const resolver = Promise.withResolvers()
@@ -46,7 +47,7 @@ export default class Car {
                 this.sensor.rayCount, 6, 4
             ])
         }
-        this.controls = new Controls(this.control)
+        this.controls = new keyboardControls(this.control)
 
 
         this.mask = document.createElement("canvas");

@@ -1,6 +1,6 @@
 import Segment from "../primitives/segment.js";
 import Region from "../math/region.js";
-
+import {lerp} from "../utils/algebra-math-utils.js"
 export default class Sensor {
     constructor(car, {
         rayCount = 6, rayLength = 150,

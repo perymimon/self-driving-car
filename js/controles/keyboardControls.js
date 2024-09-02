@@ -1,4 +1,4 @@
-class Controls {
+export default class KeyboardControls {
     constructor(type) {
         this.forward = false
         this.left = false

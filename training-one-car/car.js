@@ -32,7 +32,7 @@ class Car {
                 this.sensors.rayCount, 6, 4
             ])
         }
-        this.controls = new Controls(this.control)
+        this.controls = new KeyboardControls(this.control)
 
 
         this.mask = document.createElement("canvas");
