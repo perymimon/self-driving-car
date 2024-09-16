@@ -10,18 +10,32 @@ export default class Polygon {
 
     constructor(points, label) {
         this.points = points;
-        this.segments = []
-        for (var i = 1; i < points.length; i++)
-            this.segments.push(new Segment(points[i - 1], points[i]));
-        this.segments.push(new Segment(points.at(-1), points[0]));
+
+        this.#generateSegments()
         this.id = Polygon.count++
         this.label = label
 
-        for (let p of this.points)
-            p.addEventListener('change', () => {
-                this.#center = null
-                this.#radius = null
-            })
+        // for (let p of this.points)
+        //     p.addEventListener('change', () => {
+        //         this.#center = null
+        //         this.#radius = null
+        //     })
+    }
+    #generateSegments(){
+        this.segments = []
+        let points = this.points
+        for (var i = 1; i < points.length; i++)
+            this.segments.push(new Segment(points[i - 1], points[i]));
+        this.segments.push(new Segment(points.at(-1), points[0]));
+    }
+    clone(fn = (_=>_)){
+        let points = this.points.map(fn)
+        return new Polygon(points, this.label)
+    }
+    translate(fn){
+        this.points = this.points.map(fn)
+        this.#generateSegments()
+        return this
     }
 
     static load(info) {
@@ -255,12 +269,11 @@ export default class Polygon {
         ctx.fill()
         ctx.stroke()
         // my extra
-        let center = this.centeroid
         if (drawCenter || drawId) {
             if (drawCenter) center.draw(ctx, {color: 'purple'})
-            if (drawId) drawText(ctx, this.id, center.x, center.y)
+            if (drawId) drawText(ctx, this.id, this.centeroid.x, this.centeroid.y)
         }
-        if (this.label) drawText(ctx, this.label, center.x, center.y, {color: 'yellow'})
+        // if (this.label) drawText(ctx, this.label, this.centeroid.x, this.centeroid.y, {color: 'yellow'})
 
     }
 }

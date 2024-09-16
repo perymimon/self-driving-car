@@ -4,33 +4,85 @@
     <meta charset="UTF-8">
     <title>Phone Tilt Experiment</title>
     <style>
-video{
-    border:1px solid;
-
-}
         body {
             margin: 0;
-            overflow: hidden;
+            /*overflow: hidden;*/
             display: flex;
             align-items: center;
             height: 100vh;
             justify-content: center;
+            flex-wrap: wrap;
+            background-color: #0000ff;
+        }
+
+        canvas, video {
+            border: 2px solid;
+            /*background: orange;*/
+        }
+
+        video {
+            display: none
         }
 
         canvas {
-            background: orange;
+            border-color: #66ff00;
         }
 
-        .super-title {
-            position: absolute;
-            left: 10px
-        }
     </style>
 </head>
 <body>
-<video></video>
-
+<video id="myVideo"></video>
+<canvas id="myCanvas"></canvas>
+<canvas id="debugCanvas"></canvas>
+<!--<canvas id="ironManCanvas"></canvas>-->
 <script type="module">
+    import {waitToEvent} from "../js/utils/codeflow-utils.js";
+    import MarkerDetector from "../js/math/markerDetector.js"
+
+    // var debugCtx = debugCanvas.getContext("2d");
+
+    var ctx = myCanvas.getContext('2d', {willReadFrequently: true})
+    var marker = new MarkerDetector()
+    marker.debug = true
+    document.body.appendChild(marker.threshold);
+    var debugCtx = debugCanvas.getContext("2d");
+
+    function animate() {
+        ctx.drawImage(myVideo, 0, 0, myCanvas.width, myCanvas.height)
+        var imageData = ctx.getImageData(0, 0, myCanvas.width, myCanvas.height)
+        var res = marker.detect(imageData)
+        debugCtx.putImageData(imageData, 0, 0)
+
+        if (res) {
+            ctx.fillStyle = 'red'
+            for (let point of res.leftMarker.points) {
+                ctx.fillRect(point.x, point.y, 1, 1)
+            }
+            ctx.fillStyle = 'yellow'
+            for (let point of res.rightMarker.points) {
+                ctx.fillRect(point.x, point.y, 1, 1)
+            }
+        }
+        requestAnimationFrame(animate)
+    }
+
+
+    var media = navigator.mediaDevices.getUserMedia({video: true})
+        .then(async mediaStream => {
+            myVideo.srcObject = mediaStream
+            myVideo.play()
+            await waitToEvent(myVideo, 'loadeddata')
+            myCanvas.width = myVideo.videoWidth
+            myCanvas.height = myVideo.videoHeight
+
+            debugCanvas.width = myCanvas.width
+            debugCanvas.height = myCanvas.height
+
+            animate()
+        })
+    // .catch(err=>{
+    //     alert(err)
+    // })
 
 </script>
 </body>

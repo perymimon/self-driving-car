@@ -125,30 +125,32 @@ export default class Camera {
 
     render(ctx, world, carCtx) {
         const buildings = this.#filterExtrude(world.buildings.map(b => b.base), 200)
-        // const cars = this.#filterExtrude(world.cars.map(car => car.polygons), 10)
         // const trees = this.#filterExtrude(world.trees.map(tree => tree.base), 60, {color: 'green'})
         const bestCar = this.#filterExtrude([world.bestCar.polygons], 10, {color: 'green'})
         const roadPolys = world.corridor.borders.map((seg, i) => {
             return new Polygon([seg.p2, seg.p1], i)
         })
+        const carsShadow = this.#filter(world.cars.map(car => car.polygons))
 
+        for(let poly of carsShadow){
+            poly.fill = "rgba(150,150,150,1)"
+            poly.stroke = "rgba(0,0,0,0)"
+        }
         const roads = this.#filterExtrude(roadPolys, 10)
 
-        var polys = [...buildings, ...bestCar, /*...cars, /*...trees,*/ ...roads]
+        var polys = [...buildings, ...carsShadow, ...bestCar,  /*...trees,*/ ...roads]
+        // var polys = carsShadow
 
         var projectedPolys = polys.map(
-            poly => new Polygon(
-                poly.points.map(p => this.#projectPoint(ctx, p))
-            )
+            poly => poly.clone( p => this.#projectPoint(ctx, p) )
         )
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-        for (let poly of projectedPolys) {
-            poly.draw(ctx/*, {drawCenter:false, fill:'gray', stroke:'red'}*/)
+        for (let [i,poly] of projectedPolys.entries()) {
+            let {fill,stroke} = polys[i]
+            // if(fill) debugger
+            poly.draw(ctx, {fill, stroke})
         }
-        // for (let poly of polys) {
-        //     poly.draw(carCtx)
-        // }
 
 
     }

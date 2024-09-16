@@ -8,7 +8,9 @@ import {fetchLastFile} from "./operationUtil.js";
 import {arrayOrderHash} from "../js/utils/codeflow-utils.js";
 import {Counter} from "./counter.js";
 import AudioEngine from "../js/Audio/engineAudio.js";
+import CameraControl from "../js/controles/cameraControl.js";
 import Camera from "../js/camera.js";
+
 const rightPanelWidth = 300;
 
 const carCanvas = document.querySelector('#carCanvas');
@@ -41,14 +43,15 @@ reload(world)
 
 function reload(world) {
     world.cars.length = 0
-    world.addGenerateCars({type: 'KEYS', carMold, color: 'gray', name: 'Me'})
-    world.addGenerateCars({N: 30, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
+    world.addGenerateCars({type: 'CUSTOM', color: 'gray', name: 'Me'})
+    world.addGenerateCars({N:10, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
     myCar = world.cars.at(0)
     camera = new Camera(myCar)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
     var miniMapGraph = new Graph([],world.corridor.skeleton)
     miniMap = new MiniMap(miniMapCanvas, miniMapGraph, 300, world.cars);
     world.bestCar = myCar
+    myCar.controls = new CameraControl(ironManCanvas)
 }
 
 function updateBoard() {
@@ -132,6 +135,7 @@ function animate() {
 
     // world.draw(carCtx, viewPort, {showStartMarkings: false, drawSensor: false})
     miniMap.update(viewPort, world.cars)
+    miniMapCanvas.style.rotate = myCar.angle + "rad"
     camera.move(myCar)
     // camera.draw(carCtx)
     camera.render(cameraCtx, world)
@@ -165,3 +169,6 @@ function updateCarProgress(car) {
         }
     }
 }
+window.addEventListener('click', () => {
+    window.document.body.requestFullscreen()
+})

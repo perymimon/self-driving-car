@@ -3,9 +3,8 @@ import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
 import {isZero, reduceToZero} from "../utils/math-utils.js";
 import NeuralNetwork from "../items/network.js"
-import keyboardControls from "../controles/keyboardControls.js"
+import KeyboardControls from "../controles/keyboardControls.js"
 import DummyControls from "../controles/dummyControls.js";
-import KeyboardControls from "../controles/keyboardControls.js";
 import BrainControls from "../controles/brainControls.js";
 
 const carImg = new Image();
@@ -20,8 +19,8 @@ export default class Car {
     static index = 0
 
     constructor(x, y, width, height, {
-        controlType = 'DUMMY', angle = 0, maxSpeed = 3, color = "blue", label = '',
-        acceleration = 0.25, maxReverseSpeed = -1.5, friction = 0.05,
+        type, angle = 0, maxSpeed = 2, color = "blue", label = '',
+        acceleration = 0.2, maxReverseSpeed = -1.5, friction = 0.05,
 
     } = {}) {
         this.id = ++Car.index
@@ -31,7 +30,8 @@ export default class Car {
         this.height = height;
         this.color = color
 
-        this.controlType = controlType
+        // this.controlType = controlType
+        this.controlType = type
 
         this.speed = 0
         this.acceleration = acceleration
@@ -43,14 +43,14 @@ export default class Car {
         this.label = label
         this.fitness = 0
 
-        this.useBrain = controlType == 'AI'
+        this.useBrain = type == 'AI'
         this.engine = null
 
-        if (controlType != "DUMMY") {
+        if (type != "DUMMY") {
             this.sensor = new Sensor(this)
         }
 
-        switch (controlType) {
+        switch (type) {
             case 'DUMMY':
                 this.controls = new DummyControls()
                 break
@@ -61,6 +61,8 @@ export default class Car {
             case 'KEYS':
                 this.controls = new KeyboardControls()
                 break
+            // case 'CAMERA':
+            //     this.controls
 
         }
 
@@ -96,18 +98,18 @@ export default class Car {
     }
 
     static load(info, mutation) {
-        info.controlType = info.type
+        // info.controlType = info.type
         var {x, y, width, height} = info
         var car = new Car(x, y, width, height, info)
-        // if (info.sensor)
-        car.sensor = new Sensor(car, {
-            rayCount: info.sensor.rayCount,
-            raySpread: info.sensor.raySpread,
-            rayLength: info.sensor.rayLength,
-            rayOffset: info.sensor.rayOffset,
-            radius: info.sensor.radius,
-        })
-        if(info.brain) {
+        if (info.sensor)
+            car.sensor = new Sensor(car, {
+                rayCount: info.sensor.rayCount,
+                raySpread: info.sensor.raySpread,
+                rayLength: info.sensor.rayLength,
+                rayOffset: info.sensor.rayOffset,
+                radius: info.sensor.radius,
+            })
+        if (info.brain) {
             let brain = structuredClone(info.brain)
             if (mutation)
                 NeuralNetwork.mutate(brain, mutation)
@@ -137,7 +139,7 @@ export default class Car {
 
             if (this.useBrain) {
                 const offsets = this.sensor.readings.map(s => s == null ? 0 : 1 - s.offset)
-                this.controls.update(offsets)
+                this.controls?.update(offsets)
                 // const outputs = NeuralNetwork.feedForward(offsets, this.brain)
                 // this.controls.forward = outputs[0]
                 // this.controls.left = outputs[1]
@@ -194,6 +196,8 @@ export default class Car {
     }
 
     #move() {
+        if (!this.controls) return
+
         if (this.controls.forward) {
             this.speed += this.acceleration
         }

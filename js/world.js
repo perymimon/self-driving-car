@@ -132,7 +132,7 @@ export default class World {
 
     }
 
-    addGenerateCars({N = 1, type = 'AI', mutation = 0, carMold = null, color = 'red', name = ''} = {}) {
+    addGenerateCars({N = 1, type = 'CUSTOM', mutation = 0, carMold = null, color = 'red', name = ''} = {}) {
         const starts = this.markings.filter(m => m instanceof Start)
         let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
         let point = start?.center ?? new Point(100, 100)
@@ -147,7 +147,7 @@ export default class World {
                 y: point.y,
                 width: 30,
                 height: 50,
-                controlType: type,
+                controlType:type,
                 angle: Math.PI / 2 - angle(dir),
                 maxSpeed: 4,
                 color,

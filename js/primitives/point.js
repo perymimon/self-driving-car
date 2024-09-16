@@ -16,7 +16,7 @@ export default class Point extends Dispatcher {
 
     set x(v) {
         this.#x = v
-        this.#trigger('change', {key: 'x', value: v})
+        this.trigger('change', {key: 'x', value: v})
     }
 
     get x() {
@@ -25,7 +25,7 @@ export default class Point extends Dispatcher {
 
     set y(v) {
         this.#y = v
-        this.#trigger('change', {key: 'y', value: v})
+        this.trigger('change', {key: 'y', value: v})
     }
 
     get y() {
@@ -34,7 +34,7 @@ export default class Point extends Dispatcher {
 
     set z(v) {
         this.#z = v
-        this.#trigger('change', {key: 'z', value: v})
+        this.trigger('change', {key: 'z', value: v})
     }
 
     get z() {

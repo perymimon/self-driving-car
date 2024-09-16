@@ -2,9 +2,10 @@ import {scale} from "../utils/algebra-math-utils.js";
 import Point from "../primitives/point.js";
 
 export default class MiniMap {
-    constructor(canvas, graph, size) {
+    constructor(canvas, graph, size, cars) {
         this.canvas = canvas;
         this.graph = graph;
+        this.cars = cars;
         this.size = size;
 
         canvas.width = size;
@@ -16,20 +17,25 @@ export default class MiniMap {
         let {ctx, canvas, size} = this
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        let scaler = 0.1
-        let offset = scale(viewPort.getOffset(), scaler)
-        // let viewPoint = scale(offset, scaler)
+        let scalar = 0.1
+        let offset = scale(viewPort.getOffset(), scalar)
+        // let viewPoint = scale(offset, scalar)
         ctx.save()
         ctx.translate(
             offset.x + size / 2,
             offset.y + size / 2
         );
-        ctx.scale(scaler, scaler);
+        ctx.scale(scalar, scalar);
         for (let seg of this.graph.segments) {
-            seg.draw(ctx, {width: 5 / scaler, color: 'white'})
+            seg.draw(ctx, {width: 4 / scalar, color: 'white'})
         }
         for (let car of cars) {
-            if(car.damage) continue
+            this.ctx.beginPath()
+            this.ctx.arc(car.x, car.y, 5 / scalar, 0, Math.PI * 2)
+            this.ctx.fill()
+        }
+        for (let car of cars) {
+            if (car.damage) continue
             new Point(car.x, car.y).draw(ctx, {color: 'red'});
         }
 

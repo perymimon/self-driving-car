@@ -1,6 +1,5 @@
 body, html{
     margin: 0;
-    background: #4a4a4a;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,9 +11,16 @@ body, html{
     background: radial-gradient(circle farthest-side, #5A5, #096);
 }
 #cameraCanvas{
-    background: gray;
+    background-image: linear-gradient(lightblue, white 40%);
+    /*background-image: radial-gradient( at 100% 70%,  white 40%, lightblue, orangered);*/
 }
-
+#ironManCanvas{
+    position: absolute;
+    top: 20px;
+    left: 2em;
+    width:300px;
+    opacity: 50%;
+}
 #visualizer{
     display: flex;
     justify-content: space-between;
