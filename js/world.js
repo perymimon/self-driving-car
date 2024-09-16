@@ -147,7 +147,7 @@ export default class World {
                 y: point.y,
                 width: 30,
                 height: 50,
-                controlType:type,
+                type,
                 angle: Math.PI / 2 - angle(dir),
                 maxSpeed: 4,
                 color,

@@ -1,11 +1,12 @@
 import Sensor from "./sensor.js";
 import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
-import {isZero, reduceToZero} from "../utils/math-utils.js";
+import {getMaxItem, isZero, reduceToZero} from "../utils/math-utils.js";
 import NeuralNetwork from "../items/network.js"
 import KeyboardControls from "../controles/keyboardControls.js"
 import DummyControls from "../controles/dummyControls.js";
 import BrainControls from "../controles/brainControls.js";
+import {getNearestSegment, magnitude, normalize, subtract} from "../utils/algebra-math-utils.js";
 
 const carImg = new Image();
 carImg.src = "../car.png"
@@ -21,7 +22,7 @@ export default class Car {
     constructor(x, y, width, height, {
         type, angle = 0, maxSpeed = 2, color = "blue", label = '',
         acceleration = 0.2, maxReverseSpeed = -1.5, friction = 0.05,
-
+        noDamage = false
     } = {}) {
         this.id = ++Car.index
         this.x = x;
@@ -31,7 +32,7 @@ export default class Car {
         this.color = color
 
         // this.controlType = controlType
-        this.controlType = type
+        this.type = type
 
         this.speed = 0
         this.acceleration = acceleration
@@ -42,6 +43,7 @@ export default class Car {
         this.damage = false
         this.label = label
         this.fitness = 0
+        this.noDamage = noDamage
 
         this.useBrain = type == 'AI'
         this.engine = null
@@ -89,7 +91,7 @@ export default class Car {
         this.brain = info.brain
         // this.maxSpeed = info.maxSpeed
         // this.friction = info.friction
-        this.controlType = info.control
+        this.type = info.control
         this.acceleration = info.acceleration
         this.sensor.rayCount = info.sensor.rayCount
         this.sensor.raySpread = info.sensor.raySpread
@@ -98,7 +100,6 @@ export default class Car {
     }
 
     static load(info, mutation) {
-        // info.controlType = info.type
         var {x, y, width, height} = info
         var car = new Car(x, y, width, height, info)
         if (info.sensor)
@@ -120,6 +121,25 @@ export default class Car {
 
     }
 
+    #pingCar(roadBorders) {
+        var seg = getNearestSegment(this, roadBorders)
+        var correctors = this.polygons.points.map(p => {
+            let {point: projPoint} = seg.projectPoint(p)
+            return subtract(projPoint, p)
+        })
+        var corrector = getMaxItem(correctors, p => magnitude(p))
+        var normCorrector = normalize(corrector)
+
+        this.x -= normCorrector.x
+        this.y -= normCorrector.y
+
+        if ([correctors[0], correctors[2]].includes(corrector)) {
+            this.angle += 0.1
+        } else {
+            this.angle -= 0.1
+        }
+    }
+
     update(roadBorders, traffic) {
         if (this.damage) return false
         if (isZero(this.speed) && this.useBrain) setTimeout(_ => {
@@ -133,6 +153,10 @@ export default class Car {
         this.damage = this.#assessDamage(roadBorders, traffic)
         if (this.damage) {
             this.speed = 0
+        }
+        if (this.damage && this.noDamage == true) {
+            this.#pingCar(roadBorders)
+            this.damage = false
         }
         if (this.sensor) {
             this.sensor?.update(roadBorders, traffic)
@@ -159,7 +183,6 @@ export default class Car {
     }
 
     #assessDamage(roadBorders, traffic) {
-        return false
         for (let seg of roadBorders) {
             if (this.polygons.intersectSeg(seg))
                 return true

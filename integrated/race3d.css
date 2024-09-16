@@ -29,7 +29,6 @@ body, html{
     position: absolute;
     inset: 0;
     left: auto;
-    opacity: 0.5;
     margin-inline: .5em;
     width: 14em;
     margin: 1em;
@@ -48,7 +47,6 @@ body, html{
     overflow-y: hidden;
     height:15em;
     padding: .5em;
-    text-shadow: white 1px 1px 1px;
 
 }
 
@@ -62,7 +60,8 @@ body, html{
 }
 #miniMapCanvas{
     border-radius:50%;
-    border: 1px solid white
+    border: 1px solid white;
+    opacity: 0.5;
 
 }
 

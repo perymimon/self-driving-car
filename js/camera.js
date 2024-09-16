@@ -5,22 +5,25 @@ import {cross, distance, lerp, subtract} from "./utils/algebra-math-utils.js";
 import Segment from "./primitives/segment.js";
 
 export default class Camera {
-    constructor({x, y, angle, speed = 0}, range = 1500, distanceBehind = 125) {
-
+    constructor(car, range = 1500, distanceBehind = 125) {
+        let {x, y, angle, speed = 0, maxSpeed = 3} = car
         this.range = range;
         this.distanceBehind = distanceBehind;
-        // this.x = x
-        // this.y = y
-        // this.angle = angle
-        this.move({x, y, angle, speed});
+        this.x = x
+        this.y = y
+        this.angle = angle
+        this.move(car);
 
     }
 
-    move({x, y, angle, speed}) {
-        let t = 0.06
-        this.x = lerp(this.x ?? x, x + this.distanceBehind * Math.sin(angle), t)
-        this.y = lerp(this.y ?? y, y + this.distanceBehind * Math.cos(angle), t)
-        this.z = lerp(this.z ?? -30, -30 + speed *2* Math.random(),0.05)
+    move({x, y, angle, speed, maxSpeed}) {
+        let t = 0.15
+        this.x ??= x
+        this.y ??= y
+        this.z ??= -30 - (10 * speed/maxSpeed)
+        this.x = lerp(this.x, x + this.distanceBehind * Math.sin(angle), t)
+        this.y = lerp(this.y, y + this.distanceBehind * Math.cos(angle), t)
+        // this.z = lerp(this.z , -30 + speed *2* Math.random(),0.05)
         this.angle = lerp(this.angle ?? angle, angle, t)
         this.center = new Point(this.x, this.y);
         this.tip = new Point(//todo: need to research it more
@@ -132,9 +135,17 @@ export default class Camera {
         })
         const carsShadow = this.#filter(world.cars.map(car => car.polygons))
 
-        for(let poly of carsShadow){
+        for (let poly of carsShadow) {
             poly.fill = "rgba(150,150,150,1)"
             poly.stroke = "rgba(0,0,0,0)"
+            this.dist = poly.distanceToPoint(this)
+            // poly.label = this.dist.toFixed(0)
+        }
+        for (let poly of buildings) {
+            poly.fill = "rgba(150,150,150,.5)"
+            poly.stroke = "rgba(150,150,150,1)"
+            poly.dist = poly.distanceToPoint(this)
+            // poly.label = this.dist.toFixed(0)
         }
         const roads = this.#filterExtrude(roadPolys, 10)
 
@@ -142,18 +153,21 @@ export default class Camera {
         // var polys = carsShadow
 
         var projectedPolys = polys.map(
-            poly => poly.clone( p => this.#projectPoint(ctx, p) )
+            poly => poly.clone(p => this.#projectPoint(ctx, p))
         )
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-        for (let [i,poly] of projectedPolys.entries()) {
-            let {fill,stroke} = polys[i]
-            // if(fill) debugger
-            poly.draw(ctx, {fill, stroke})
+        const x = this.x, y = this.y;
+        for (let [i, poly] of projectedPolys.entries()) {
+            let {fill, stroke, dist = 0} = polys[i]
+            ctx.globalAlpha = (1 - dist / this.range) ** 2
+            poly.draw(ctx, {fill, stroke, join:"round"})
+            // ctx.globalAlpha = 1
         }
 
 
     }
+
     draw(ctx) {
         // this.center.draw(ctx, {color: 'red'});
         // this.tip.draw(ctx, {color: 'black'});

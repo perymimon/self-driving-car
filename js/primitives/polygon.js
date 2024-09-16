@@ -273,7 +273,7 @@ export default class Polygon {
             if (drawCenter) center.draw(ctx, {color: 'purple'})
             if (drawId) drawText(ctx, this.id, this.centeroid.x, this.centeroid.y)
         }
-        // if (this.label) drawText(ctx, this.label, this.centeroid.x, this.centeroid.y, {color: 'yellow'})
+        if (this.label) drawText(ctx, this.label, this.centeroid.x, this.centeroid.y, {color: 'black'})
 
     }
 }
