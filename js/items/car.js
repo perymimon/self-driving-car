@@ -1,7 +1,8 @@
 import Sensor from "./sensor.js";
 import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
-import {getMaxItem, isZero, reduceToZero} from "../utils/math-utils.js";
+import { isZero, reduceToZero} from "../utils/math-utils.js";
+import { getMaxItem } from "../utils/codeflow-utils.js";
 import NeuralNetwork from "../items/network.js"
 import KeyboardControls from "../controles/keyboardControls.js"
 import DummyControls from "../controles/dummyControls.js";

@@ -28,6 +28,13 @@ export function getNearestSegment(point, segments, threshold = Number.MAX_SAFE_I
     }
     return nearest
 }
+export function vector3d(horAngle,  verAngle, length){
+    return new Point(
+        Math.cos(horAngle) * Math.cos(verAngle) * length, // X component
+        Math.sin(horAngle) * Math.cos(verAngle) * length, // Y component
+        Math.sin(verAngle) * length                            // Z component
+    );
+}
 
 export function distance(p1, p2) {
     return Math.hypot(p1.x - p2.x, p1.y - p2.y)
@@ -61,7 +68,7 @@ export function dot(p1, p2) {
     return p1.x * p2.x + p1.y * p2.y
 }
 
-export function cross(p1, p2){
+export function cross(p1, p2) {
     return p1.x * p2.y - p1.y * p2.x
 }
 
@@ -69,7 +76,16 @@ export function cross(p1, p2){
 export function translate(point, angle, offset) {
     return new Point(
         point.x + Math.cos(angle) * offset,
-        point.y + Math.sin(angle) * offset
+        point.y + Math.sin(angle) * offset,
+        point.z
+    )
+}
+
+export function translate3d(point, offset, angle, angle2 = 0) {
+    return new Point(
+        point.x + Math.cos(angle) * offset,
+        point.y + Math.sin(angle) * offset,
+        point.z + Math.sin(angle2) * offset
     )
 }
 
@@ -77,8 +93,16 @@ export function angle(p) {
     return Math.atan2(p.y, p.x)
 }
 
+export function angle2P(p1, p2) {
+    return Math.atan2(p1.y - p2.y, p1.x - p2.x)
+}
+
 export function radToDeg(rad) {
     return (180 / Math.PI) * rad
+}
+
+export function degToRad(deg) {
+    return (Math.PI / 180) * deg
 }
 
 export function lerp(A, B, t) {
@@ -90,6 +114,15 @@ export function lerp2D(A, B, t) {
         lerp(A.x, B.x, t),
         lerp(A.y, B.y, t),
     )
+}
+
+export function inward(a, b, p = 0.3) {
+    var A = lerp2D(a, b, p)
+    var B = lerp2D(b, a, p)
+    a.x = A.x
+    a.y = A.y
+    b.x = B.x
+    b.y = B.y
 }
 
 export function getIntersection(seg1, seg2) {
@@ -206,9 +239,6 @@ export function domainMap(v, domain, limit) {
     return (v - ds) / (de - ds) * (le - ls) + ls
 }
 
-export function degToRad(deg) {
-    return deg * Math.PI / 180
-}
 
 export function getShortestPath(start, end, graph) {
     if (!start || !end) return []
