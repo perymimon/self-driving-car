@@ -9,6 +9,7 @@ import {arrayOrderHash} from "../js/utils/codeflow-utils.js";
 import {Counter} from "./counter.js";
 import AudioEngine from "../js/Audio/engineAudio.js";
 import Camera from "../js/camera.js";
+
 const rightPanelWidth = 300;
 
 const carCanvas = document.querySelector('#carCanvas');
@@ -44,7 +45,7 @@ function reload(world) {
     carMold.noDamage = true
 
     world.addGenerateCars({type: 'KEYS', carMold, color: 'gray', name: 'Me'})
-    world.addGenerateCars({N: 30, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
+    world.addGenerateCars({N: 10, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
     myCar = world.cars.at(0)
     camera = new Camera(myCar)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
@@ -134,6 +135,7 @@ function animate() {
 
     // world.draw(carCtx, viewPort, {showStartMarkings: false, drawSensor: false})
     miniMap.update(viewPort, world.cars)
+    miniMapCanvas.style.rotate = myCar.angle + "rad"
     camera.move(myCar)
     // camera.draw(carCtx)
     camera.render(cameraCtx, world)
@@ -167,3 +169,6 @@ function updateCarProgress(car) {
         }
     }
 }
+window.addEventListener('click', () => {
+    window.document.body.requestFullscreen()
+})

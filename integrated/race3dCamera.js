@@ -43,7 +43,9 @@ reload(world)
 
 function reload(world) {
     world.cars.length = 0
-    world.addGenerateCars({type: 'CUSTOM', color: 'gray', name: 'Me'})
+    carMold.noDamage = true
+
+    world.addGenerateCars({type: 'CUSTOM', carMold:{noDamage:true} , color: 'gray', name: 'Me'})
     world.addGenerateCars({N:10, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
     myCar = world.cars.at(0)
     camera = new Camera(myCar)
@@ -60,7 +62,7 @@ function updateBoard() {
         let div = document.getElementById(car.id) || (_ => {
             let div = document.createElement('div')
             div.id = car.id
-            div.style.color = car.color
+            div.style.color = car.type == "AI"? 'white' : car.color
             div.classList.add('stat')
             return div
         })();

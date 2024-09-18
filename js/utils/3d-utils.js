@@ -16,7 +16,6 @@ export function generateFaces(poly1, poly2) {
 }
 
 export function extrude(face1, {x = 0, y = 0, z = 0} = {}) {
-    debugger
     var face2 = new Polygon(
         face1.points.map(p => new Point(
             p.x + x, p.y + y, p.z + z
