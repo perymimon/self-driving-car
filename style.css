@@ -22,7 +22,10 @@ h2 {
     font-weight: 700;
     margin-top: 30px;
 }
-
+h3{
+    text-align: center;
+    margin-block: 0;
+}
 p, ul {
     font-family: 'Roboto', sans-serif;
     font-size: 1rem;
