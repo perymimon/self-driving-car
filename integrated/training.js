@@ -1,5 +1,11 @@
+import NeuralNetwork from "../js/items/network.js"
+import BrainVisualizer from "../js/visualizer/brain-visualizer.js";
+import Car from "../js/items/Car.js";
+import PrimitiveRoad from "../js/items/primitive-road.js"
+
 const carCanvas = document.querySelector('#carCanvas');
 const lanes = 5
+
 carCanvas.width = lanes * 80;
 
 const networkCanvas = document.querySelector('#networkCanvas');
@@ -8,7 +14,7 @@ networkCanvas.width = 300;
 const carCtx = carCanvas.getContext('2d');
 const networkCtx = networkCanvas.getContext('2d');
 
-const road = new Road(carCanvas.width / 2, carCanvas.width * 0.9, lanes);
+const road = new PrimitiveRoad(carCanvas.width / 2, carCanvas.width * 0.9, lanes);
 const cars = generateCars(1000)
 var bestCar = cars[0]
 var goodCars = [...cars]
@@ -24,24 +30,27 @@ if (localStorage.getItem('bestBrain')) {
 
 
 var traffic = [
-    new Car(road.getLaneCenter(1), -100, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(0), -300, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(2), -300, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(2), -500, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(1), -500, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(0), -900, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(1), -700, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(0), -100, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(3), -300, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(4), -400, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(0), -700, 30, 50, "DUMMY", 0, 3),
-    new Car(road.getLaneCenter(4), -600, 30, 50, "DUMMY", 0, 3),
+    new Car(road.getLaneCenter(1), -100, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(0), -300, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(2), -300, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(2), -500, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(1), -500, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(0), -900, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(1), -700, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(0), -100, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(3), -300, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(4), -400, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(0), -700, 30, 50, {type: "DUMMY", maxSpeed: 3}),
+    new Car(road.getLaneCenter(4), -600, 30, 50, {type: "DUMMY", maxSpeed: 3}),
 ]
 
 animate()
 
 function generateCars(N) {
-    return Array.from(Array(N), () => new Car(road.getLaneCenter(1), 100, 30, 50, "AI", 0, 4, 'red'))
+    return Array(N).fill().map(() => new Car(road.getLaneCenter(1), 100, 30, 50, {
+            type: "AI", maxSpeed: 4, color: 'red'
+        })
+    )
 }
 
 function save() {
@@ -63,7 +72,7 @@ function animate(time) {
         if (!(bestCar.y - car.y < -carCanvas.height)) continue
         let lance = random(0, lanes)
         let y = bestCar.y - carCanvas.height * 0.7 - random(0, 10) * 100
-        let newCar = new Car(road.getLaneCenter(lance), y, 30, 50, "DUMMY", 0, 3 )
+        let newCar = new Car(road.getLaneCenter(lance), y, 30, 50, "DUMMY", 0, 3)
         traffic.splice(i, 1, newCar)
     }
 
@@ -115,6 +124,6 @@ function animate(time) {
     carCtx.restore()
 
     networkCtx.lineDashOffset = -time / 50
-    Visualizer.drawNetwork(networkCtx, bestCar.brain)
+    BrainVisualizer.drawNetwork(networkCtx, bestCar.controls.brain)
     requestAnimationFrame(animate)
 }

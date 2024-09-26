@@ -1,4 +1,8 @@
-class Road {
+import Segment from "../primitives/segment.js";
+import Point from "../primitives/point.js";
+import {lerp} from "../utils/algebra-math-utils.js"
+
+export default class PrimitiveRoad {
     constructor(x, width, laneCount = 3) {
         this.width = width;
         this.laneCount = laneCount;
@@ -10,14 +14,14 @@ class Road {
         const infinity = 10_000_000
         this.top = -infinity
         this.bottom = infinity
-        const topLeft = {x: this.left, y: this.top}
-        const topRight = {x: this.right, y: this.top}
-        const bottomLeft = {x: this.left, y: this.bottom}
-        const bottomRight = {x: this.right, y: this.bottom}
+        const topLeft = new Point(this.left, this.top)
+        const topRight = new Point(this.right, this.top)
+        const bottomLeft = new Point(this.left, this.bottom)
+        const bottomRight = new Point(this.right, this.bottom)
 
         this.borders = [
-            [topLeft, bottomLeft],
-            [topRight, bottomRight]
+            new Segment(topLeft, bottomLeft),
+            new Segment(topRight, bottomRight)
         ]
     }
 
@@ -40,11 +44,12 @@ class Road {
         }
 
         for (let border of this.borders) {
-            ctx.setLineDash([])
-            ctx.beginPath()
-            ctx.moveTo(border[0].x, border[0].y)
-            ctx.lineTo(border[1].x, border[1].y)
-            ctx.stroke()
+            border.draw(ctx, {dash: []})
+            // ctx.setLineDash([])
+            // ctx.beginPath()
+            // ctx.moveTo(border[0].x, border[0].y)
+            // ctx.lineTo(border[1].x, border[1].y)
+            // ctx.stroke()
         }
     }
 }

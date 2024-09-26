@@ -98,7 +98,7 @@ function animate(time) {
     networkCtx.lineDashOffset = -time / 100
 
     networkCtx.clearRect(0, 0, networkCanvas.width, networkCanvas.height)
-    // if (bestCar) Visualizer.drawNetwork(networkCtx, bestCar.brain)
+    // if (bestCar) BrainVisualizer.drawNetwork(networkCtx, bestCar.brain)
 }
 
 document.getElementById('saveBrain').addEventListener('click', saveBrain)

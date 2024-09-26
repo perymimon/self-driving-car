@@ -8,7 +8,7 @@ import {fetchLastFile} from "./operationUtil.js";
 import {arrayOrderHash} from "../js/utils/codeflow-utils.js";
 import {Counter} from "./counter.js";
 import AudioEngine from "../js/Audio/engineAudio.js";
-import CameraControl from "../js/controles/cameraControl.js";
+import CameraControl from "../js/controls/cameraControl.js";
 import Camera from "../js/camera.js";
 
 const rightPanelWidth = 300;

@@ -4,9 +4,9 @@ import Point from "../primitives/point.js";
 import { isZero, reduceToZero} from "../utils/math-utils.js";
 import { getMaxItem } from "../utils/codeflow-utils.js";
 import NeuralNetwork from "../items/network.js"
-import KeyboardControls from "../controles/keyboardControls.js"
-import DummyControls from "../controles/dummyControls.js";
-import BrainControls from "../controles/brainControls.js";
+import KeyboardControls from "../controls/keyboardControls.js"
+import DummyControls from "../controls/dummyControls.js";
+import BrainControls from "../controls/brainControls.js";
 import {getNearestSegment, magnitude, normalize, subtract} from "../utils/algebra-math-utils.js";
 
 const carImg = new Image();

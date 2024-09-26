@@ -9,7 +9,7 @@ import {arrayOrderHash} from "../js/utils/codeflow-utils.js";
 import {Counter} from "./counter.js";
 import AudioEngine from "../js/Audio/engineAudio.js";
 import Camera from "../js/camera.js";
-import PhoneControls from "../js/controles/phoneControls.js";
+import PhoneControls from "../js/controls/phoneControls.js";
 const rightPanelWidth = 300;
 
 const carCanvas = document.querySelector('#carCanvas');

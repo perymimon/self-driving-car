@@ -1,4 +1,7 @@
-class Visualizer {
+import {lerp} from "../utils/algebra-math-utils.js"
+import {clearCircle, getRGBA} from "../utils/canvas-utils.js";
+
+export default class BrainVisualizer {
     static drawNetwork(ctx, network) {
         const margin = 50
         const left = margin
@@ -6,7 +9,7 @@ class Visualizer {
         const width = ctx.canvas.width - margin * 2;
         const height = ctx.canvas.height - margin * 2;
 
-        // Visualizer.drawLevel(ctx, network.levels[0], left, top, width, height)
+        // BrainVisualizer.drawLevel(ctx, network.levels[0], left, top, width, height)
         const {levels} = network
         const levelsCount = levels.length
         const levelHeight = height / levelsCount
@@ -15,7 +18,7 @@ class Visualizer {
         for (let i = levelsCount - 1; 0 <= i; i--) {
             const offset = levelsCount == 1 ? 0.5 : i / (levelsCount - 1)
             const levelTop = top + lerp(height - levelHeight, 0, offset)
-            Visualizer.drawLevel(ctx, levels[i], left, levelTop, width, levelHeight,
+            BrainVisualizer.drawLevel(ctx, levels[i], left, levelTop, width, levelHeight,
                 symbols
             )
             symbols = null
@@ -32,8 +35,8 @@ class Visualizer {
 
         for (let i = 0; i < inputs.length; i++) {
             for (let j = 0; j < outputs.length; j++) {
-                const xOutput = Visualizer.#getNodeX(outputs, j, left, right)
-                const xInput = Visualizer.#getNodeX(inputs, i, left, right)
+                const xOutput = BrainVisualizer.#getNodeX(outputs, j, left, right)
+                const xInput = BrainVisualizer.#getNodeX(inputs, i, left, right)
                 ctx.beginPath()
                 ctx.moveTo(xInput, bottom)
                 ctx.lineTo(xOutput, top)
@@ -45,7 +48,8 @@ class Visualizer {
         }
 
         for (let i = 0; i < inputs.length; i++) {
-            const x = Visualizer.#getNodeX(inputs, i, left, right)
+            const x = BrainVisualizer.#getNodeX(inputs, i, left, right)
+            clearCircle(ctx, x, bottom, nodeRadius)
             clearCircle(ctx, x, bottom, nodeRadius)
             ctx.beginPath()
             ctx.arc(x, bottom, nodeRadius * 0.8, 0, 2 * Math.PI)
@@ -54,7 +58,7 @@ class Visualizer {
         }
 
         for (let i = 0; i < outputs.length; i++) {
-            const x = Visualizer.#getNodeX(outputs, i, left, right)
+            const x = BrainVisualizer.#getNodeX(outputs, i, left, right)
 
             clearCircle(ctx, x, top, nodeRadius)
 
