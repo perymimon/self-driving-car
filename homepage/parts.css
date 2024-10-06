@@ -1,0 +1,125 @@
+body {
+    scroll-padding: 20px;
+    scroll-behavior: smooth;
+}
+
+/* scroll-snap */
+.x.mandatory-scroll-snapping {
+    scroll-snap-type: x mandatory;
+}
+
+.x.proximity-scroll-snapping {
+    scroll-snap-type: x proximity;
+}
+
+.y.mandatory-scroll-snapping {
+    scroll-snap-type: y mandatory;
+}
+
+.y.proximity-scroll-snapping {
+    scroll-snap-type: y proximity;
+}
+
+.container {
+    text-align: center;
+    scroll-snap-align: start;
+    flex: none;
+}
+
+.navbar {
+    position: sticky;
+    top: 4px;
+    z-index: 1;
+    padding-inline: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .navbar-brand {
+        text-align: start;
+        --main-color: orange;
+        a {
+            color: currentColor;
+        }
+        small {
+            display: block;
+        }
+    ;
+        stroke: 1px solid;
+        -webkit-text-stroke: 1px #ffffff00;
+    }
+}
+
+ul.list-style-none{
+    list-style-type: none;
+}
+
+.glass {
+    backdrop-filter: blur(5px);
+    background: rgb(166 157 213 / 25%);
+    border: solid rgba(255, 255, 255, 50%);
+}
+.text-gradient{
+    --startColor: var(--main-color, #42d392);
+    --endColor: var(--second-color, #647eff);
+    background: -webkit-linear-gradient(315deg, var(--startColor) 25%, var(--endColor));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.roundness {
+    border-radius: 1em;
+}
+
+strong {
+    color: #663399ad;
+}
+.card {
+    background-color: rgba(248, 249, 250, 0.7);
+    border: 1px solid #e0e0e0;
+    padding: .5em;
+    border-radius: 8px;
+    text-align: left;
+    color:black;
+    --main-color: #978bbc;
+    h3{
+        text-align: left;
+    }
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+
+.feature-grid img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.feature-grid h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: black;
+}
+
+.feature-grid p {
+    font-size: 1rem;
+    color: #333;
+}
+
+ul.list{
+    color: #337982;
+    font-size: 0.8em;
+    text-align: left;
+    list-style-type: square;
+    list-style-position: inside;
+}
+#modules-and-architecture{
+    .card{
+        margin-block-end: .5em;
+    }
+}

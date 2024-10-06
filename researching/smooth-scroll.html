@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>smooth scroll</title>
+    <style>
+        body {
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+        }
+        a{display: block}
+        .container{
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items:center;
+            flex-direction:column;
+            border:1px solid;
+            font-size:4em;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+        }
+        .flex-container {
+            flex: 1;
+            overflow: scroll;
+            height: 100vh;
+            scroll-behavior: smooth; /* Add this line */
+            scroll-snap-type: y proximity;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <a href="#c-01">go to container 01</a>
+    <a href="#c-02">go to container 02</a>
+    <a href="#c-03">go to container 03</a>
+    <a href="#c-04">go to container 04</a>
+    <a href="#c-05">go to container 05</a>
+    <a href="#c-06">go to container 06</a>
+    <a href="#c-07">go to container 07</a>
+    <a href="#c-08">go to container 08</a>
+    <a href="#c-09">go to container 09</a>
+    <a href="#c-10">go to container 10</a>
+</div >
+<div class="flex-container">
+    <div class="container" id="c-01" style="background:burlywood">01</div>
+    <div class="container" id="c-02" style="background:darksalmon">02</div>
+    <div class="container" id="c-03" style="background:#3db843">03</div>
+    <div class="container" id="c-04" style="background:#38ac8d">04</div>
+    <div class="container" id="c-05" style="background:#32abb6">05</div>
+    <div class="container" id="c-06" style="background:#806126">06</div>
+    <div class="container" id="c-07" style="background:#9421a1">07</div>
+    <div class="container" id="c-08" style="background:#adcf17">08</div>
+    <div class="container" id="c-09" style="background:#325a30">09</div>
+    <div class="container" id="c-10" style="background:#66c1b4">10</div>
+</div>
+
+</body>
+</html>

@@ -1,4 +1,3 @@
-import NeuralNetwork from "../js/items/network.js"
 import BrainVisualizer from "../js/visualizer/brain-visualizer.js";
 import Car from "../js/items/Car.js";
 import PrimitiveRoad from "../js/items/primitive-road.js"
@@ -15,18 +14,7 @@ const carCtx = carCanvas.getContext('2d');
 const networkCtx = networkCanvas.getContext('2d');
 
 const road = new PrimitiveRoad(carCanvas.width / 2, carCanvas.width * 0.9, lanes);
-const cars = generateCars(1000)
-var bestCar = cars[0]
-var goodCars = [...cars]
-
-if (localStorage.getItem('bestBrain')) {
-    let bestBrain = JSON.parse(localStorage.getItem('bestBrain'));
-    for (let car of cars) {
-        let brain = structuredClone(bestBrain)
-        car.brain = NeuralNetwork.mutate(brain, 0.1);
-    }
-    cars[0].brain = bestBrain
-}
+const cars = generateCars(100)
 
 
 var traffic = [
@@ -44,22 +32,31 @@ var traffic = [
     new Car(road.getLaneCenter(4), -600, 30, 50, {type: "DUMMY", maxSpeed: 3}),
 ]
 
-animate()
 
 function generateCars(N) {
-    return Array(N).fill().map(() => new Car(road.getLaneCenter(1), 100, 30, 50, {
-            type: "AI", maxSpeed: 4, color: 'red'
+    var savedBrainString = localStorage.getItem('bestBrain')
+    if (savedBrainString) {
+        var bestBrain = JSON.parse(savedBrainString);
+    }
+    var cars = Array(N).fill().map(() =>
+        new Car(road.getLaneCenter(1), 100, 30, 50, {
+            type: "AI", maxSpeed: 4, color: 'red', brain: bestBrain, mutation: 0.2
         })
     )
+    if (bestBrain)
+        cars[0].controls.brain = bestBrain
+    return cars
+
 }
 
-function save() {
-    localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain))
+globalThis.save = function save() {
+    localStorage.setItem('bestBrain', JSON.stringify(bestCar.controls.brain))
 }
-
-function discard() {
+globalThis.discard = function discard() {
     localStorage.removeItem('bestBrain')
 }
+var goodCars = [...cars]
+var bestCar = goodCars.at(0)
 
 function animate(time) {
     // ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -68,6 +65,7 @@ function animate(time) {
         y: -bestCar.y + carCanvas.height * 0.7
     }
 
+    // generate more traffic
     for (let [i, car] of traffic.entries()) {
         if (!(bestCar.y - car.y < -carCanvas.height)) continue
         let lance = random(0, lanes)
@@ -80,25 +78,14 @@ function animate(time) {
     for (let car of traffic) {
         car.update(road.borders, [])
     }
+    goodCars.forEach(car => car.update(road.borders, traffic))
+    goodCars = goodCars.filter(car => !car.damage).sort((a, b) => a.y - b.y)
 
-    let farestCar = goodCars.reduce((best, car) => best.y > car.y ? car : best)
-    for (let car of goodCars) {
-        if (Math.abs(farestCar.y - car.y) > carCanvas.height) {
-            car.damage = true
-        } else {
-            car.update(road.borders, traffic)
-        }
-    }
-    goodCars = goodCars.filter(car => !car.damage)
+    bestCar = goodCars.at(0)
 
-
-    let candidatesCars = goodCars.filter(car => Math.abs(car.y - farestCar.y) <= 100)
-    bestCar = candidatesCars.reduce((best, car) => {
-            let bestToMiddle = Math.abs(best.x - road.getLaneCenter(1))
-            let carToMiddle = Math.abs(car.x - road.getLaneCenter(1))
-            return bestToMiddle > carToMiddle ? car : best
-        }
-    )
+    goodCars.forEach(car => {
+        car.damage = Math.abs(bestCar.y - car.y) > carCanvas.height
+    })
 
     carCanvas.height = window.innerHeight;
     networkCanvas.height = window.innerHeight;
@@ -118,8 +105,9 @@ function animate(time) {
     }
     carCtx.globalAlpha = 1
 
-    bestCar.draw(carCtx, 'blue', true)
-    cars[0].draw(carCtx, 'orange', true)
+    // cars[0].draw(carCtx, {color: 'orange', drawSensor: true})
+    bestCar.draw(carCtx, {color: 'yellow', drawSensor: true})
+    cars.at(0).draw(carCtx, {color: 'green', drawSensor: true})
 
     carCtx.restore()
 
@@ -127,3 +115,5 @@ function animate(time) {
     BrainVisualizer.drawNetwork(networkCtx, bestCar.controls.brain)
     requestAnimationFrame(animate)
 }
+
+animate()

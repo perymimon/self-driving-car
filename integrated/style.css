@@ -38,10 +38,6 @@ canvas:focus{
     outline: 4px white inset;
 }
 
-
-
-
-
 label,button{
     display: inline-block;
     border: none;

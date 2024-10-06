@@ -1,8 +1,8 @@
 import Sensor from "./sensor.js";
 import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
-import { isZero, reduceToZero} from "../utils/math-utils.js";
-import { getMaxItem } from "../utils/codeflow-utils.js";
+import {isZero, reduceToZero} from "../utils/math-utils.js";
+import {getMaxItem} from "../utils/codeflow-utils.js";
 import NeuralNetwork from "../items/network.js"
 import KeyboardControls from "../controls/keyboardControls.js"
 import DummyControls from "../controls/dummyControls.js";
@@ -23,6 +23,7 @@ export default class Car {
     constructor(x, y, width, height, {
         type, angle = 0, maxSpeed = 2, color = "blue", label = '',
         acceleration = 0.2, maxReverseSpeed = -1.5, friction = 0.05,
+        brain, mutation = 0.1,
         noDamage = false
     } = {}) {
         this.id = ++Car.index
@@ -58,8 +59,7 @@ export default class Car {
                 this.controls = new DummyControls()
                 break
             case 'AI':
-                let brain = new NeuralNetwork([this.sensor.rayCount, 6, 4])
-                this.controls = new BrainControls(brain)
+                this.controls = new BrainControls(brain, mutation)
                 break
             case 'KEYS':
                 this.controls = new KeyboardControls()
@@ -73,19 +73,29 @@ export default class Car {
         this.mask.width = width;
         this.mask.height = height;
 
-        const maskCtx = this.mask.getContext("2d");
+        document.getElementById('maskArea').appendChild(this.mask);
+
+
         this.update([], [])
+        this.setColor(color)
 
+
+    }
+
+    setColor(color) {
+        const maskCtx = this.mask.getContext("2d");
+        this.color = color
         resolver.promise.then(() => {
-            maskCtx.fillStyle = color;
-            maskCtx.rect(0, 0, this.width, this.height);
-            maskCtx.fill();
-
-            maskCtx.globalCompositeOperation = "destination-atop";
             maskCtx.drawImage(carImg, 0, 0, this.width, this.height);
+            maskCtx.globalCompositeOperation = "source-in";
+
+            maskCtx.fillStyle = color;
+            maskCtx.fillRect(0, 0, this.width, this.height);
+
+
+
+
         })
-
-
     }
 
     load(info) {
@@ -114,7 +124,7 @@ export default class Car {
         if (info.brain) {
             let brain = structuredClone(info.brain)
             if (mutation)
-                NeuralNetwork.mutate(brain, mutation)
+                brain =  NeuralNetwork.mutate(brain, mutation)
             car.controls.brain = brain
         }
 
@@ -251,8 +261,11 @@ export default class Car {
         this.y -= Math.cos(this.angle) * this.speed
     }
 
-    draw(ctx, {drawSensor = false} = {}) {
+    draw(ctx, {drawSensor = false, color} = {}) {
         if (!carImg.complete) return
+        if (color && this.color != color) {
+            this.setColor(color)
+        }
         drawSensor && this.sensor?.draw(ctx)
 
         ctx.save();
