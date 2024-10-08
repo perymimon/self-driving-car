@@ -2,8 +2,8 @@ import NeuralNetwork from "../items/network.js";
 
 export default class BrainControls {
     constructor(brain, mutation = 0.1) {
-        if(!brain)
-            this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
+        if(mutation == 0)
+            this.brain = brain
         else {
             let brainClone = structuredClone(brain)
             this.brain = NeuralNetwork.mutate(brainClone, mutation);

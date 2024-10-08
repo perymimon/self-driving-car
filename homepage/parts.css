@@ -24,11 +24,15 @@ body {
     text-align: center;
     scroll-snap-align: start;
     flex: none;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .navbar {
     position: sticky;
-    top: 4px;
+    top: 0;
     z-index: 1;
     padding-inline: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -42,7 +46,6 @@ body {
         small {
             display: block;
         }
-    ;
         stroke: 1px solid;
         -webkit-text-stroke: 1px #ffffff00;
     }
@@ -82,41 +85,51 @@ strong {
     h3{
         text-align: left;
     }
+;
+    /* display: grid; */
 }
 
 .feature-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit,minmax(15em, 1fr));;
+    flex-flow: row wrap;
     gap: 20px;
     list-style-type: none;
     padding: 0;
     margin-top: 20px;
+    h4 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        color: black;
+    }
+    p {
+        font-size: 1rem;
+        color: #333;
+        height: 3em;
+    }
+    img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 15px;
+    }
+    .list > li{
+        display: grid;
+        grid-template-columns: 4em 1fr;
+        grid-auto-flow: column;
+    }
 }
 
-
-.feature-grid img {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 15px;
+.disable{
+    color: #9c9c9c;
 }
 
-.feature-grid h4 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: black;
-}
-
-.feature-grid p {
-    font-size: 1rem;
-    color: #333;
-}
 
 ul.list{
     color: #337982;
     font-size: 0.8em;
     text-align: left;
-    list-style-type: square;
-    list-style-position: inside;
+    /* list-style-type: square; */
+    /* list-style-position: inside; */
 }
 #modules-and-architecture{
     .card{

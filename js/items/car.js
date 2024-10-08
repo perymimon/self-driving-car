@@ -59,7 +59,12 @@ export default class Car {
                 this.controls = new DummyControls()
                 break
             case 'AI':
-                this.controls = new BrainControls(brain, mutation)
+                if(! brain){
+                    let brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
+                    this.controls = new BrainControls(brain, 0)
+                }else{
+                    this.controls = new BrainControls(brain, mutation)
+                }
                 break
             case 'KEYS':
                 this.controls = new KeyboardControls()
