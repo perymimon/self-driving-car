@@ -10,6 +10,7 @@ export default class Region {
         let {left, right, top, bottom} = this
 
         let distance = Math.min(x - left, right - x, y - top, bottom - y)
+        // if distance is negative it mean we out of threshold by a lot
         return distance < threshold
     }
 

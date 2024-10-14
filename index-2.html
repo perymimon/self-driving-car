@@ -8,7 +8,7 @@
     <link href="homepage/style.css" rel="stylesheet">
     <link href="homepage/parts.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+</head>
 <body class="dark-mode y mandatory-scroll-snapping">
 
 <nav class="navbar navbar-expand-lg navbar-light glass">
@@ -17,7 +17,7 @@
         <small>By <a href="https://www.linkedin.com/in/pery-mimon-11302a32/">Pery Mimon</a> learn from <a
                 href="https://radufromfinland.com/">Radu</a></small>
     </div>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+    <button class="navbar-toggled" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -193,27 +193,367 @@
 <div class="container mt-5 glass roundness" id="modules-and-architecture">
     <h1>Modules and Architecture</h1>
     <p>
-        The Self-Driving Car Project is organized into several modules, each responsible for different aspects of the
-        simulation. This modular architecture makes the project flexible and extensible, allowing for easier maintenance
+        Project organized into several modules, each responsible for different aspects of the
+        simulation. This modular architecture makes the code reusable flexible and extensible, allowing for easier
+        maintenance
         and development.
     </p>
-    <!-- Add module details here -->
-</div>
+    <link rel="stylesheet" href="homepage/components-style/module-tree.css">
+    <ul class="module-tree">
+        <li>
+            <label class="folder">
+                <input type="checkbox" checked>
+                <i class="fas fa-cubes"></i> Primitives
+            </label>
+            <ul class="collapsed">
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/primitives/envelope.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> envelope
+                    </a>
+                    <p>Takes a <code>Segment</code> and creates a <code>Polygon</code> around it. Used to convert skeleton segments into 2D polygons.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/primitives/point.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> point
+                    </a>
+                    <p>
+                        Takes <code>x</code> and <code>y</code> coordinates to represent a point in 2D space, with methods for calculating distances and transformations.
+                    </p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/primitives/polygon.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> polygon
+                    </a>
+                    <p>Takes an array of <code>Point</code> objects representing vertices.
+                        Provides methods for calculating area, perimeter, and determining point inclusion.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/primitives/segment.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> segment
+                    </a>
+                    <p>Takes two <code>Point</code> objects to define the endpoints of the segment. Includes methods for detecting
+                        intersections and calculating length.</p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <label class="folder">
+                <input type="checkbox">
+                <i class="fas fa-cubes"></i> Markings
+            </label>
+            <ul class="collapsed">
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/markings/cross.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> cross
+                    </a>
+                    <p>Defines crosswalk markings for pedestrian interactions in the simulation.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/markings/light.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> light
+                    </a>
+                    <p>Handles traffic light markings and their placement in the simulation environment.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/markings/parking.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> parking
+                    </a>
+                    <p>Defines parking space markings for car navigation and parking behaviors.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/markings/start.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> start
+                    </a>
+                    <p>Represents the start line marking for the car's journey.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/markings/stop.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> stop
+                    </a>
+                    <p>Defines stop line markings for intersections and stopping points.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/markings/target.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> target
+                    </a>
+                    <p>Defines target points for navigation and movement objectives.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/markings/yield.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> yield
+                    </a>
+                    <p>Handles yield markings for traffic merging scenarios.</p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <label class="folder">
+                <input type="checkbox">
+                <i class="fas fa-cubes"></i> Audio
+            </label>
+            <ul class="collapsed">
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/Audio/beepAudio.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> beepAudio
+                    </a>
+                    <p>Manages audio feedback, specifically the beep sounds used during various simulation events.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/Audio/engineAudio.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> engineAudio
+                    </a>
+                    <p>Simulates engine sounds to make the driving experience more realistic.</p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <label class="folder">
+                <input type="checkbox" checked>
+                <i class="fas fa-cubes"></i> Bases
+            </label>
+            <ul class="collapsed">
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/bases/dispatcher.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> dispatcher
+                    </a>
+                    <p>Acts as the main event dispatcher, handling communication between different components of the
+                        simulation.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/bases/marking.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> marking
+                    </a>
+                    <p>Manages road markings, which are used for guiding the car within lanes and ensuring adherence to
+                        traffic rules.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/bases/markingEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> markingEditor
+                    </a>
+                    <p>Provides editing tools for road markings, including placement and adjustments.</p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <label class="folder">
+                <input type="checkbox">
+                <i class="fas fa-cubes"></i> Controls
+            </label>
+            <ul class="collapsed">
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/controls/brainControls.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> brainControls
+                    </a>
+                    <p>Contains the main logic for decision-making, representing the 'brain' of the car.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/controls/cameraControl.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> cameraControl
+                    </a>
+                    <p>Enables user or AI control over the camera, including zoom and angle adjustments.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/controls/dummyControls.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> dummyControls
+                    </a>
+                    <p>Handles dummy car controls for simple simulations.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/controls/keyboardControls.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> keyboardControls
+                    </a>
+                    <p>Enables controlling the car using the keyboard for manual simulations.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/controls/phoneControls.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> phoneControls
+                    </a>
+                    <p>Handles car controls using a phone, allowing mobile input for the simulation.</p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <label class="folder">
+                <input type="checkbox">
+                <i class="fas fa-cubes"></i> Editors
+            </label>
+            <ul class="collapsed">
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/editors/crossEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> crossEditor
+                    </a>
+                    <p>Provides tools to edit crosswalks within the simulation, used to simulate pedestrian
+                        interactions.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/editors/graphEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> graphEditor
+                    </a>
+                    <p>Provides tools to edit graph-based navigation paths for the car.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/editors/lightEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> lightEditor
+                    </a>
+                    <p>Handles editing of traffic lights within the simulation environment.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/editors/parkingEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> parkingEditor
+                    </a>
+                    <p>Provides tools to edit parking spaces and related behaviors in the simulation.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/editors/startEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> startEditor
+                    </a>
+                    <p>Enables editing of starting positions for the car in the simulation.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/editors/stopEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> stopEditor
+                    </a>
+                    <p>Handles editing of stop points for the car within the simulation.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/editors/targetEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> targetEditor
+                    </a>
+                    <p>Allows editing of target locations for the car to navigate towards.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/editors/yieldEditor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> yieldEditor
+                    </a>
+                    <p>Handles editing of yield signs and related car behaviors.</p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <label class="folder">
+                <input type="checkbox">
+                <i class="fas fa-cubes"></i> Items
+            </label>
+            <ul class="collapsed">
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/items/car.js" target="_blank">
+                        <i class="fas fa-microchip"></i> car
+                    </a>
+                    <p>Defines the car object, its properties, and behaviors, including acceleration, steering, and
+                        collision detection.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/items/sensor.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> sensor
+                    </a>
+                    <p>Simulates the sensors mounted on the car, allowing it to detect obstacles and navigate the
+                        environment.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/items/building.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> building
+                    </a>
+                    <p>Defines buildings in the environment, including their properties and spatial relationships.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/items/network.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> network
+                    </a>
+                    <p>Handles the network structure for road connections and car navigation.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/items/primitive-road.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> primitive-road
+                    </a>
+                    <p>Defines simple road structures for use in the simulation environment.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/items/tree.js" target="_blank">
+                        <i class="fas fa-microchip"></i> tree
+                    </a>
+                    <p>Represents trees in the environment, adding realism to the simulation.</p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <label class="folder">
+                <input type="checkbox" checked>
+                <i class="fas fa-cubes"></i> Math
+            </label>
+            <ul class="collapsed">
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/math/graph.js" target="_blank">
+                        <i class="fas fa-microchip"></i> graph
+                    </a>
+                    <p>Handles graph-based algorithms for pathfinding and other spatial calculations.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/math/markerDetector.js"
+                       target="_blank">
+                        <i class="fas fa-microchip"></i> markerDetector
+                    </a>
+                    <p>Detects and processes markers for use in navigation and positioning.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/math/osm.js" target="_blank">
+                        <i class="fas fa-microchip"></i> osm
+                    </a>
+                    <p>Handles integration with OpenStreetMap (OSM) data for realistic navigation scenarios.</p>
+                </li>
+                <li class="module">
+                    <a href="https://github.com/perymimon/self-driving-car/blob/main/js/math/region.js" target="_blank">
+                        <i class="fas fa-microchip"></i> region
+                    </a>
 
-<div class="container mt-5 glass roundness" id="contact-information">
-    <h1>Contact Information</h1>
-    <p>
-        If you have any questions about the Self-Driving Car Project or would like to discuss the math concepts
-        demonstrated here, feel free to reach out.
-    </p>
-    <p>
-        You can contact me via email: <strong><a href="mailto:pery.mimon@gmail.com">pery.mimon@gmail.com</a></strong>
-    </p>
-    <p>
-        Or connect with me on LinkedIn: <strong><a href="https://www.linkedin.com/in/pery-mimon-11302a32/"
-                                                   target="_blank">LinkedIn Profile</a></strong>
-    </p>
-</div>
+                    <div class="container mt-5 glass roundness" id="contact-information">
+                        <h1>Contact Information</h1>
+                        <p>
+                            If you have any questions about the Self-Driving Car Project or would like to discuss the
+                            math concepts
+                            demonstrated here, feel free to reach out.
+                        </p>
+                        <p>
+                            You can contact me via email: <strong><a href="mailto:pery.mimon@gmail.com">pery.mimon@gmail.com</a></strong>
+                        </p>
+                        <p>
+                            Or connect with me on LinkedIn: <strong><a
+                                href="https://www.linkedin.com/in/pery-mimon-11302a32/"
+                                target="_blank">LinkedIn Profile</a></strong>
+                        </p>
+                    </div>
 
 </body>
 </html>

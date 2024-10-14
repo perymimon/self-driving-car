@@ -1,0 +1,91 @@
+ul.module-tree {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin-left: 20px;
+    text-align: left;
+    ol {
+        list-style-type: none;
+        padding-left: 20px;
+        margin: 0;
+        position: relative;
+    }
+
+    h3{
+        font-weight: 600;
+        margin-bottom: .5rem;
+        margin-top: 1rem;
+        text-align: left;
+    }
+    strong{
+        color:rgb(122, 183, 255);
+    }
+}
+
+
+li.module{
+    display: grid;
+    grid-template-columns: 10em max-content;
+}
+/*ul.module-tree::before {*/
+/*    content: "";*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    width: 1px;*/
+/*    height: 100%;*/
+/*    background-color: #ccc;*/
+/*}*/
+ul.module-tree li {
+    position: relative;
+    margin-block-end: 1em;
+}
+.module-tree li::before {
+    /* content: ""; */
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 10px;
+    height: 1px;
+    background-color: #ccc;
+}
+.module-tree a {
+    text-decoration: none;
+    font-weight: bold;
+    /* display: flex; */
+    align-items: center;
+}
+.module-tree a:hover {
+    text-decoration: underline;
+}
+.module-tree .fa-folder {
+    margin-right: 5px;
+    color: #f4a261;
+}
+
+.folder {
+    cursor: pointer;
+    display: inline-block;
+}
+input[type="checkbox"] {
+    display: none;
+}
+label:has( input[type="checkbox"] ) > .fas {
+    transition: transform 0.3s ease;
+}
+label:has(>input[type="checkbox"]:checked) > .fas {
+    transform: rotate(90deg);
+}
+label:has(>input[type="checkbox"]:checked) {
+    .modules-count{ display: none; }
+    & + ol {
+        display: block;
+    }
+}
+ul {
+    list-style-type: none;
+    padding-left: 1em;
+}
+.collapsed {
+    display: none;
+}

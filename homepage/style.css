@@ -18,7 +18,7 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: #fff;
-    font-size: 1.2em;
+    font-size: 1.3em;
 }
 
 label {
@@ -46,7 +46,9 @@ h3 {
     text-align: center;
     margin-block: 0;
 }
-
+p{
+    margin:auto;
+}
 /*p, ul {*/
 /*    font-family: 'Roboto', sans-serif;*/
 /*    font-size: 1rem;*/
