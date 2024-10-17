@@ -37,3 +37,8 @@ button:hover{
     filter: grayscale(0);
     background: #939191;
 }
+
+#study{
+    align-self: start;
+    width: 50em;
+}
