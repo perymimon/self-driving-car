@@ -78,8 +78,7 @@ export default class Car {
         this.mask.width = width;
         this.mask.height = height;
 
-        document.getElementById('maskArea').appendChild(this.mask);
-
+        // document.getElementById('maskArea').appendChild(this.mask);
 
         this.update([], [])
         this.setColor(color)
