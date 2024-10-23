@@ -2,24 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>self driving car - race</title>
+    <title>race - self driving car</title>
+    <link href="homepage/style.css" rel="stylesheet">
+    <link href="integrated/style.css" rel="stylesheet">
     <link rel="stylesheet" href="integrated/race.css">
 </head>
 <body>
-<div>
-    <a href="https://radufromfinland.com/projects/aiCarPlayground/?s=race_1">Radu original</a>
-</div>
+<div id="study">
+    <h1>Study</h1>
+    Interface for training a self-driving car using a neural network and visualizing it via the Canvas API.
+    <dl>
+        <dt>Q2: What are the core JavaScript modules and their roles?</dt>
+        <dd>
+            car.js: Manages car movement.
+            sensor.js: Handles sensor data.
+            control.js: Manages user/AI controls.
+            track.js: Draws and manages the track.
+            network.js: Implements the neural network.
+        </dd>
 
-<canvas id="carCanvas"></canvas>
-<div id="visualizer">
-    <div id="statistics"></div>
-    <canvas id="miniMapCanvas"></canvas>
+        <dt>question 2</dt>
+        <dd>answer 2</dd>
+    </dl>
+    <script type="module">
+        import {marked} from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
+        import $ from 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/+esm'
+        // Import Prism.js core
+        import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js';
+        // Import JavaScript language support
+        import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js';
+        // import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js';
+
+        let filename = './homepage/study/race-overview.md'
+        let response = await fetch(filename)
+        let text = await response.text()
+        document.getElementById('study').innerHTML = marked(text)
+        window.Prism.highlightAll();
+    </script>
+    <div>
+        <a href="https://radufromfinland.com/projects/aiCarPlayground/?s=race_1">Radu original</a>
+    </div>
 </div>
-<div id="counter">1</div>
-<script src="js/visualizer/brain-visualizer.js"></script>
-<script src="js/items/network.js"></script>
+<div id="project">
+    <canvas id="carCanvas"></canvas>
+    <div id="visualizer">
+        <div id="statistics"></div>
+        <canvas id="miniMapCanvas"></canvas>
+    </div>
+    <div id="counter">1</div>
+</div>
 <script src="integrated/race.js" type="module"></script>
-
+<a href="./training.html" class="prev">Training</a>
+<link href="homepage/prism.css" rel="stylesheet"/>
 
 </body>
 </html>

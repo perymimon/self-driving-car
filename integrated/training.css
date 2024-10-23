@@ -1,13 +1,4 @@
-body{
-    margin: 0;
-    background: #4a4a4a;
-    display: flex;
-    overflow: hidden;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 
-}
 #carCanvas{
     background: #939191;
     /*width: 200px*/
@@ -21,8 +12,6 @@ body{
     display: flex;
     flex-direction: column;
     gap: 5px;
-
-
 }
 
 button{

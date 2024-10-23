@@ -1,45 +1,10 @@
-*{
-    box-sizing: border-box;
-}
-body,html{
-    margin:0;
-    padding:0;
-    background-color: #000;
-    text-align: center;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
+#controls{
+    display:flex;
+    border-bottom: 1px solid;
 }
 #editorCanvas{
     background-color: #8aae6f;
-}
-.canvasContainer{
-    flex: 1;
-}
-canvas{
-
-}
-label:has(input[type="radio"]:not(:checked)){
-    filter: grayscale(1);
-}
-label,button{
-    display: inline-block;
-    background-color: white;
     border: none;
-    font-size: 20px;
-    border-radius: 10px;
-    text-shadow: 1px -1px 4px rgba(0, 0, 0, 0.69);
-    cursor: pointer;
-    padding: 0.1em;
-
-    input{
-        border: none;
-        appearance: textfield;
-    }
-    input[type=file]{
-        display: none;
-    }
 }
 
 dialog{
@@ -51,4 +16,8 @@ dialog{
         display: flex;
         justify-content: space-around;
     }
+}
+.toolbar{
+    display: inline-flex;
+    align-items: center;
 }

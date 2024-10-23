@@ -3,50 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>self driving car - world</title>
+    <link rel="stylesheet" href="homepage/style.css">
+    <link rel="stylesheet" href="integrated/style.css">
     <link rel="stylesheet" href="integrated/world-editor.css">
 </head>
 <body>
-<div id="controls">
-    <button id="disposeButton">🗑️</button>
-    <button id="saveButton">💾</button>
-    <label>📁<input type="file" id="fileInput" accept='.world'> </label>
-    <button id="openOSMModal">🌍</button>
-    |
-    <form id="graphTools" class="toolbar" style="display:inline-block">
-        <label title="graph editor">🌐<input type="radio" name="graph" value="graph"/></label>
-        <label title="start editor">🚗<input type="radio" name="graph" value="start"/></label>
-        <label title="target editor">🎯<input type="radio" name="graph" value="target"/></label>
-        <label title="cross editor">🚶<input type="radio" name="graph" value="cross"/></label>
-        <label title="parking editor">🅿️<input type="radio" name="graph" value="parking"/></label>
-        <label title="light editor">🚦<input type="radio" name="graph" value="light"/></label>
-        <label title="stop editor">🔴<input type="radio" name="graph" value="stop"/></label>
-    </form>
+<div id="study">
+    <h1>Study</h1>
+    Interface for training a self-driving car using a neural network and visualizing it via the Canvas API.
+    <dl>
+        <dt>Q2: What are the core JavaScript modules and their roles?</dt>
+        <dd>
+            car.js: Manages car movement.
+            sensor.js: Handles sensor data.
+            control.js: Manages user/AI controls.
+            track.js: Draws and manages the track.
+            network.js: Implements the neural network.
+        </dd>
 
-    <label class="toolbar">Generates
-        <button id="generateButton">⚒️</button>
-        |
-        <button id="generateRoads">1. 🗺️️</button>
-        <button id="generateBuilding">2.🏨</button>
-        <button id="generateTrees">3.🌲</button>
-        <button id="generateLanes">4.🛣️</button>
-        <button id="generateCorridor">5. 🧱️</button>
-    </label>
-
-
+        <dt>question 2</dt>
+        <dd>answer 2</dd>
+    </dl>
+    <script type="module">
+        import {marked} from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
+        import $ from 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/+esm'
+        // Import Prism.js core
+        import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js';
+        // Import JavaScript language support
+        import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js';
+        // import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js';
+        let response = await fetch('./homepage/study/world-editor.md')
+        let text = await response.text()
+        document.getElementById('study').innerHTML = marked(text)
+        window.Prism.highlightAll();
+    </script>
 </div>
-<div class="canvasContainer">
-    <canvas id="editorCanvas"></canvas>
-</div>
-<!-- The Modal -->
-<dialog id="myModal">
-    <h2>Open Street Map Input</h2>
-    <textarea id="osmInput"></textarea>
-    <div class="toolbar">
-        <button id="processModalBtn">Process</button>
-        <button id="closeModalBtn">Close</button>
+<div id="project">
+    <div id="controls">
+        <button id="disposeButton">🗑️</button>
+        <button id="saveButton">💾</button>
+        <label>📁<input type="file" id="fileInput" accept='.world'> </label>
+        <button id="openOSMModal">🌍</button>
+        <vr></vr>
+        <form id="graphTools" class="toolbar" >
+            <label title="graph editor">🌐<input type="radio" name="graph" value="graph"/></label>
+            <label title="start editor">🚗<input type="radio" name="graph" value="start"/></label>
+            <label title="target editor">🎯<input type="radio" name="graph" value="target"/></label>
+            <label title="cross editor">🚶<input type="radio" name="graph" value="cross"/></label>
+            <label title="parking editor">🅿️<input type="radio" name="graph" value="parking"/></label>
+            <label title="light editor">🚦<input type="radio" name="graph" value="light"/></label>
+            <label title="stop editor">🔴<input type="radio" name="graph" value="stop"/></label>
+        </form>
+
+        <div class="toolbar">
+            Generates
+            <button id="generateButton">⚒️</button>
+            <vr></vr>
+            <button id="generateRoads">1. 🗺️️</button>
+            <button id="generateBuilding">2.🏨</button>
+            <button id="generateTrees">3.🌲</button>
+            <button id="generateLanes">4.🛣️</button>
+            <button id="generateCorridor">5. 🧱️</button>
+        </div>
     </div>
-</dialog>
-
+    <canvas id="editorCanvas"></canvas>
+    <!-- The Modal -->
+    <dialog id="myModal">
+        <h2>Open Street Map Input</h2>
+        <textarea id="osmInput"></textarea>
+        <div class="toolbar">
+            <button id="processModalBtn">Process</button>
+            <button id="closeModalBtn">Close</button>
+        </div>
+    </dialog>
+</div>
+<a href="./race.html" class="next" page="race">race</a>
+<a href="./training.html" class="prev" page="training">training</a>
 <script type="module" src="integrated/world-editor.js"></script>
 </body>
 </html>

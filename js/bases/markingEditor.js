@@ -1,5 +1,8 @@
 import {getNearestSegment, inRange} from "../utils/algebra-math-utils.js";
-
+/**
+ Gets legal segments and registers to mouse `move` and `down` events. Generates a temporary marking on the nearest
+ legal segment. When the mouse is pressed down, it adds the marking to a list of markings.
+ */
 export default class MarkingEditor {
     #segmentsInView = null
     #viewport = null

@@ -1,3 +1,7 @@
+@import url('./prism.css');
+@import url('./components-style/button-next.css');
+@import url('./components-style/qna.css');
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
 *, html {
@@ -21,10 +25,6 @@ body {
     font-size: 1.3em;
 }
 
-label {
-    filter: grayscale(100%);
-}
-
 h1 {
     font-family: 'Raleway', sans-serif;
     color: #444;
@@ -46,14 +46,7 @@ h3 {
     text-align: center;
     margin-block: 0;
 }
-p{
-    margin:auto;
-}
-/*p, ul {*/
-/*    font-family: 'Roboto', sans-serif;*/
-/*    font-size: 1rem;*/
-/*    line-height: 1.6;*/
-/*}*/
+
 
 a {
     color: currentColor;
@@ -63,17 +56,17 @@ a {
 
     &:hover {
         color: currentColor;
+        text-decoration: underline;
     }
 }
 
-a:hover {
-    text-decoration: underline;
-}
-
-ul {
+ul, ol {
     padding: 0;
+    color: #337982;
+    text-align: left;
+    /* list-style-type: square; */
+    /* list-style-position: inside; */
 }
-
 
 .image-container {
     text-align: center;
@@ -103,4 +96,41 @@ ul.modules {
 
 small {
     font-size: 0.8em;
+}
+
+label, button {
+    border: none;
+    font-size: 20px;
+    /* border-radius: 10px; */
+    /* text-shadow: 1px -1px 4px rgba(0, 0, 0, 0.69); */
+    cursor: pointer;
+    padding: 0.15em;
+    /* filter: grayscale(1); */
+    /* opacity:0.5; */
+    /* width: min-content; */
+    /* color: #ffffff; */
+    background: #ffffff3d;
+
+    input {
+        border: none;
+        appearance: textfield;
+    }
+
+    input:is([type=file],[type=radio]) {
+        display: none;
+    }
+
+    &:has(input[type="radio"]:not(:checked)) {
+        filter: grayscale(1);
+    }
+
+    &:hover {
+        filter: grayscale(0) !important;
+        background: #939191;
+    }
+}
+
+vr{
+    display: inline-block;
+    border-left:1px solid;
 }

@@ -1,3 +1,17 @@
+#study{
+    overflow:auto;
+    height: 100%;
+    padding-inline:0.3em;
+    max-width: 54em;
+    scrollbar-color: green transparent;
+    scrollbar-width: thin;
+}
+h1,h2,h3,h4,h5,h6{
+    text-align: left;
+}
+p{
+    margin-block:0.5em;
+}
 dl {
     margin: 20px;
     padding: 0;

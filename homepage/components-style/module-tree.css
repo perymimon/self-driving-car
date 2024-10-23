@@ -17,9 +17,7 @@ ul.module-tree {
         margin-top: 1rem;
         text-align: left;
     }
-    strong{
-        color:rgb(122, 183, 255);
-    }
+
 }
 
 
@@ -38,7 +36,7 @@ li.module{
 /*}*/
 ul.module-tree li {
     position: relative;
-    margin-block-end: 1em;
+    margin-block-end: .2em;
 }
 .module-tree li::before {
     /* content: ""; */

@@ -1,0 +1,47 @@
+:is(button,a):is(.next, .prev) {
+    border: 0.1em solid;
+    background: purple;
+    position: fixed;
+    height: 3em;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    transition: height 0.1s, opacity 0.1s;
+    opacity: 0.3;
+    line-height: 1;
+    text-align: center;
+    vertical-align: bottom;
+    align-items: center;
+    justify-content: center;
+
+    &.next {
+        bottom: 2%;
+        right: 2%;
+    }
+
+    &.prev {
+        bottom: 2%;
+        left: 2%;
+    }
+
+    &:hover {
+        opacity: 1;
+        height: 4em;
+        aspect-ratio: 2 / 1;
+
+        &.next::after {
+            content: ' ➡';
+        }
+
+        &.prev::before {
+            content: '⬅ ';
+        }
+    }
+;
+    /* text-align: end; */
+    /* grid-auto-flow: column; */
+    /* grid-template-columns: auto auto; */
+    text-align: center;
+    vertical-align: bottom;
+    align-items: center;
+    justify-content: center;
+}

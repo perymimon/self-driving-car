@@ -15,7 +15,7 @@ const ctx = editorCanvas.getContext('2d')
 
 var rect = editorCanvas.parentNode.getBoundingClientRect();
 editorCanvas.width = rect.width;
-editorCanvas.height = rect.height - 31;
+editorCanvas.height = rect.height - editorCanvas.previousElementSibling.offsetHeight;
 
 const worldString = localStorage.getItem('world')
 const worldInfo = worldString ? JSON.parse(worldString) : null
@@ -103,7 +103,7 @@ document.getElementById('openOSMModal').addEventListener('click', () => {
 document.getElementById('closeModalBtn').addEventListener('click', () => {
     modal.close();
 })
-document.getElementById('processModalBtn').onclick = function parsePsmData() {
+document.getElementById('processModalBtn').onclick = function parseOsmData() {
     if (osmInput.value == "") return
 
     let {points, segments} = parseRoads(JSON.parse(osmInput.value))
@@ -122,19 +122,6 @@ document.getElementById('graphTools').onchange = function (e) {
     setMode(mode)
 }
 
-
-function setMode(mode) {
-    disableEditors()
-    tools[mode]?.editor.enable()
-    document.querySelector(`input[value="${mode}"]`).checked = true
-}
-
-function disableEditors() {
-    for (let mode in tools) {
-        tools[mode].editor.disable()
-    }
-}
-
 animate()
 
 function animate() {
@@ -150,3 +137,14 @@ function animate() {
     requestAnimationFrame(animate)
 }
 
+function setMode(mode) {
+    disableEditors()
+    tools[mode]?.editor.enable()
+    document.querySelector(`input[value="${mode}"]`).checked = true
+}
+
+function disableEditors() {
+    for (let mode in tools) {
+        tools[mode].editor.disable()
+    }
+}

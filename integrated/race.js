@@ -11,7 +11,7 @@ import AudioEngine from "../js/Audio/engineAudio.js";
 const rightPanelWidth = 300;
 
 const carCanvas = document.querySelector('#carCanvas');
-carCanvas.width = window.innerWidth;
+carCanvas.width = window.innerWidth / 2;
 carCanvas.height = window.innerHeight;
 
 const miniMapCanvas = document.querySelector('#miniMapCanvas');

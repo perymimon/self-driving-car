@@ -1,12 +1,11 @@
-import NeuralNetwork from "../items/network.js";
+import NeuralNetwork from "../math/network.js";
 
 export default class BrainControls {
     constructor(brain, mutation = 0.1) {
         if(mutation == 0)
             this.brain = brain
         else {
-            let brainClone = structuredClone(brain)
-            this.brain = NeuralNetwork.mutate(brainClone, mutation);
+            this.brain = NeuralNetwork.mutate(brain, mutation);
         }
 
         this.forward = false

@@ -1,9 +1,9 @@
 import Sensor from "./sensor.js";
 import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
-import {isZero, reduceToZero} from "../utils/math-utils.js";
+import {clap, isZero, reduceToZero} from "../utils/math-utils.js";
 import {getMaxItem} from "../utils/codeflow-utils.js";
-import NeuralNetwork from "../items/network.js"
+import NeuralNetwork from "../math/network.js"
 import KeyboardControls from "../controls/keyboardControls.js"
 import DummyControls from "../controls/dummyControls.js";
 import BrainControls from "../controls/brainControls.js";
@@ -243,8 +243,7 @@ export default class Car {
             this.speed -= this.acceleration
         }
 
-        this.speed = Math.min(this.speed, this.maxSpeed)
-        this.speed = Math.max(this.speed, this.maxReverseSpeed)
+        this.speed = clap(this.speed, this.maxReverseSpeed, this.maxSpeed)
 
         this.speed = reduceToZero(this.speed, this.friction)
         if (this.speed === 0) return
