@@ -176,7 +176,8 @@ export default class World {
         segs.pop() // pop the last extra padding segment
         this.corridor = {
             borders: segments,
-            skeleton: segs
+            skeleton: segs,
+            length: segments.reduce((acc, b) => acc + b.length(), 0)
         }
     }
 
@@ -287,6 +288,7 @@ export default class World {
 
     draw(ctx, viewPort, {
         showStartMarkings = true, showItems = 1000, showLane = false,
+        showCorridorBorder = true,showCorridorSkeleton = true,
         drawSensor = true
     } = {}) {
         let viewPoint = scale(viewPort.getOffset(), -1)
@@ -308,9 +310,13 @@ export default class World {
             seg.draw(ctx, {color: 'white', width: 4})
         }
 
-        if (this.corridor)
+        if (this.corridor && showCorridorBorder)
             for (let seg of this.corridor.borders) {
                 seg.draw(ctx, {color: 'red', width: 4});
+            }
+        if (this.corridor && showCorridorSkeleton)
+            for (let seg of this.corridor.skeleton) {
+                seg.draw(ctx, {color: 'yellow', width: 4});
             }
 
 
@@ -321,7 +327,8 @@ export default class World {
         ctx.globalAlpha = 1
         this.bestCar?.draw(ctx, {drawSensor})
 
-        if(!viewPoint.equal(this.#lastViewPoint)) {
+        // draw each layer on different image and draw all layer
+        // if(!viewPoint.equal(this.#lastViewPoint)) {
             if (showItems) {
                 let items = [...this.buildings, ...this.trees]
                     // .filter(item => viewPort.inRenderBox(item.base.points))
@@ -340,7 +347,7 @@ export default class World {
                     seg.draw(ctx, {color: 'red'})
                 }
         }
-        this.#lastViewPoint = viewPoint
-    }
+        // this.#lastViewPoint = viewPoint
+    // }
 
 }

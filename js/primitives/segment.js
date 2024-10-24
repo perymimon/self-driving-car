@@ -13,7 +13,15 @@ export default class Segment {
         this.id = Segment.counter++
         // todo: make arc shape. and make intersection for it
     }
-
+    move(positionVector ){
+        this.p1.move(positionVector)
+        this.p2.move(positionVector)
+        this.dirty()
+    }
+    dirty(){
+        this.#center = null
+        this.#radius = 0
+    }
     static load(info) {
         let seg = new Segment(
             Point.load(info.p1),

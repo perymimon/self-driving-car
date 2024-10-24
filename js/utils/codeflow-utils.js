@@ -39,3 +39,24 @@ export function getMinItem(array, valueFn) {
     })
 }
 
+export class Counter{
+    constructor(count) {
+        this.steps = count
+        this.reset()
+    }
+    counting(){
+        this.currentCount -= 1
+        return this.currentCount <= 0
+    }
+    countingIf(condition){
+        if(condition)
+            return this.counting()
+        else
+            return this.reset()
+    }
+    reset(){
+        this.currentCount = this.steps
+        return false
+    }
+
+}

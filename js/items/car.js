@@ -1,13 +1,15 @@
 import Sensor from "./sensor.js";
+import SensorCompass from "./sensorCompass.js";
 import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
-import {clap, isZero, reduceToZero} from "../utils/math-utils.js";
-import {getMaxItem} from "../utils/codeflow-utils.js";
+import {clap, isCloseZero, reduceToZero} from "../utils/math-utils.js";
+import {Counter, getMaxItem} from "../utils/codeflow-utils.js";
 import NeuralNetwork from "../math/network.js"
 import KeyboardControls from "../controls/keyboardControls.js"
 import DummyControls from "../controls/dummyControls.js";
 import BrainControls from "../controls/brainControls.js";
 import {getNearestSegment, magnitude, normalize, subtract} from "../utils/algebra-math-utils.js";
+import Segment from "../primitives/segment.js";
 
 const carImg = new Image();
 carImg.src = "../car.png"
@@ -49,9 +51,13 @@ export default class Car {
 
         this.useBrain = type == 'AI'
         this.engine = null
+        this.progress = 0;
+
+        this.polygons = this.#createPolygon()
 
         if (type != "DUMMY") {
             this.sensor = new Sensor(this)
+            this.pathCompass = new SensorCompass(this)
         }
 
         switch (type) {
@@ -59,10 +65,10 @@ export default class Car {
                 this.controls = new DummyControls()
                 break
             case 'AI':
-                if(! brain){
-                    let brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
+                if (!brain) {
+                    let brain = new NeuralNetwork([this.sensor.rayCount + 1, 6, 4]);
                     this.controls = new BrainControls(brain, 0)
-                }else{
+                } else {
                     this.controls = new BrainControls(brain, mutation)
                 }
                 break
@@ -97,8 +103,6 @@ export default class Car {
             maskCtx.fillRect(0, 0, this.width, this.height);
 
 
-
-
         })
     }
 
@@ -128,7 +132,7 @@ export default class Car {
         if (info.brain) {
             let brain = structuredClone(info.brain)
             if (mutation)
-                brain =  NeuralNetwork.mutate(brain, mutation)
+                brain = NeuralNetwork.mutate(brain, mutation)
             car.controls.brain = brain
         }
 
@@ -136,7 +140,7 @@ export default class Car {
 
     }
 
-    #pingCar(roadBorders) {
+    #bounceCar(roadBorders) {
         var seg = getNearestSegment(this, roadBorders)
         var correctors = this.polygons.points.map(p => {
             let {point: projPoint} = seg.projectPoint(p)
@@ -155,29 +159,34 @@ export default class Car {
         }
     }
 
-    update(roadBorders, traffic) {
+    isStopped = new Counter(60)
+
+    update(roadBorders, traffic = [], path ) {
         if (this.damage) return false
-        if (isZero(this.speed) && this.useBrain) setTimeout(_ => {
-            if (isZero(this.speed))
-                this.damage = true
-        }, 200)
-        this.#move()
+
+        let positionPoint = this.#move()
         this.fitness += this.speed
 
-        this.polygons = this.#createPolygon()
+        this.polygons.move(positionPoint)
         this.damage = this.#assessDamage(roadBorders, traffic)
         if (this.damage) {
             this.speed = 0
         }
         if (this.damage && this.noDamage == true) {
-            this.#pingCar(roadBorders)
+            this.#bounceCar(roadBorders)
             this.damage = false
+        }
+        if (this.isStopped.countingIf(isCloseZero(this.speed) && this.useBrain)) {
+            this.damage = true
         }
         if (this.sensor) {
             this.sensor?.update(roadBorders, traffic)
-
+            if(path) this.pathCompass.update(path)
             if (this.useBrain) {
                 const offsets = this.sensor.readings.map(s => s == null ? 0 : 1 - s.offset)
+                /* Add compass reading */
+                if(path) offsets.push(this.pathCompass.readings())
+
                 this.controls?.update(offsets)
                 // const outputs = NeuralNetwork.feedForward(offsets, this.brain)
                 // this.controls.forward = outputs[0]
@@ -195,6 +204,23 @@ export default class Car {
         }
 
         return true
+    }
+
+    updateProgress(segments) {
+        let dones = []
+        let carSeg = getNearestSegment(this, segments)
+        for (let seg of segments) {
+            if (seg == carSeg) {
+                let proj = seg.projectPoint(this)
+                let partSeg = new Segment(seg.p1, proj.point)
+                dones.push(partSeg)
+                break
+            } else {
+                dones.push(seg)
+            }
+        }
+        this.progress = dones.reduce((acc, b) => acc + b.length(), 0)
+        this.dones = dones
     }
 
     #assessDamage(roadBorders, traffic) {
@@ -260,8 +286,10 @@ export default class Car {
             }
         }
         // console.table(this)
+        let {x, y} = this
         this.x -= Math.sin(this.angle) * this.speed
         this.y -= Math.cos(this.angle) * this.speed
+        return subtract(this, {x, y})
     }
 
     draw(ctx, {drawSensor = false, color} = {}) {
@@ -270,6 +298,7 @@ export default class Car {
             this.setColor(color)
         }
         drawSensor && this.sensor?.draw(ctx)
+        drawSensor && this.pathCompass?.draw(ctx)
 
         ctx.save();
         ctx.translate(this.x, this.y);
@@ -294,42 +323,4 @@ export default class Car {
 
     }
 
-    // draw(ctx) {
-    //     ctx.save()
-    //     ctx.translate(this.x, this.y)
-    //     ctx.rotate(-this.angle)
-    //
-    //     ctx.beginPath()
-    //     ctx.rect(
-    //         -this.width / 2,
-    //         -this.height / 2,
-    //         this.width,
-    //         this.height
-    //     )
-    //     ctx.fill();
-    //
-    //     ctx.restore()
-    //
-    //     this.sensors.draw(ctx)
-    // }
-
-    // draw(ctx, color = 'black', drawSensor) {
-    //     drawSensor && this.sensors?.draw(ctx)
-    //
-    //     if (this.damage)
-    //         ctx.fillStyle = 'gray'
-    //     else
-    //         ctx.fillStyle = color
-    //
-    //     let {polygons} = this
-    //     ctx.beginPath()
-    //     ctx.moveTo(polygons[0].x, polygons[0].y)
-    //     for (let i = 1; i < polygons.length; i++) {
-    //         ctx.lineTo(polygons[i].x, polygons[i].y)
-    //     }
-    //     ctx.lineTo(polygons[0].x, polygons[0].y)
-    //     ctx.fill()
-    //
-    //
-    // }
 }

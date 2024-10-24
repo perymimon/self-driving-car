@@ -28,9 +28,8 @@ export default class Sensor {
         this.#castRays()
         this.readings = []
         for (let ray of this.rays) {
-            this.readings.push(
-                this.#getReading(ray, this.bordersRegion, traffic)
-            )
+            let firstTouch  = this.#getReading(ray, this.bordersRegion, traffic)
+            this.readings.push(firstTouch)
         }
     }
 

@@ -40,11 +40,11 @@ function reload(world) {
     myCar = world.cars.at(0)
     viewPort = new ViewPort(carCanvas, 1, world.offset)
     miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
-    updateBoard()
+    updateScoreBoard()
     world.bestCar = myCar
 }
 
-function updateBoard() {
+function updateScoreBoard() {
     var carEl = []
     for (let [i, car] of world.cars.entries()) {
         let div = document.getElementById(car.id) || (_ => {
@@ -85,19 +85,20 @@ update()
 
 async function update(time) {
     let somethingUpdate = !started
-
+    //todo: move it up to global or world
     if (started) {
         let borders = world.corridor.borders || world.roadBorders
 
         for (let car of world.cars.filter(car => !car.damage)) {
             somethingUpdate = car.update(borders, []) || somethingUpdate
-
-        }
-        for (let car of world.cars) {
-            updateCarProgress(car)
+            car.updateProgress(world?.corridor.skeleton)
+            if(car.progress >= world.corridor.length){
+                car.progress = world.corridor.length
+                car.finishTime = frameCount
+            }
         }
         world.cars.sort((carA, carB) => carB.progress - carA.progress)
-        updateBoard()
+        updateScoreBoard()
     }
 
     if (somethingUpdate) {
@@ -127,7 +128,7 @@ function animate() {
     miniMap.update(viewPort, world.cars)
 }
 
-function updateCarProgress(car) {
+function updateCarRaceProgress(car) {
     if (!car.finishTime) {
         car.progress = 0
         let corridorSkeleton = world.corridor.skeleton

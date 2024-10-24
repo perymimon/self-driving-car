@@ -157,7 +157,7 @@ export default class Camera {
             frontLeft, quarterFrontLeft, middleLeft, quarterBackLeft, backLeft,
             backRight, quarterBackRight, middleRight, quarterFrontRight, frontRight
         ])
-            .translate(p => (p.z = -wheelRadius, p))
+            .move({x:0,y:0, z:-wheelRadius})
         var ceiling = base.clone(p => new Point(p.x, p.y, -height - wheelRadius))
 
         var midLine = base.clone(p => new Point(p.x, p.y, (-height * 2 / 5 - wheelRadius)))

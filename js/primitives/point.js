@@ -13,7 +13,11 @@ export default class Point extends Dispatcher {
         this.#z = z
         this.id = Point.count++
     }
-
+    move({x,y,z} = {}){
+        if(x) this.#x += x
+        if(y) this.#y += y
+        if(z) this.#z += z
+    }
     set x(v) {
         this.#x = v
         this.trigger('change', {key: 'x', value: v})

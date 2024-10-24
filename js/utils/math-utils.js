@@ -1,6 +1,6 @@
 import {eps} from "./algebra-math-utils.js";
 
-export function isZero(value) {
+export function isCloseZero(value) {
     return Math.abs(value) < eps;
 }
 
@@ -14,4 +14,9 @@ export function reduceToZero(value, friction) {
 export function clap(value, min, max) {
     return Math.max(Math.min(value, max), min)
 }
-
+/** get angle -inf to inf and return angle -PI to PI */
+export function normAngle(a) {
+    let fullCircle = Math.PI * 2
+    let halfCircle = Math.PI
+    return (a % fullCircle + fullCircle) % fullCircle - halfCircle
+}

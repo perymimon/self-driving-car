@@ -21,22 +21,40 @@ export default class Polygon {
         //         this.#radius = null
         //     })
     }
-    #generateSegments(){
+
+    move(positionVector) {
+        for(let point of this.points){
+            point.move(positionVector)
+        }
+        for(let seg of this.segments){
+            seg.dirty()
+        }
+        this.dirty()
+        return this
+    }
+    dirty(){
+        this.#center = null
+        this.#radius = null
+    }
+
+    #generateSegments() {
         this.segments = []
         let points = this.points
         for (var i = 1; i < points.length; i++)
             this.segments.push(new Segment(points[i - 1], points[i]));
         this.segments.push(new Segment(points.at(-1), points[0]));
     }
-    clone(fn = (_=>_)){
+
+    clone(fn = (_ => _)) {
         let points = this.points.map(fn)
         return new Polygon(points, this.label)
     }
-    translate(fn){
-        this.points = this.points.map(fn)
-        this.#generateSegments()
-        return this
-    }
+
+    // translate(fn) {
+    //     this.points = this.points.map(fn)
+    //     this.#generateSegments()
+    //     return this
+    // }
 
     static load(info) {
         return new Polygon(
@@ -134,8 +152,7 @@ export default class Polygon {
         } else if (numPoints == 2) {
             let [p1, p2] = points
             this.#center = average(p1, p2);
-        }
-        else {
+        } else {
             for (let i = 0; i < numPoints; i++) {
                 const x0 = points[i].x;
                 const y0 = points[i].y;
