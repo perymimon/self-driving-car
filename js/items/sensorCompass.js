@@ -6,7 +6,8 @@ import Segment from "../primitives/segment.js";
 export default class SensorCompass {
 
     constructor(car) {
-        this.car = car;
+        this.car = car
+        this.nearSeg = null
     }
 
     update(segments){
@@ -23,6 +24,7 @@ export default class SensorCompass {
     }
 
     draw(ctx){
+        if(!this.nearSeg) return
         let seg = new Segment(this.car, this.nearSeg.p2)
         seg.draw(ctx, {color:'hwb(60deg 10% 56%)', dash:[2,2]})
     }

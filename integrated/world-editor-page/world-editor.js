@@ -1,15 +1,15 @@
-import Graph from '../js/math/graph.js'
-import GraphEditor from "../js/editors/graphEditor.js";
-import StopEditor from "../js/editors/stopEditor.js";
-import CrossEditor from "../js/editors/crossEditor.js";
-import ViewPort from "../js/viewport.js";
-import World from "../js/world.js"
-import StartEditor from "../js/editors/startEditor.js";
-import YieldEditor from "../js/editors/yieldEditor.js";
-import ParkingEditor from "../js/editors/parkingEditor.js";
-import TargetEditor from "../js/editors/targetEditor.js";
-import LightEditor from "../js/editors/lightEditor.js";
-import {parseRoads} from "../js/math/osm.js";
+import Graph from '../../js/math/graph.js'
+import GraphEditor from "../../js/editors/graphEditor.js";
+import StopEditor from "../../js/editors/stopEditor.js";
+import CrossEditor from "../../js/editors/crossEditor.js";
+import ViewPort from "../../js/viewport.js";
+import World from "../../js/world.js"
+import StartEditor from "../../js/editors/startEditor.js";
+import YieldEditor from "../../js/editors/yieldEditor.js";
+import ParkingEditor from "../../js/editors/parkingEditor.js";
+import TargetEditor from "../../js/editors/targetEditor.js";
+import LightEditor from "../../js/editors/lightEditor.js";
+import {parseRoads} from "../../js/math/osm.js";
 
 const ctx = editorCanvas.getContext('2d')
 

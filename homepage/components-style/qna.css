@@ -2,7 +2,7 @@
     overflow:auto;
     height: 100%;
     padding-inline:0.3em;
-    max-width: 54em;
+    max-width: max(40em,40vw);
     scrollbar-color: green transparent;
     scrollbar-width: thin;
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>training - self driving car</title>
+    <link rel="stylesheet" href="../../homepage/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="training.css">
+</head>
+<body>
+<div id="study">
+    <h1>Study</h1>
+    Interface for training a self-driving car using a neural network and visualizing it via the Canvas API.
+    <dl>
+        <dt>Q2: What are the core JavaScript modules and their roles?</dt>
+        <dd>
+            car.js: Manages car movement.
+            sensor.js: Handles sensor data.
+            control.js: Manages user/AI controls.
+            track.js: Draws and manages the track.
+            network.js: Implements the neural network.
+        </dd>
+
+        <dt>question 2</dt>
+        <dd>answer 2</dd>
+    </dl>
+    <script type="module">
+        import {marked} from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
+        import $ from 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/+esm'
+        // Import Prism.js core
+        import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js';
+        // Import JavaScript language support
+        import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js';
+        // import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js';
+
+        let filename = './training-overview.md'
+        let response = await fetch(filename)
+        let text = await response.text()
+        document.getElementById('study').innerHTML = marked(text)
+        window.Prism.highlightAll();
+    </script>
+</div>
+<div id="project">
+    <canvas id="carCanvas"></canvas>
+    <div id="verticalButtons">
+        <button onclick="save()">💾</button>
+        <button onclick="discard()">🗑️</button>
+    </div>
+    <canvas id="networkCanvas"></canvas>
+    <div id="maskArea"></div>
+</div>
+<a href="../../index.html" class="prev" page="home">Home</a>
+<a href="../world-editor-page/world-editor.html" class="next" page="world-editor">world editor</a>
+
+<script src="training.js" type="module"></script>
+<link href="../../homepage/prism.css" rel="stylesheet"/>
+</body>
+</html>

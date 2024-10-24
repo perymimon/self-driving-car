@@ -12,7 +12,7 @@ import {getNearestSegment, magnitude, normalize, subtract} from "../utils/algebr
 import Segment from "../primitives/segment.js";
 
 const carImg = new Image();
-carImg.src = "../car.png"
+carImg.src = "../../assets/car.png"
 const resolver = Promise.withResolvers()
 carImg.onload = function () {
     resolver.resolve()

@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>training - self driving car</title>
-    <link rel="stylesheet" href="homepage/style.css">
-    <link rel="stylesheet" href="integrated/style.css">
-    <link rel="stylesheet" href="integrated/training.css">
-    <link rel="stylesheet" href="homepage/components-style/qna.css">
+    <title>race - self driving car</title>
+    <link href="../../homepage/style.css" rel="stylesheet">
+    <link href="../style.css" rel="stylesheet">
+    <link href="training-world.css" rel="stylesheet">
 </head>
 <body>
 <div id="study">
@@ -34,26 +33,33 @@
         import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js';
         // import 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js';
 
-        let filename = './homepage/study/training-overview.md'
+        let filename = './training-world.md'
         let response = await fetch(filename)
         let text = await response.text()
         document.getElementById('study').innerHTML = marked(text)
         window.Prism.highlightAll();
     </script>
+    <div>
+        <a href="https://radufromfinland.com/projects/aiCarPlayground/?s=race_1">Radu original</a>
+    </div>
 </div>
 <div id="project">
-    <canvas id="carCanvas"></canvas>
-    <div id="verticalButtons">
-        <button onclick="save()">💾</button>
-        <button onclick="discard()">🗑️</button>
+    <div id="controls">
+        <label>📁<input type="file" id="fileInput" title="load world" accept='.world'>world </label>
+        <label>📁<input type="file" id="fileInput" title="load car" accept='.world'>car </label>
+        <div id="banner-notification">
+            <label>world loaded</label>
+            <label>car loaded</label>
+        </div>
     </div>
-    <canvas id="networkCanvas"></canvas>
-    <div id="maskArea"></div>
+    <canvas id="carCanvas"></canvas>
+    <div id="visualizer">
+        <canvas id="miniMapCanvas"></canvas>
+    </div>
+    <div id="counter">1</div>
 </div>
-<a href="./index.html" class="prev" page="home">Home</a>
-<a href="./world-editor.html" class="next" page="world-editor">world editor</a>
-
-<script src="integrated/training.js" type="module"></script>
-<link href="homepage/prism.css" rel="stylesheet"/>
+<script src="training-world.js" type="module"></script>
+<a href="../race-page/race.html" class="next" page="race">race</a>
+<a href="../world-editor-page/world-editor.html" class="prev" page="world editor">world editor</a>
 </body>
 </html>

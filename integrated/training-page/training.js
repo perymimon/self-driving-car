@@ -1,6 +1,6 @@
-import BrainVisualizer from "../js/visualizer/brain-visualizer.js";
-import Car from "../js/items/Car.js";
-import PrimitiveRoad from "../js/items/primitive-road.js"
+import BrainVisualizer from "../../js/visualizer/brain-visualizer.js";
+import Car from "../../js/items/car.js";
+import PrimitiveRoad from "../../js/items/primitive-road.js"
 
 const carCanvas = document.querySelector('#carCanvas');
 const lanes = 5

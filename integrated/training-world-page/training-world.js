@@ -1,8 +1,8 @@
-import Graph from '../js/math/graph.js'
-import ViewPort from "../js/viewport.js";
-import World from "../js/world.js"
-import MiniMap from "../js/visualizer/miniMap.js"
-import {fetchLastFile} from "./operationUtil.js";
+import Graph from '../../js/math/graph.js'
+import ViewPort from "../../js/viewport.js";
+import World from "../../js/world.js"
+import MiniMap from "../../js/visualizer/miniMap.js"
+import {fetchLastFile} from "../operationUtil.js";
 
 const rightPanelWidth = 300;
 
