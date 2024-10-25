@@ -1,16 +1,15 @@
 import {getNearestPoint} from "../utils/algebra-math-utils.js";
 import Segment from "../primitives/segment.js";
-import Dispatcher from "../bases/dispatcher.js";
+import {DispatcherWithWeakRef} from "../bases/dispatcher.js";
+import {ADD, CHANGE, REMOVE} from "./_markingEditor.js";
 
-export default class GraphEditor extends Dispatcher {
+export default class GraphEditor extends DispatcherWithWeakRef {
 
     constructor(viewPort, world) {
         super()
         this.viewPort = viewPort
         this.canvas = viewPort.canvas
-        this.world = world
-        this.graph = world.graph
-
+        this.setWorld(world)
         this.ctx = this.canvas.getContext('2d');
 
         this.selected = null
@@ -22,17 +21,22 @@ export default class GraphEditor extends Dispatcher {
         this.start = null
         this.end = null
 
-        this.canvas.setAttribute('tabindex', '0');
+        //this.canvas.setAttribute('tabindex', '0');
 
         this.listeners = {
             mousedown: this.#handleMouseDown.bind(this),
             mousemove: this.#handleMouseMove.bind(this),
             mouseup: this.#handleMouseUp.bind(this),
-            mouseLeave: (e) => this.selected = null,
+            //     mouseLeave: (e) => this.selected = null,
             keydown: this.#handleKeyDown.bind(this),
         }
 
         this.#addEventListeners()
+    }
+
+    setWorld(world) {
+        this.world = world
+        this.graph = world.graph
     }
 
     getNearestPoint(point, excludes = []) {
@@ -63,61 +67,60 @@ export default class GraphEditor extends Dispatcher {
     }
 
     #handleMouseDown(e) {
-        if (e.button === 2) { //right click
-            if (this.selected) {
-                this.selected = null
-
-            } else if (this.hovered) {
-                this.#removePoint(this.hovered)
-            }
-        } else if (e.button == 0) { // left down
+        if (e.button == 0) { // left down
             if (this.hovered) {
-                // If hovered just select the node
+                // save the hovered for dragging
                 // this.#selectPoint(this.hovered)
+                this.#selectPoint(this.hovered)
                 this.draging = this.hovered
-                this.mousedown = this.mouse
+                this.hovered = null
+
             } else {
-                // if not create and add a new point
+                // add a mouse point to graph and select it
                 if (this.graph.addPoint(this.mouse))
                     console.log('add new point at', this.mouse)
                 this.#selectPoint(this.mouse)
+            }
+        } else if (e.button === 2) { //right click
+            if (this.selected) {
+                this.selected = null
+                return
+            }
+            if (this.hovered) {
+                this.#removePoint(this.hovered)
             }
         }
     }
 
     #handleMouseMove(e) {
-        setTimeout(() => this.canvas.focus(), 0)
-        window.focus()
-        console.log('mouse move')
+        // setTimeout(() => this.canvas.focus(), 0)
         this.mouse = this.viewPort.getMouse(e, true)
-        this.hovered = this.getNearestPoint(this.mouse, [this.draging])
         if (this.draging) {
             this.draging.x = this.mouse.x
             this.draging.y = this.mouse.y
         }
+        // check if mouse hover point that is not the one that Dragging
+        this.hovered = this.getNearestPoint(this.mouse, [this.draging])
+
     }
 
     #handleMouseUp(e) {
         if (e.button == 0) {// left click
-            if (this.mousedown?.equal(this.mouse)) {
+            if (this.draging) {
                 if (this.hovered) {
-                    // If hovered just select the node
-                    this.#selectPoint(this.hovered)
-                    this.draging = null
-                } else {
-                    // if not create and add a new point
-                    if (this.graph.addPoint(this.mouse))
-                        console.log('add new point at', this.mouse)
-                    this.#selectPoint(this.mouse)
-                }
-            } else { // dragging
-                if (this.hovered && this.draging) {
+                    // todo:move that logic to Graph
                     this.graph.segments.forEach(seg => seg.replacePoint(this.draging, this.hovered))
                     this.graph.removePoint(this.draging)
-
                 }
+                this.trigger(CHANGE, {type: this.draging})
                 this.draging = null
             }
+            // if (this.mousedown?.equal(this.mouse)) {
+            // if (this.hovered) {
+            //     // If hovered just select the node
+            //     this.#selectPoint(this.hovered)
+            // }
+            // }
         }
     }
 
@@ -137,15 +140,24 @@ export default class GraphEditor extends Dispatcher {
     }
 
     #selectPoint(point) {
-        if (this.selected)
-            this.graph.addSegment(new Segment(this.selected, point))
+        console.log('selected point')
+        if (this.selected) {
+            var segment = new Segment(this.selected, point)
+            this.graph.addSegment(segment)
+            this.trigger(ADD, {type: segment})
+            this.trigger(CHANGE, {type: segment})
+        }
+
         // If hovered just select the node
         this.selected = point
     }
 
     #removePoint(point) {
-        if (this.graph.removePoint(point))
+        if (this.graph.removePoint(point)) {
+            this.trigger(REMOVE, {type: point})
+            this.trigger(CHANGE, {type: point})
             console.log('remove point at', point)
+        }
         this.hovered = null
         if (this.selected == this.hovered)
             this.selected = null
@@ -165,7 +177,7 @@ export default class GraphEditor extends Dispatcher {
 
         if (this.selected) {
             new Segment(this.selected, asset).draw(ctx, {dash: [3, 3]})
-            this.selected.draw(this.ctx, {outline: true});
+            this.selected.draw(ctx, {color: 'blue'});
 
         }
 
