@@ -116,3 +116,31 @@ export function onElementResize(element, callback) {
     resizeObserver.observe(element);
     return resizeObserver; // Return observer in case you want to disconnect later
 }
+
+export function extractFormData(form) {
+    const formDataObj = {};
+
+    // Iterate over all form elements
+    for (let element of form.elements) {
+        // Skip elements without a name or disabled elements
+        if (!element.name || element.disabled) continue;
+
+        // Handle different input types
+        switch (element.type) {
+            case 'checkbox':
+                // For checkboxes, store the checked status
+                formDataObj[element.name] = element.checked;
+                break;
+            case 'radio':
+                if ((element.name in formDataObj)) break;
+                // For radio buttons, store the selected value
+                formDataObj[element.name] = form.elements[element.name]?.value ?? null;
+                break;
+            default:
+                // For other input types, store the value
+                formDataObj[element.name] = element.value;
+                break;
+        }
+    }
+    return formDataObj
+}
