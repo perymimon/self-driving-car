@@ -1,5 +1,17 @@
-import {add, average, distance, dot, getIntersection, magnitude, normalize, scale, subtract} from "../utils/algebra-math-utils.js";
+import {
+    add,
+    average,
+    distance,
+    dot,
+    getIntersection,
+    inRange,
+    magnitude,
+    normalize,
+    scale,
+    subtract
+} from "../utils/algebra-math-utils.js";
 import Point from "./point.js";
+
 export default class Segment {
     static counter = 0
     #radius = 0
@@ -13,15 +25,18 @@ export default class Segment {
         this.id = Segment.counter++
         // todo: make arc shape. and make intersection for it
     }
-    move(positionVector ){
+
+    move(positionVector) {
         this.p1.move(positionVector)
         this.p2.move(positionVector)
         this.dirty()
     }
-    dirty(){
+
+    dirty() {
         this.#center = null
         this.#radius = 0
     }
+
     static load(info) {
         let seg = new Segment(
             Point.load(info.p1),
@@ -85,7 +100,7 @@ export default class Segment {
 
     distanceToPoint(point) {
         const proj = this.projectPoint(point);
-        if (proj.offset > 0 && proj.offset < 1) {
+        if (inRange(0, 1, proj.offset)) {
             return distance(point, proj.point);
         }
         const distToP1 = distance(point, this.p1);
