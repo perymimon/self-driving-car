@@ -105,21 +105,25 @@ export default class _markingEditor extends DispatcherWithWeakRef {
 
     #handleMouseDown(evt) {
         var markings = this.world.markings
-        if (evt.button == 0) // left click
+        if (evt.button == 0) { // left click
             if (this.intent) {
                 markings.push(this.intent)
                 this.intent = null
                 this.trigger(ADD, {type: this.intent})
                 this.trigger(CHANGE, {type: this.intent})
-            } else if (evt.button == 2) // right click
-                for (let i = 0; i < this.markings.length; i++) {
-                    let poly = markings[i].poly
-                    if (poly.containsPoint(this.mouse)) {
-                        let removed = markings.splice(i, 1)
-                        this.trigger(ADD, {type: removed[0]})
-                        this.trigger(CHANGE, {type: removed[0]})
-                    }
-                }
+            }
+        }
+        if (evt.button == 2) {// right click
+            let underMouse = markings.filter(marking => marking.poly.containsPoint(this.mouse))
+            for (let marking of underMouse) {
+                markings.splice(markings.indexOf(marking), 1)
+            }
+            if (underMouse.length > 0) {
+                this.trigger(ADD, {type: underMouse})
+                this.trigger(CHANGE, {type: underMouse})
+            }
+
+        }
     }
 
     display() {
