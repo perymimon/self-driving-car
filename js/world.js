@@ -5,15 +5,16 @@ import Segment from "./primitives/segment.js";
 import Tree from "./items/tree.js";
 import Building from "./items/building.js";
 import Graph from "./math/graph.js";
-import Cross from "./markings/cross.js";
-import Light from "./markings/light.js";
-import Parking from "./markings/parking.js";
-import Start from "./markings/start.js";
-import Stop from "./markings/stop.js";
-import Target from "./markings/target.js";
-import Yield from "./markings/yield.js";
+import Cross from "./editors/markings/cross.js";
+import Light from "./editors/markings/light.js";
+import Parking from "./editors/markings/parking.js";
+import Start from "./editors/markings/start.js";
+import Stop from "./editors/markings/stop.js";
+import Target from "./editors/markings/target.js";
+import Yield from "./editors/markings/yield.js";
 import Point from "./primitives/point.js";
 import Car from "./items/car.js";
+import {DispatcherWithWeakRef} from "./bases/dispatcher.js";
 
 const Markings = {
     'cross': Cross,
@@ -26,7 +27,7 @@ const Markings = {
     Cross, Light, Parking, Start, Stop, Target, Yield,
 }
 
-export default class World {
+export default class World extends DispatcherWithWeakRef{
     roadWidth = 100
     roadRoundness = 6
     buildingWidth = 150
@@ -36,8 +37,8 @@ export default class World {
     #lastViewPoint = new Point(0, 0)
 
     constructor(graph) {
+        super()
         this.graph = graph || new Graph();
-
         this.envelopes = []
         this.roadBorders = []
         this.buildings = []
@@ -53,14 +54,16 @@ export default class World {
             this.generate()
     }
 
-    dispose() {
-        this.graph.dispose()
-        this.envelopes = []
-        this.roadBorders = []
-        this.buildings = []
-        this.trees = []
-        this.laneGuides = []
-        this.markings = []
+    dispose(options) {
+        let all = !options
+        if (all || options.graph) this.graph.dispose()
+        if (all || options.envelopes) this.envelopes = []
+        if (all || options.roadBorders) this.roadBorders = []
+        if (all || options.buildings) this.buildings = []
+        if (all || options.trees) this.trees = []
+        if (all || options.laneGuides) this.laneGuides = []
+        if (all || options.markings) this.markings = []
+        if (all || options.corridor) this.corridor = null
     }
 
     static Load(info) {
@@ -88,7 +91,7 @@ export default class World {
         world.zoom = info.zoom
         world.offset = info.offset
         if (info.corridor)
-            world.generate({all: false, corridor: true})
+            world.generate({corridor: true})
 
         return world
     }
@@ -97,9 +100,13 @@ export default class World {
         return JSON.stringify(this.graph);
     }
 
-    generate({all = true, corridor = false, buildings = false, trees = false, roads = false, lanes = false} = {}) {
+    generate(options = {}) {
+        let {corridor = false, buildings = false, trees = false, roadBorders = false, laneGuides = false} = options
+        let specific = Object.values(options).some(Boolean)
+        let all = !specific
+
         let {graph, roadRoundness, roadWidth} = this
-        if (all || roads) {
+        if (all || roadBorders) {
             this.envelopes = graph.segments.map(seg =>
                 new Envelope(seg, roadWidth, roadRoundness)
             )
@@ -117,7 +124,7 @@ export default class World {
             let treeCount = Math.min(10, this.buildings.length / 10)
             this.trees = trees ? this.#generatedTrees(treeCount) : []
         }
-        if (all || lanes)
+        if (all || laneGuides)
             this.laneGuides = this.#generateLaneGuides()
 
         if (all || corridor) {
@@ -129,6 +136,7 @@ export default class World {
                 this.generateCorridor(startPoint, targetPoint)
             }
         }
+        this.trigger('generate')
 
     }
 
@@ -165,9 +173,9 @@ export default class World {
         var path = this.graph.getShortestPath(start, end, true)
 
         let segs = []
-        for(let i of path.keys()){
-            let {[i]:seg0, [i+1]:seg1} = path
-            if(!seg1) break
+        for (let i of path.keys()) {
+            let {[i]: seg0, [i + 1]: seg1} = path
+            if (!seg1) break
             segs.push(new Segment(seg0, seg1))
         }
 
@@ -182,17 +190,13 @@ export default class World {
     }
 
     #generateLaneGuides() {
-        const tmpEnvelope = []
+        const envelopes = []
         for (let seg of this.graph.segments) {
-            tmpEnvelope.push(
-                new Envelope(
-                    seg,
-                    this.roadWidth / 2,
-                    this.roadRoundness
-                ),
+            envelopes.push(
+                new Envelope(seg, this.roadWidth / 2, this.roadRoundness),
             )
         }
-        return Polygon.multiUnion(tmpEnvelope.map(seg => seg.poly))
+        return Polygon.multiUnion(envelopes.map(seg => seg.poly))
     }
 
     #generateBuildings() {
@@ -287,8 +291,8 @@ export default class World {
     inRenderBox
 
     draw(ctx, viewPort, {
-        showStartMarkings = true, showItems = 1000, showLane = false,
-        showCorridorBorder = true,showCorridorSkeleton = true,
+        showStartMarkings = true, showItems = Infinity, showLane = true,
+        showCorridorBorder = true, showCorridorSkeleton = true,
         drawSensor = true
     } = {}) {
         let viewPoint = scale(viewPort.getOffset(), -1)
@@ -327,27 +331,28 @@ export default class World {
         ctx.globalAlpha = 1
         this.bestCar?.draw(ctx, {drawSensor})
 
-        // draw each layer on different image and draw all layer
+        // todo:draw each layer on different image and draw all layer
         // if(!viewPoint.equal(this.#lastViewPoint)) {
-            if (showItems) {
-                let items = [...this.buildings, ...this.trees]
-                    // .filter(item => viewPort.inRenderBox(item.base.points))
-                    .filter(item => item.base.distanceToPoint(viewPoint) < showItems)
-                    .sort((a, b) =>
-                        b.base.distanceToPoint(viewPoint) -
-                        a.base.distanceToPoint(viewPoint)
-                    )
-                // ITEMS IS BUILDINGS AND TREES
-                for (let item of items) {
-                    item.draw(ctx, viewPoint, {drawId: true})
-                }
+        if (showItems) {
+            let items = [...this.buildings, ...this.trees]
+                // .filter(item => viewPort.inRenderBox(item.base.points))
+                .filter(item => item.base.distanceToPoint(viewPoint) < showItems)
+                .sort((a, b) =>
+                    b.base.distanceToPoint(viewPoint) -
+                    a.base.distanceToPoint(viewPoint)
+                )
+            // ITEMS IS BUILDINGS AND TREES
+            for (let item of items) {
+                item.draw(ctx, viewPoint, {drawId: true})
             }
-            if (showLane)
-                for (const seg of this.laneGuides) {
-                    seg.draw(ctx, {color: 'red'})
-                }
         }
-        // this.#lastViewPoint = viewPoint
+        if (showLane)
+            for (const seg of this.laneGuides) {
+                seg.draw(ctx, {color: '#7f0505'})
+            }
+    }
+
+    // this.#lastViewPoint = viewPoint
     // }
 
 }

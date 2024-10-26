@@ -1,15 +1,24 @@
 import {getNearestSegment, inRange} from "../utils/algebra-math-utils.js";
+import {DispatcherWithWeakRef} from "../bases/dispatcher.js";
+import {$get} from "../utils/codeflow-utils.js";
+
+export const CHANGE = 'change', ADD = 'add', REMOVE = 'remove';
 /**
  Gets legal segments and registers to mouse `move` and `down` events. Generates a temporary marking on the nearest
  legal segment. When the mouse is pressed down, it adds the marking to a list of markings.
  */
-export default class MarkingEditor {
+export default class _markingEditor extends DispatcherWithWeakRef {
     #segmentsInView = null
     #viewport = null
 
-    constructor(viewport, world, targetSegments) {
+    constructor(viewport, world, targetSegmentsName) {
+        super()
+        this.clearSegmentsInView = () => {
+            this.#segmentsInView = null
+        }
         this.viewport = viewport;
-        this.world = world;
+        this.targetSegmentsName = targetSegmentsName;
+        this.setWorld(world);
 
         this.canvas = viewport.canvas;
         this.ctx = this.canvas.getContext('2d');
@@ -19,16 +28,19 @@ export default class MarkingEditor {
             mousemove: this.#handleMouseMove.bind(this),
         }
 
-        this.targetSegments = targetSegments;
+    }
 
-        this.markings = this.world.markings
+    setWorld(world) {
+        this.world?.removeEventListener('generate', this.clearSegmentsInView)
+        this.world = world;
+        this.#segmentsInView = null
+        world.addEventListener('generate', this.clearSegmentsInView)
+
     }
 
     set viewport(viewport) {
         this.#viewport = viewport;
-        viewport.addEventListener('change', () => {
-            this.#segmentsInView = null;
-        })
+        viewport.addEventListener('change', this.clearSegmentsInView)
     }
 
     get viewport() {
@@ -41,10 +53,9 @@ export default class MarkingEditor {
     }
 
     get segmentsInView() {
-        if (this.#segmentsInView) return this.#segmentsInView;
-        return this.#segmentsInView = this.targetSegments.filter(
-            seg => this.viewport.inView([seg.p1, seg.p2])
-        );
+        if (this.#segmentsInView) return this.#segmentsInView
+        var targetSegments = $get(this.world, this.targetSegmentsName)
+        return this.#segmentsInView = this.viewport.segmentsInView(targetSegments)
     }
 
     #addEventListeners() {
@@ -67,6 +78,7 @@ export default class MarkingEditor {
 
     disable() {
         this.#removeEventListener()
+        this.clearSegmentsInView()
     }
 
 
@@ -92,19 +104,22 @@ export default class MarkingEditor {
     }
 
     #handleMouseDown(evt) {
+        var markings = this.world.markings
         if (evt.button == 0) // left click
             if (this.intent) {
-                this.markings.push(this.intent)
+                markings.push(this.intent)
                 this.intent = null
-            }
-        if (evt.button == 2) // right click
-            for (let i = 0; i < this.markings.length; i++) {
-                let poly = this.markings[i].poly
-                if (poly.containsPoint(this.mouse)) {
-                    this.markings.splice(i, 1)
-                    return
+                this.trigger(ADD, {type: this.intent})
+                this.trigger(CHANGE, {type: this.intent})
+            } else if (evt.button == 2) // right click
+                for (let i = 0; i < this.markings.length; i++) {
+                    let poly = markings[i].poly
+                    if (poly.containsPoint(this.mouse)) {
+                        let removed = markings.splice(i, 1)
+                        this.trigger(ADD, {type: removed[0]})
+                        this.trigger(CHANGE, {type: removed[0]})
+                    }
                 }
-            }
     }
 
     display() {

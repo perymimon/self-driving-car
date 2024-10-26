@@ -1,8 +1,9 @@
 import Point from "./primitives/point.js";
 import {add, scale, subtract} from "./utils/algebra-math-utils.js";
 import Polygon from "./primitives/polygon.js";
+import {DispatcherWithWeakRef} from "./bases/dispatcher.js";
 
-export default class Viewport extends EventTarget {
+export default class Viewport extends DispatcherWithWeakRef {
 
     constructor(canvas, zoom = 1, offset = null) {
         super()
@@ -22,11 +23,6 @@ export default class Viewport extends EventTarget {
         }
 
         this.#addEventListener()
-    }
-
-    #trigger(eventName, detail = {}) {
-        const event = new CustomEvent(eventName, {detail});
-        this.dispatchEvent(event);
     }
 
     getRenderBox() {
@@ -51,9 +47,13 @@ export default class Viewport extends EventTarget {
         border.draw(ctx, {lineWidth: 10})
         center.draw(ctx)
     }
-
-    inView(points = []) {
-        let {left, top, bottom, right} = this.getRenderBox()
+    segmentsInView(segments = [], box = this.getRenderBox()){
+        return segments.filter(
+            seg => this.inView([seg.p1, seg.p2], box)
+        );
+    }
+    inView(points = [], box = this.getRenderBox()) {
+        let {left, top, bottom, right} = box
         return points.some(point => {
             if (point.x < left) return false
             if (point.y < top) return false
@@ -108,7 +108,7 @@ export default class Viewport extends EventTarget {
         if (this.drag.active) {
             this.drag.end = this.getMouse(event)
             this.drag.offset = subtract(this.drag.end, this.drag.start)
-            this.#trigger('change', {})
+            this.trigger('change', {})
         }
     }
 
@@ -129,6 +129,6 @@ export default class Viewport extends EventTarget {
         let step = 0.1
         this.zoom += dir * step
         this.zoom = Math.max(1, Math.min(this.zoom, this.maxZoom))
-        this.#trigger('change', {})
+        this.trigger('change', {})
     }
 }

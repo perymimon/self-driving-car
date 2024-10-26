@@ -1,6 +1,6 @@
-import Dispatcher from "../bases/dispatcher.js";
+import {DispatcherWithWeakRef} from "../bases/dispatcher.js";
 
-export default class Point extends Dispatcher {
+export default class Point extends DispatcherWithWeakRef {
     #x = 0
     #y = 0
     #z = 0
@@ -17,6 +17,7 @@ export default class Point extends Dispatcher {
         if(x) this.#x += x
         if(y) this.#y += y
         if(z) this.#z += z
+        this.trigger('change', {key:'xyz' , value: {x,y,z}})
     }
     set x(v) {
         this.#x = v

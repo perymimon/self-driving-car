@@ -1,13 +1,17 @@
 import Point from '../primitives/point.js'
 import Segment from '../primitives/segment.js'
-import Dispatcher from "../bases/dispatcher.js";
+import {DispatcherWithWeakRef} from "../bases/dispatcher.js";
 import {add, getNearestSegment, getShortestPath, scale} from "../utils/algebra-math-utils.js";
 
-export default class Graph extends Dispatcher {
-    constructor(points = [], segments = []) {
+export default class Graph extends DispatcherWithWeakRef {
+    constructor(points = [], segments = [], tracePoints = false) {
         super()
         this.points = points;
         this.segments = segments;
+        if(tracePoints)
+        for (let p of points){
+            p.addEventListener('change',_=> this.#triggerChange())
+        }
     }
 
     static Load(info) {
@@ -20,7 +24,9 @@ export default class Graph extends Dispatcher {
         ))
         return new Graph(points, segments)
     }
-
+    #triggerChange(){
+        this.trigger('change')
+    }
     hash() {
         return JSON.stringify(this)
     }
@@ -39,7 +45,7 @@ export default class Graph extends Dispatcher {
     addPoint(point) {
         if (this.pointExists(point)) return false
         this.points.push(point)
-        this.trigger('update')
+        this.#triggerChange()
         return true
     }
 
@@ -51,10 +57,27 @@ export default class Graph extends Dispatcher {
         for (let seg of segments) {
             this.removeSegment(seg)
         }
-        this.trigger('update')
+        this.#triggerChange()
+        return true
+    }
+    addSegment(seg) {
+        if (this.segmentExists(seg)) return false
+        this.segments.push(seg)
+        this.#triggerChange()
         return true
     }
 
+    segmentExists(segment) {
+        return this.segments.some(seg => segment.equal(seg))
+    }
+
+    removeSegment(segment) {
+        let i = this.segments.findIndex(seg => seg.equal(segment))
+        if (i == -1) return false
+        this.segments.splice(i, 1)
+        this.#triggerChange()
+        return true
+    }
     getSegmentsWithPoint(point) {
         let segs = []
         for (let seg of this.segments) {
@@ -129,23 +152,6 @@ export default class Graph extends Dispatcher {
         return this.points.some(p => p.equal(point))
     }
 
-    addSegment(seg) {
-        if (this.segmentExists(seg)) return false
-        this.segments.push(seg)
-        this.trigger('update')
-        return true
-    }
 
-    segmentExists(segment) {
-        return this.segments.some(seg => segment.equal(seg))
-    }
-
-    removeSegment(segment) {
-        let i = this.segments.findIndex(seg => seg.equal(segment))
-        if (i == -1) return false
-        this.segments.splice(i, 1)
-        this.trigger('update')
-        return true
-    }
 
 }

@@ -1,4 +1,4 @@
-import Marking from "../bases/marking.js";
+import Marking from "../../bases/marking.js";
 
 export default class Target extends Marking{
     constructor(center, directionVector, width, height) {

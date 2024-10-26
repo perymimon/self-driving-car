@@ -1,6 +1,6 @@
-import Segment from "../primitives/segment.js";
-import {add, lerp2D, perpendicular, scale} from "../utils/algebra-math-utils.js";
-import Marking from "../bases/marking.js";
+import Segment from "../../primitives/segment.js";
+import {add, lerp2D, perpendicular, scale} from "../../utils/algebra-math-utils.js";
+import Marking from "../../bases/marking.js";
 
 export default class Light extends Marking {
     constructor(center, directionVector, width, height) {

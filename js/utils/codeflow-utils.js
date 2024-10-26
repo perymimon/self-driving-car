@@ -144,3 +144,23 @@ export function extractFormData(form) {
     }
     return formDataObj
 }
+
+export function $get(object, path, defaultValue) {
+    // If the path is a string, convert it to an array
+    if (typeof path === 'string') {
+        // Handle both dot notation and bracket notation
+        path = path.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, '').split('.');
+    }
+
+    // Iterate over the path array to access nested properties
+    let result = object;
+    for (let key of path) {
+        if (result != null && key in result) {
+            result = result[key];
+        } else {
+            // Return default value if the property doesn't exist
+            return defaultValue;
+        }
+    }
+    return result;
+}

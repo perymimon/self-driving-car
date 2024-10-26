@@ -1,12 +1,11 @@
-import MarkingEditor from "../bases/markingEditor.js";
-import Start from "../markings/start.js";
+import _markingEditor from "./_markingEditor.js";
+import Start from "./markings/start.js";
 
-export default class StartEditor extends MarkingEditor {
+export default class StartEditor extends _markingEditor {
     constructor(viewport, world) {
-        super(viewport, world, world.laneGuides);
+        super(viewport, world, 'laneGuides');
 
     }
-
     createMarking(center, directionVector) {
         let start = new Start(
             center,

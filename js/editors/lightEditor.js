@@ -1,11 +1,10 @@
-import MarkingEditor from "../bases/markingEditor.js";
-import Light from "../markings/light.js";
+import _markingEditor from "./_markingEditor.js";
+import Light from "./markings/light.js";
 
-export default class LightEditor extends MarkingEditor {
+export default class LightEditor extends _markingEditor {
     constructor(viewport, world) {
-        super(viewport, world, world.laneGuides);
+        super(viewport, world, 'laneGuides');
     }
-
     createMarking(center, directionVector){
         return new Light(
             center,

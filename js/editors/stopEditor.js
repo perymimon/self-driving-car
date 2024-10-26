@@ -1,11 +1,10 @@
-import Stop from "../markings/stop.js";
-import MarkingEditor from "../bases/markingEditor.js";
+import Stop from "./markings/stop.js";
+import _markingEditor from "./_markingEditor.js";
 
-export default class StopEditor extends MarkingEditor {
+export default class StopEditor extends _markingEditor {
     constructor(viewport, world) {
-        super(viewport, world, world.laneGuides);
+        super(viewport, world, 'laneGuides');
     }
-
     createMarking(center, directionVector){
         return new Stop(
             center,

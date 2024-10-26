@@ -1,12 +1,12 @@
-import {angle} from "../utils/algebra-math-utils.js";
-import Marking from "../bases/marking.js";
+import {angle} from "../../utils/algebra-math-utils.js";
+import Marking from "../../bases/marking.js";
 
 export default class Start extends Marking{
     constructor(center, directionVector, width, height) {
         super(center, directionVector, width, height);
         this.img = new Image()
         this.img.onload = function (){       }
-        this.img.src = '../car.png'
+        this.img.src = '../../assets/car.png'
 
     }
 

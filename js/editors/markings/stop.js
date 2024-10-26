@@ -1,5 +1,5 @@
-import {angle} from "../utils/algebra-math-utils.js";
-import Marking from "../bases/marking.js";
+import {angle} from "../../utils/algebra-math-utils.js";
+import Marking from "../../bases/marking.js";
 
 export default class Stop extends Marking{
     constructor(center, directionVector, width, height) {
