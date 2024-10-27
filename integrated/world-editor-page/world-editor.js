@@ -10,82 +10,109 @@ import ParkingEditor from "../../js/editors/parkingEditor.js";
 import TargetEditor from "../../js/editors/targetEditor.js";
 import LightEditor from "../../js/editors/lightEditor.js";
 import {parseRoads} from "../../js/math/osm.js";
+import {
+    downloadJSON,
+    extractFormData,
+    fetchLastFile,
+    onElementResize,
+    readJsonFile
+} from "../../js/utils/codeflow-utils.js";
 
 const ctx = editorCanvas.getContext('2d')
 
-var rect = editorCanvas.parentNode.getBoundingClientRect();
-editorCanvas.width = rect.width;
-editorCanvas.height = rect.height - editorCanvas.previousElementSibling.offsetHeight;
+// var rect = editorCanvas.parentNode.getBoundingClientRect();
+// editorCanvas.width = rect.width;
+// editorCanvas.height = rect.height - editorCanvas.previousElementSibling.offsetHeight;
+onElementResize(editorCanvas, function (rect, element) {
+    element.width = rect.width;
+    element.height = rect.height
+})
 
-const worldString = localStorage.getItem('world')
-const worldInfo = worldString ? JSON.parse(worldString) : null
 
+let worldInfo = await fetchLastFile('last-world-saved', '../../saved/small_with_target.world')
+    .catch(e => null)
+// const worldString = localStorage.getItem('world')
+// const worldInfo = worldString ? JSON.parse(worldString) : null
 var world = worldInfo ? World.Load(worldInfo) : new World(new Graph())
-var viewPort = null
-var tools = {}
+var viewPort = new ViewPort(editorCanvas, worldInfo.zoom, worldInfo.offset)
+var tools = {
+    graph: {editor: new GraphEditor(viewPort, world)},
+    stop: {editor: new StopEditor(viewPort, world)},
+    cross: {editor: new CrossEditor(viewPort, world)},
+    start: {editor: new StartEditor(viewPort, world)},
+    yield: {editor: new YieldEditor(viewPort, world)},
+    parking: {editor: new ParkingEditor(viewPort, world)},
+    target: {editor: new TargetEditor(viewPort, world)},
+    light: {editor: new LightEditor(viewPort, world)},
+}
 
-restart()
-setMode('graph')
+restart('graph')
 
-function restart(w = world) {
-    viewPort = new ViewPort(editorCanvas, w.zoom, w.offset)
-    disableEditors()
-    tools = {
-        graph: {editor: new GraphEditor(viewPort, w)},
-        stop: {editor: new StopEditor(viewPort, w)},
-        cross: {editor: new CrossEditor(viewPort, w)},
-        start: {editor: new StartEditor(viewPort, w)},
-        yield: {editor: new YieldEditor(viewPort, w)},
-        parking: {editor: new ParkingEditor(viewPort, w)},
-        target: {editor: new TargetEditor(viewPort, w)},
-        light: {editor: new LightEditor(viewPort, w)},
+function restart(mode = 'graph') {
+    // viewPort = new ViewPort(editorCanvas, w.zoom, w.offset)
+    if (world.zoom) viewPort.zoom = world.zoom
+    if (world.offset) viewPort.offset = world.offset
+
+    for (let mode in tools) {
+        tools[mode].editor.onchange = event => {
+            let formdata = extractFormData(construction)
+            formdata.roads = true
+            world.generate(formdata)
+        }
+        tools[mode].editor.setWorld(world)
     }
+    setEditModeType(mode)
+    presetConstructionForm()
+
 }
 
-function generate(options) {
+function presetConstructionForm() {
+    construction.elements.roadBorders.checked = Boolean(world.roadBorders?.length)
+    construction.elements.buildings.checked = Boolean(world.buildings?.length)
+    construction.elements.trees.checked = Boolean(world.trees?.length)
+    construction.elements.laneGuides.checked = Boolean(world.laneGuides?.length)
+    construction.elements.corridor.checked = Boolean(world.corridor?.length)
+}
+
+/*global*/
+window.generate2 = function (event) {
+    var input = event.target
+    var {checked, name} = input
+    if (checked) {
+        world.generate({[name]: true})
+    } else {
+        world.dispose({[name]: true})
+    }
+    presetConstructionForm()
+
+
+}
+window.generate = (options) => {
+
     world.generate(options)
-    restart(world)
 }
+window.dispose = () => world.dispose()
+window.save = saveWorld
 
-/*toolbar*/
-document.getElementById('generateButton').onclick = () => generate()
-document.getElementById('generateRoads').onclick = () => generate({all: false, roads: true})
-document.getElementById('generateBuilding').onclick = () => generate({all: false, buildings: true})
-document.getElementById('generateTrees').onclick = () => generate({all: false, trees: true})
-document.getElementById('generateLanes').onclick = () => generate({all: false, lanes: true})
-document.getElementById('generateCorridor').onclick = () => generate({all: false, corridor: true})
-document.getElementById('disposeButton').onclick = function dispose() {
-    world.dispose()
-}
-document.getElementById('saveButton').onclick = function save() {
+function saveWorld() {
     world.offset = viewPort.offset
     world.zoom = viewPort.zoom
 
-    let a = document.createElement('a')
-    a.setAttribute('href', `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(world))}`)
-    a.setAttribute('download', 'name.world')
-    a.click()
-
+    downloadJSON(world, 'default.world','world')
     localStorage.setItem('world', JSON.stringify(world))
 }
-document.getElementById('fileInput').addEventListener('change', function load(event) {
-        const file = event.target.files[0]
-        if (!file) {
-            alert('No File selected')
-            return
-        }
-        let reader = new FileReader()
-        reader.readAsText(file)
-        reader.onload = (evt) => {
-            let fileContent = evt.target.result
-            let jsonData = JSON.parse(fileContent)
 
-            world = World.Load(jsonData)
-            restart(world)
-            // localStorage.setItem('world', JSON.stringify(world))
-        }
+window.load = async function load(event) {
+    const file = event.target.files[0]
+    if (!file) {
+        alert('No File selected')
+        return
     }
-)
+    let worldInfo = await readJsonFile(file, 'last-world-loaded')
+    world = World.Load(worldInfo)
+    restart()
+}
+
 const modal = document.getElementById('myModal')
 
 document.getElementById('myModal').addEventListener('click', (event) => {
@@ -114,30 +141,16 @@ document.getElementById('processModalBtn').onclick = function parseOsmData() {
     modal.close()
 }
 
-document.getElementById('graphTools').onsubmit = (evt) => evt.preventDefault()
+// document.getElementById('graphTools').onsubmit = (evt) => evt.preventDefault()
 document.getElementById('graphTools').onchange = function (e) {
     e.preventDefault()
     let formData = new FormData(this);
     let mode = formData.get('graph')
-    setMode(mode)
+    setEditModeType(mode)
 }
 
-animate()
 
-function animate() {
-    viewPort.reset()
-
-    world.draw(ctx, viewPort, {showLane: false, showItems: 200})
-    // viewPort.drawRenderBox(ctx)
-    ctx.globalAlpha = 0.3
-    for (let mode in tools) {
-        tools[mode].editor.display()
-    }
-    ctx.globalAlpha = 1
-    requestAnimationFrame(animate)
-}
-
-function setMode(mode) {
+function setEditModeType(mode) {
     disableEditors()
     tools[mode]?.editor.enable()
     document.querySelector(`input[value="${mode}"]`).checked = true
@@ -147,4 +160,19 @@ function disableEditors() {
     for (let mode in tools) {
         tools[mode].editor.disable()
     }
+}
+
+animate()
+
+function animate() {
+    viewPort.reset()
+
+    world.draw(ctx, viewPort, {showLane: true})
+    // viewPort.drawRenderBox(ctx)
+    ctx.globalAlpha = 0.3
+    for (let mode in tools) {
+        tools[mode].editor.display()
+    }
+    ctx.globalAlpha = 1
+    requestAnimationFrame(animate)
 }

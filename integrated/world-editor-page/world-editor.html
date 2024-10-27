@@ -40,12 +40,13 @@
 </div>
 <div id="project">
     <div id="controls">
-        <button id="disposeButton">🗑️</button>
-        <button id="saveButton">💾</button>
-        <label>📁<input type="file" id="fileInput" accept='.world'> </label>
+        <button id="disposeButton" onclick="dispose()">🗑️</button>
+        <button id="saveButton" onclick="save()">💾</button>
+        <label>📁<input type="file" id="fileInput" accept='.world' onchange="load(event)"> </label>
         <button id="openOSMModal">🌍</button>
         <vr></vr>
-        <form id="graphTools" class="toolbar" >
+        <form id="graphTools" class="toolbar" onsubmit="event.preventDefault()">
+            Editor
             <label title="graph editor">🌐<input type="radio" name="graph" value="graph"/></label>
             <label title="start editor">🚗<input type="radio" name="graph" value="start"/></label>
             <label title="target editor">🎯<input type="radio" name="graph" value="target"/></label>
@@ -55,16 +56,14 @@
             <label title="stop editor">🔴<input type="radio" name="graph" value="stop"/></label>
         </form>
 
-        <div class="toolbar">
-            Generates
-            <button id="generateButton">⚒️</button>
-            <vr></vr>
-            <button id="generateRoads">1. 🗺️️</button>
-            <button id="generateBuilding">2.🏨</button>
-            <button id="generateTrees">3.🌲</button>
-            <button id="generateLanes">4.🛣️</button>
-            <button id="generateCorridor">5. 🧱️</button>
-        </div>
+        <form class="toolbar" onsubmit="event.preventDefault()" id="construction" onchange="generate2(event)">
+            with
+            <label title="roadBorders"><input name="roadBorders" type="checkbox" onclick="">🛡️</label>
+            <label title="building"><input name="buildings" type="checkbox" onclick="">🏨</label>
+            <label title="tree"><input name="trees" type="checkbox" >🌲</label>
+            <label title="lanes"><input name="laneGuides" type="checkbox" >🛣</label>
+            <label title="corridor"><input name="corridor" type="checkbox" >🧱</label>
+        </form>
     </div>
     <canvas id="editorCanvas"></canvas>
     <!-- The Modal -->

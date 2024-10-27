@@ -5,6 +5,7 @@
 #editorCanvas{
     background-color: #8aae6f;
     border: none;
+    flex: 1;
 }
 
 dialog{
