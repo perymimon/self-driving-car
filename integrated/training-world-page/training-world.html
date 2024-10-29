@@ -5,7 +5,7 @@
     <title>race - self driving car</title>
     <link href="../../homepage/style.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet">
-    <link href="training-world.css" rel="stylesheet">
+    <link href="./training-world.css" rel="stylesheet">
 </head>
 <body>
 <div id="study">
@@ -46,7 +46,6 @@
 <div id="project">
     <div id="controls">
         <label>📁<input type="file" id="fileInput" title="load world" accept='.world'>world </label>
-        <label>📁<input type="file" id="fileInput" title="load car" accept='.world'>car </label>
         <div id="banner-notification">
             <label>world loaded</label>
             <label>car loaded</label>
@@ -54,9 +53,9 @@
     </div>
     <canvas id="carCanvas"></canvas>
     <div id="visualizer">
+        <canvas id="networkCanvas"></canvas>
         <canvas id="miniMapCanvas"></canvas>
     </div>
-    <div id="counter">1</div>
 </div>
 <script src="training-world.js" type="module"></script>
 <a href="../race-page/race.html" class="next" page="race">race</a>

@@ -12,6 +12,8 @@ body {
     position: relative;
     flex: 1;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 #carCanvas {
@@ -54,3 +56,10 @@ canvas:focus {
     outline: 4px white inset;
 }
 
+.page-right-side{
+    flex:1;
+    align-items: stretch;
+}
+.page-left-side{
+    max-width: min(40em, 40vw);
+}

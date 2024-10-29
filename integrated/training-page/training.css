@@ -1,20 +1,35 @@
+#project {
+    display: grid;
+    grid-template-areas: "a a" "b c";
 
-#carCanvas{
+    & #controls {
+        grid-area: a;
+    }
+    & #carCanvas{
+        grid-area: b;
+    }
+    & #networkCanvas {
+        grid-area: c;
+    }
+}
+
+#carCanvas {
     background: #939191;
     /*width: 200px*/
 }
-#networkCanvas{
+
+#networkCanvas {
     background: #957895;
     /*width: 200px*/
 }
 
-#verticalButtons{
+#verticalButtons {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
 
-button{
+button {
     border: none;
     border-radius: 5px;
     padding: 5px 5px 7px 5px;
@@ -22,12 +37,13 @@ button{
     font-size: 30px;
     filter: grayscale(1);
 }
-button:hover{
+
+button:hover {
     filter: grayscale(0);
     background: #939191;
 }
 
-#study{
+#study {
     align-self: start;
     width: 50em;
 }

@@ -10,7 +10,8 @@
 }
 
 body {
-    font-family: "Inter var experimental", "Inter var", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
+    /*font-family: "Inter var experimental", "Inter var", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif*/
+    font-family: 'Raleway', sans-serif;
     height: auto;
     /*font-family: 'Roboto', sans-serif;*/
     margin: 0;
@@ -101,16 +102,14 @@ small {
 label, button {
     border: none;
     font-size: 20px;
-    /* border-radius: 10px; */
-    /* text-shadow: 1px -1px 4px rgba(0, 0, 0, 0.69); */
     cursor: pointer;
     padding: 0.15em;
-    /* filter: grayscale(1); */
-    /* opacity:0.5; */
-    /* width: min-content; */
-    /* color: #ffffff; */
     background: #ffffff3d;
+    line-height: 1.5;
 
+    &:is(button).notice-button{
+        border: unset;
+    }
     input {
         border: none;
         appearance: textfield;
@@ -120,17 +119,49 @@ label, button {
         display: none;
     }
 
-    &:has(input[type="radio"]:not(:checked)) {
+    &:has(
+    input[type="radio"]) {
         filter: grayscale(1);
+    }
+
+    &:has(
+    input[type="radio"]:checked) {
+        filter: grayscale(0);
+        background-image: radial-gradient(transparent 40%, #dad9db 50%, transparent 60%);
     }
 
     &:hover {
         filter: grayscale(0) !important;
         background: #939191;
     }
+
 }
 
-vr{
+vr {
     display: inline-block;
-    border-left:1px solid;
+    /* border-left: 1px solid; */
+    margin-inline:0.2em;
+}
+#controls{
+    display:flex;
+    border-bottom: 1px solid;
+    /* gap: 0.2em; */
+    /* border-left: 1px solid; */
+    .toolbar{
+        display: inline-flex;
+        align-items: center;
+        border:1px solid currentColor;
+        padding: 0.1em;
+        border-radius: 0.25em;
+        &::before{
+
+            content: attr(groupname);
+            margin-inline-end: 0.3em;
+        }
+    }
+}
+dialog[open]{
+    display: flex;
+    flex-direction: column;
+    width: 50vw;
 }

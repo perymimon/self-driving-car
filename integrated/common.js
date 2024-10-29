@@ -1,14 +1,14 @@
-import Start from "../js/markings/start.js";
+import Start from "../js/editors/markings/start.js";
 import Point from "../js/primitives/point.js";
 import Car from "../js/items/car.js";
 import {angle} from "../js/utils/algebra-math-utils.js";
-import {fetchLastFile} from "./operationUtil.js";
 import World from "../js/world.js";
 import Graph from "../js/math/graph.js";
 import ViewPort from "../js/viewport.js";
 import MiniMap from "../js/visualizer/miniMap.js";
+import {fetchLastFile} from "../js/utils/codeflow-utils.js";
 
-export function canvasion(selector, width, height){
+export function canvastion(selector, width, height) {
     const canvas = document.querySelector(selector)
     canvas.width = width;
     canvas.height = height;
@@ -16,8 +16,7 @@ export function canvasion(selector, width, height){
     return [canvas, ctx]
 }
 
-export const [carCanvas,carCtx]
-    = canvasion('#carCanvas', window.innerWidth, window.innerHeight);
+export const [carCanvas, carCtx] = canvasion('#carCanvas', window.innerWidth, window.innerHeight);
 
 var worldJson = await fetchLastFile('world', './saved/small_with_target.world')
 export var world = World.Load(worldJson) ?? new World(new Graph())

@@ -39,7 +39,7 @@ export function getMinItem(array, valueFn) {
     })
 }
 
-export class Counter {
+export class TrackCounter {
     constructor(count) {
         this.steps = count
         this.reset()
@@ -50,11 +50,8 @@ export class Counter {
         return this.currentCount <= 0
     }
 
-    countingIf(condition) {
-        if (condition)
-            return this.counting()
-        else
-            return this.reset()
+    trackDown(condition) {
+        return  condition? this.counting(): this.reset()
     }
 
     reset() {
@@ -64,8 +61,11 @@ export class Counter {
 
 }
 
-export function downloadJSON(json, filename = 'default.json') {
-    let a = document.createElement('a')
+export function downloadJSON(json, defFilename = 'default', extension = 'json') {
+    var filename = prompt('Enter the file name:', defFilename);
+    if(!filename) return false
+    if(!filename.endsWith(`.${extension}`)) filename += `.${extension}`
+    var a = document.createElement('a')
     a.setAttribute('href', `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(json))}`)
     a.setAttribute('download', filename)
     a.click()
@@ -95,6 +95,7 @@ export async function fetchJSONFile(fileName) {
     var res = await fetch(fileName)
     return await res.json()
 }
+
 
 export async function fetchLastFile(memoName, defaultPath) {
     var filename = localStorage.getItem(memoName);
@@ -163,4 +164,14 @@ export function $get(object, path, defaultValue) {
         }
     }
     return result;
+}
+
+export function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+        .then(() => {
+            console.log('Text copied to clipboard');
+        })
+        .catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
 }

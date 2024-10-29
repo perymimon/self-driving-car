@@ -101,15 +101,16 @@ export default class World extends DispatcherWithWeakRef{
     }
 
     generate(options = {}) {
-        let {corridor = false, buildings = false, trees = false, roadBorders = false, laneGuides = false} = options
+        let {corridor = false, buildings = false,
+            trees = false, roadBorders = false, laneGuides = false} = options
         let specific = Object.values(options).some(Boolean)
         let all = !specific
 
         let {graph, roadRoundness, roadWidth} = this
+        this.envelopes = graph.segments.map(seg =>
+            new Envelope(seg, roadWidth, roadRoundness)
+        )
         if (all || roadBorders) {
-            this.envelopes = graph.segments.map(seg =>
-                new Envelope(seg, roadWidth, roadRoundness)
-            )
             this.roadBorders = Polygon.multiUnion(this.envelopes.map(env => env.poly));
             this.buildings = []
             this.trees = []

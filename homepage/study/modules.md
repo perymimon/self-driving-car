@@ -38,7 +38,7 @@
    for [Cross](https://github.com/perymimon/self-driving-car/blob/main/js/markings/cross.js), [Light](https://github.com/perymimon/self-driving-car/blob/main/js/markings/light.js), [Parking](https://github.com/perymimon/self-driving-car/blob/main/js/markings/parking.js), [Start](https://github.com/perymimon/self-driving-car/blob/main/js/markings/start.js), [Stop](https://github.com/perymimon/self-driving-car/blob/main/js/markings/stop.js), [Target](https://github.com/perymimon/self-driving-car/blob/main/js/markings/target.js),
    and [Yield](https://github.com/perymimon/self-driving-car/blob/main/js/markings/yield.js) marking.
 
-3. **[markingEditor.js](https://github.com/perymimon/self-driving-car/blob/main/js/bases/markingEditor.js)**
+3. **[_markingEditor.js](https://github.com/perymimon/self-driving-car/blob/main/js/bases/markingEditor.js)**
    Extended class for specific road marking classes. designed to handle the creation and management of "markings" on a world  
    Used by [Cross](https://github.com/perymimon/self-driving-car/blob/main/js/markings/cross.js), [Light](https://github.com/perymimon/self-driving-car/blob/main/js/markings/light.js), [Parking](https://github.com/perymimon/self-driving-car/blob/main/js/markings/parking.js), [Start](https://github.com/perymimon/self-driving-car/blob/main/js/markings/start.js), [Stop](https://github.com/perymimon/self-driving-car/blob/main/js/markings/stop.js), [Target](https://github.com/perymimon/self-driving-car/blob/main/js/markings/target.js),
    and [Yield](https://github.com/perymimon/self-driving-car/blob/main/js/markings/yield.js).

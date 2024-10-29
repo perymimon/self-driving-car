@@ -11,6 +11,7 @@ import TargetEditor from "../../js/editors/targetEditor.js";
 import LightEditor from "../../js/editors/lightEditor.js";
 import {parseRoads} from "../../js/math/osm.js";
 import {
+    copyToClipboard,
     downloadJSON,
     extractFormData,
     fetchLastFile,
@@ -18,7 +19,16 @@ import {
     readJsonFile
 } from "../../js/utils/codeflow-utils.js";
 
+
+window.generate = (options) => world.generate(options)
+window.generate2 = generate2
+window.dispose = () => world.dispose()
+window.save = saveWorld
+window.load = load
+window.parseOsmData = parseOsmData;
+window.copyQL = copyQLOpenStreetMap
 const ctx = editorCanvas.getContext('2d')
+
 
 // var rect = editorCanvas.parentNode.getBoundingClientRect();
 // editorCanvas.width = rect.width;
@@ -29,12 +39,11 @@ onElementResize(editorCanvas, function (rect, element) {
 })
 
 
-let worldInfo = await fetchLastFile('last-world-saved', '../../saved/small_with_target.world')
-    .catch(e => null)
+let worldJson = await fetchLastFile('last-world-saved', '../../saved/small_with_target.world')
 // const worldString = localStorage.getItem('world')
 // const worldInfo = worldString ? JSON.parse(worldString) : null
-var world = worldInfo ? World.Load(worldInfo) : new World(new Graph())
-var viewPort = new ViewPort(editorCanvas, worldInfo.zoom, worldInfo.offset)
+var world = worldJson ? World.Load(worldJson) : new World(new Graph())
+var viewPort = new ViewPort(editorCanvas, worldJson.zoom, worldJson.offset)
 var tools = {
     graph: {editor: new GraphEditor(viewPort, world)},
     stop: {editor: new StopEditor(viewPort, world)},
@@ -75,7 +84,7 @@ function presetConstructionForm() {
 }
 
 /*global*/
-window.generate2 = function (event) {
+function generate2(event) {
     var input = event.target
     var {checked, name} = input
     if (checked) {
@@ -87,22 +96,17 @@ window.generate2 = function (event) {
 
 
 }
-window.generate = (options) => {
-
-    world.generate(options)
-}
-window.dispose = () => world.dispose()
-window.save = saveWorld
 
 function saveWorld() {
     world.offset = viewPort.offset
     world.zoom = viewPort.zoom
 
-    downloadJSON(world, 'default.world','world')
+    downloadJSON(world, 'default.world', 'world')
     localStorage.setItem('world', JSON.stringify(world))
 }
 
-window.load = async function load(event) {
+
+async function load(event) {
     const file = event.target.files[0]
     if (!file) {
         alert('No File selected')
@@ -113,42 +117,25 @@ window.load = async function load(event) {
     restart()
 }
 
-const modal = document.getElementById('myModal')
-
-document.getElementById('myModal').addEventListener('click', (event) => {
-    if (event.target === modal) {
-        modal.close();
-    }
-})
-
-// Get the button that opens the modal
-document.getElementById('openOSMModal').addEventListener('click', () => {
-    modal.showModal();
-})
-
-// Get the button that closes the modal
-document.getElementById('closeModalBtn').addEventListener('click', () => {
-    modal.close();
-})
-document.getElementById('processModalBtn').onclick = function parseOsmData() {
+function parseOsmData() {
     if (osmInput.value == "") return
 
     let {points, segments} = parseRoads(JSON.parse(osmInput.value))
     world.graph.points = points
     world.graph.segments = segments
-    world.generate({buildings: false, trees: false})
-    console.log(world.laneGuides)
-    modal.close()
+    var options = extractFormData(construction2)
+    debugger
+    world.generate(options)
+    osmmodal.close()
 }
 
-// document.getElementById('graphTools').onsubmit = (evt) => evt.preventDefault()
-document.getElementById('graphTools').onchange = function (e) {
-    e.preventDefault()
-    let formData = new FormData(this);
-    let mode = formData.get('graph')
-    setEditModeType(mode)
-}
-
+document.getElementById('graphTools').onchange =
+    function graphTools(e) {
+        e.preventDefault()
+        let formData = new FormData(this);
+        let mode = formData.get('graph')
+        setEditModeType(mode)
+    }
 
 function setEditModeType(mode) {
     disableEditors()
@@ -160,6 +147,12 @@ function disableEditors() {
     for (let mode in tools) {
         tools[mode].editor.disable()
     }
+}
+
+
+async function copyQLOpenStreetMap() {
+    var text = await fetch('./osm.ql').then(res => res.text())
+    await copyToClipboard(text);
 }
 
 animate()
@@ -176,3 +169,4 @@ function animate() {
     ctx.globalAlpha = 1
     requestAnimationFrame(animate)
 }
+

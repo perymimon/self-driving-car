@@ -1,9 +1,6 @@
-#controls{
-    display:flex;
-    border-bottom: 1px solid;
-}
+
 #editorCanvas{
-    background-color: #8aae6f;
+    /* background-color: #8ad552; */
     border: none;
     flex: 1;
 }
@@ -11,14 +8,10 @@
 dialog{
     textarea{
         height: 10em;
-        width: min(80em,50vw);
+        width: min(80em,100%);
     }
     .toolbar{
         display: flex;
         justify-content: space-around;
     }
-}
-.toolbar{
-    display: inline-flex;
-    align-items: center;
 }

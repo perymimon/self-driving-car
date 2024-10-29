@@ -3,7 +3,7 @@ import SensorCompass from "./sensorCompass.js";
 import Polygon from "../primitives/polygon.js";
 import Point from "../primitives/point.js";
 import {clap, isCloseZero, reduceToZero} from "../utils/math-utils.js";
-import {Counter, getMaxItem} from "../utils/codeflow-utils.js";
+import {getMaxItem, TrackCounter} from "../utils/codeflow-utils.js";
 import NeuralNetwork from "../math/network.js"
 import KeyboardControls from "../controls/keyboardControls.js"
 import DummyControls from "../controls/dummyControls.js";
@@ -159,33 +159,39 @@ export default class Car {
         }
     }
 
-    isStopped = new Counter(60)
+    trackStopped = new TrackCounter(60)
 
-    update(roadBorders, traffic = [], path ) {
+    update(roadBorders, traffic = [], pathTracking) {
         if (this.damage) return false
 
-        let positionPoint = this.#move()
-        this.fitness += this.speed
+        this.#move()
 
-        this.polygons.move(positionPoint)
-        this.damage = this.#assessDamage(roadBorders, traffic)
-        if (this.damage) {
-            this.speed = 0
+        if (pathTracking) {
+            let segmentsDone = this.#updateProgress(pathTracking)
+            this.fitness = segmentsDone.reduce((acc, b) => acc + b.length(), 0)
+        } else {
+            this.fitness += this.speed
         }
+
+        this.damage = this.#assessDamage(roadBorders, traffic)
         if (this.damage && this.noDamage == true) {
             this.#bounceCar(roadBorders)
             this.damage = false
         }
-        if (this.isStopped.countingIf(isCloseZero(this.speed) && this.useBrain)) {
+        if (this.damage) {
+            this.speed = 0
+        }
+        // if car not move for X frame it consider damaged
+        if (!this.damage && this.trackStopped.trackDown(isCloseZero(this.speed) && this.useBrain)) {
             this.damage = true
         }
         if (this.sensor) {
             this.sensor?.update(roadBorders, traffic)
-            if(path) this.pathCompass.update(path)
+            if (pathTracking) this.pathCompass.update(pathTracking)
             if (this.useBrain) {
                 const offsets = this.sensor.readings.map(s => s == null ? 0 : 1 - s.offset)
                 /* Add compass reading */
-                if(path) offsets.push(this.pathCompass.readings())
+                if (pathTracking) offsets.push(this.pathCompass.readings())
 
                 this.controls?.update(offsets)
                 // const outputs = NeuralNetwork.feedForward(offsets, this.brain)
@@ -206,7 +212,7 @@ export default class Car {
         return true
     }
 
-    updateProgress(segments) {
+    #updateProgress(segments) {
         let dones = []
         let carSeg = getNearestSegment(this, segments)
         for (let seg of segments) {
@@ -219,8 +225,9 @@ export default class Car {
                 dones.push(seg)
             }
         }
-        this.progress = dones.reduce((acc, b) => acc + b.length(), 0)
-        this.dones = dones
+        return dones
+
+
     }
 
     #assessDamage(roadBorders, traffic) {
@@ -260,7 +267,7 @@ export default class Car {
     }
 
     #move() {
-        if (!this.controls) return
+        if (!this.controls) return new Point(0, 0)
 
         if (this.controls.forward) {
             this.speed += this.acceleration
@@ -272,7 +279,7 @@ export default class Car {
         this.speed = clap(this.speed, this.maxReverseSpeed, this.maxSpeed)
 
         this.speed = reduceToZero(this.speed, this.friction)
-        if (this.speed === 0) return
+        if (this.speed === 0) return new Point(0, 0)
 
         if (this.controls.tilt) {
             this.angle -= this.controls.tilt * 0.03
@@ -289,7 +296,9 @@ export default class Car {
         let {x, y} = this
         this.x -= Math.sin(this.angle) * this.speed
         this.y -= Math.cos(this.angle) * this.speed
-        return subtract(this, {x, y})
+        var positionPoint = subtract(this, {x, y})
+        this.polygons.move(positionPoint)
+        return positionPoint
     }
 
     draw(ctx, {drawSensor = false, color} = {}) {

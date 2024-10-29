@@ -4,8 +4,7 @@ import World from "../js/world.js"
 import {getNearestSegment} from "../js/utils/algebra-math-utils.js";
 import MiniMap from "../js/visualizer/miniMap.js"
 import Segment from "../js/primitives/segment.js";
-import {fetchLastFile} from "./operationUtil.js";
-import {arrayOrderHash} from "../js/utils/codeflow-utils.js";
+import {arrayOrderHash, fetchLastFile} from "../js/utils/codeflow-utils.js";
 import {Counter} from "./counter.js";
 import AudioEngine from "../js/Audio/engineAudio.js";
 import Camera from "../js/camera.js";

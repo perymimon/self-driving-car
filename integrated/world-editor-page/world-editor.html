@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="world-editor.css">
 </head>
 <body>
-<div id="study">
+<div id="study" class="page-left-side">
     <h1>Study</h1>
     Interface for training a self-driving car using a neural network and visualizing it via the Canvas API.
     <dl>
@@ -38,15 +38,16 @@
         window.Prism.highlightAll();
     </script>
 </div>
-<div id="project">
+<div id="project" class="page-right-side">
     <div id="controls">
-        <button id="disposeButton" onclick="dispose()">🗑️</button>
-        <button id="saveButton" onclick="save()">💾</button>
-        <label>📁<input type="file" id="fileInput" accept='.world' onchange="load(event)"> </label>
-        <button id="openOSMModal">🌍</button>
+        <div class="toolbar">
+            <button id="disposeButton" onclick="dispose()">🗑️</button>
+            <button id="saveButton" onclick="save()">💾</button>
+            <label>📁<input type="file" id="fileInput" accept='.world' onchange="load(event)"> </label>
+            <button id="openOSMModal" onclick="osmmodal.showModal()">🌍</button>
+        </div>
         <vr></vr>
-        <form id="graphTools" class="toolbar" onsubmit="event.preventDefault()">
-            Editor
+        <form id="graphTools" groupname="Editor" class="toolbar" onsubmit="event.preventDefault()">
             <label title="graph editor">🌐<input type="radio" name="graph" value="graph"/></label>
             <label title="start editor">🚗<input type="radio" name="graph" value="start"/></label>
             <label title="target editor">🎯<input type="radio" name="graph" value="target"/></label>
@@ -55,29 +56,45 @@
             <label title="light editor">🚦<input type="radio" name="graph" value="light"/></label>
             <label title="stop editor">🔴<input type="radio" name="graph" value="stop"/></label>
         </form>
-
-        <form class="toolbar" onsubmit="event.preventDefault()" id="construction" onchange="generate2(event)">
-            with
+        <vr></vr>
+        <form id="construction" class="toolbar" groupname="with" onsubmit="event.preventDefault()"
+              onchange="generate2(event)">
             <label title="roadBorders"><input name="roadBorders" type="checkbox" onclick="">🛡️</label>
             <label title="building"><input name="buildings" type="checkbox" onclick="">🏨</label>
-            <label title="tree"><input name="trees" type="checkbox" >🌲</label>
-            <label title="lanes"><input name="laneGuides" type="checkbox" >🛣</label>
-            <label title="corridor"><input name="corridor" type="checkbox" >🧱</label>
+            <label title="tree"><input name="trees" type="checkbox">🌲</label>
+            <label title="lanes"><input name="laneGuides" type="checkbox">🛣</label>
+            <label title="corridor"><input name="corridor" type="checkbox">🧱</label>
         </form>
+        <!-- The Modal -->
+        <dialog id="osmmodal">
+            <h2>Open Street Map Input</h2>
+            <p>
+                go to <a target="_blank" href="https://overpass-turbo.eu/">OverPass Turbo</a> and put that query
+                after you found location you want.note that the region you want must be small
+                <button class="notice-button" onclick="copyQL(osmquery.value)">copy osm query</button>
+            </p>
+            <form id="construction2" class="toolbar" groupname="with" onsubmit="event.preventDefault()"
+                  onchange="generate2(event)">
+                <label title="roadBorders"><input name="roadBorders" type="checkbox" onclick="">🛡️</label>
+                <label title="building"><input name="buildings" type="checkbox" onclick="">🏨</label>
+                <label title="tree"><input name="trees" type="checkbox">🌲</label>
+                <label title="lanes"><input name="laneGuides" type="checkbox">🛣</label>
+                <label title="corridor"><input name="corridor" type="checkbox">🧱</label>
+            </form>
+            <textarea id="osmInput"></textarea>
+            <div class="controls">
+                <button id="processModalBtn" onclick="parseOsmData(this)">Process</button>
+                <button id="closeModalBtn" onclick="osmmodal.close()">Close</button>
+                <canvas id="miniMapCanvas"></canvas>
+            </div>
+        </dialog>
     </div>
     <canvas id="editorCanvas"></canvas>
-    <!-- The Modal -->
-    <dialog id="myModal">
-        <h2>Open Street Map Input</h2>
-        <textarea id="osmInput"></textarea>
-        <div class="toolbar">
-            <button id="processModalBtn">Process</button>
-            <button id="closeModalBtn">Close</button>
-        </div>
-    </dialog>
+
 </div>
 <a href="../training-world-page/training-world.html" class="next" page="training world">training world</a>
 <a href="../training-page/training.html" class="prev" page="training">training</a>
 <script type="module" src="world-editor.js"></script>
+
 </body>
 </html>
