@@ -43,7 +43,7 @@
         <a href="https://radufromfinland.com/projects/aiCarPlayground/?s=race_1">Radu original</a>
     </div>
 </div>
-<div id="project">
+<div id="project" class="main-section">
     <div id="controls">
         <label>📁<input type="file" id="fileInput" title="load world" accept='.world'>world </label>
         <div id="banner-notification">
@@ -51,14 +51,15 @@
             <label>car loaded</label>
         </div>
     </div>
-    <canvas id="carCanvas"></canvas>
+    <canvas id="carCanvas" class="main-section"></canvas>
     <div id="visualizer">
         <canvas id="networkCanvas"></canvas>
         <canvas id="miniMapCanvas"></canvas>
     </div>
 </div>
-<script src="training-world.js" type="module"></script>
 <a href="../race-page/race.html" class="next" page="race">race</a>
 <a href="../world-editor-page/world-editor.html" class="prev" page="world editor">world editor</a>
+<!--run-->
+<script src="training-world.js" type="module"></script>
 </body>
 </html>

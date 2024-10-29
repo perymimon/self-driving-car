@@ -1,14 +1,12 @@
-import Graph from '../../js/math/graph.js'
-import GraphEditor from "../../js/editors/graphEditor.js";
-import StopEditor from "../../js/editors/stopEditor.js";
 import CrossEditor from "../../js/editors/crossEditor.js";
-import ViewPort from "../../js/viewport.js";
-import World from "../../js/world.js"
-import StartEditor from "../../js/editors/startEditor.js";
-import YieldEditor from "../../js/editors/yieldEditor.js";
-import ParkingEditor from "../../js/editors/parkingEditor.js";
-import TargetEditor from "../../js/editors/targetEditor.js";
+import GraphEditor from "../../js/editors/graphEditor.js";
 import LightEditor from "../../js/editors/lightEditor.js";
+import ParkingEditor from "../../js/editors/parkingEditor.js";
+import StartEditor from "../../js/editors/startEditor.js";
+import StopEditor from "../../js/editors/stopEditor.js";
+import TargetEditor from "../../js/editors/targetEditor.js";
+import YieldEditor from "../../js/editors/yieldEditor.js";
+import Graph from '../../js/math/graph.js'
 import {parseRoads} from "../../js/math/osm.js";
 import {
     copyToClipboard,
@@ -18,6 +16,9 @@ import {
     onElementResize,
     readJsonFile
 } from "../../js/utils/codeflow-utils.js";
+import ViewPort from "../../js/viewport.js";
+import MiniMap from "../../js/visualizer/miniMap.js";
+import World from "../../js/world.js"
 
 
 window.generate = (options) => world.generate(options)
@@ -37,6 +38,10 @@ onElementResize(editorCanvas, function (rect, element) {
     element.width = rect.width;
     element.height = rect.height
 })
+onElementResize(miniMapCanvas, function (rect, element) {
+    element.width = rect.width;
+    element.height = rect.height
+})
 
 
 let worldJson = await fetchLastFile('last-world-saved', '../../saved/small_with_target.world')
@@ -44,6 +49,8 @@ let worldJson = await fetchLastFile('last-world-saved', '../../saved/small_with_
 // const worldInfo = worldString ? JSON.parse(worldString) : null
 var world = worldJson ? World.Load(worldJson) : new World(new Graph())
 var viewPort = new ViewPort(editorCanvas, worldJson.zoom, worldJson.offset)
+var miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
+
 var tools = {
     graph: {editor: new GraphEditor(viewPort, world)},
     stop: {editor: new StopEditor(viewPort, world)},
@@ -58,10 +65,11 @@ var tools = {
 restart('graph')
 
 function restart(mode = 'graph') {
-    // viewPort = new ViewPort(editorCanvas, w.zoom, w.offset)
     if (world.zoom) viewPort.zoom = world.zoom
     if (world.offset) viewPort.offset = world.offset
 
+    miniMap.graph = world.graph
+    // init toolbar
     for (let mode in tools) {
         tools[mode].editor.onchange = event => {
             let formdata = extractFormData(construction)
@@ -168,5 +176,6 @@ function animate() {
     }
     ctx.globalAlpha = 1
     requestAnimationFrame(animate)
+    miniMap.update(viewPort, [])
 }
 

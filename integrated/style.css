@@ -14,18 +14,18 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    & >canvas{
+        flex: 1;
+    }
 }
 
-#carCanvas {
-    background: radial-gradient(circle farthest-side, #5A5, #096);
-}
+#carCanvas {}
 
 #visualizer {
     display: flex;
     flex-direction: column;
-    gap: 0.5em;
+    gap: 0.2em;
     position: absolute;
-
     justify-content: flex-end;
     inset: 0;
     left: auto;
@@ -40,8 +40,8 @@ body {
 
 #miniMapCanvas {
     border-radius: 50%;
-    border: 1px solid white
-
+    border: 1px solid white;
+    aspect-ratio: 1/1;
 }
 
 #verticalButtons {
@@ -56,10 +56,13 @@ canvas:focus {
     outline: 4px white inset;
 }
 
-.page-right-side{
-    flex:1;
-    align-items: stretch;
-}
-.page-left-side{
-    max-width: min(40em, 40vw);
+body {
+    & > .main-section:nth-child(1) {
+        max-width: min(40em, 40vw);
+    }
+    & > .main-section:nth-child(2) {
+        flex:1;
+        align-items: stretch;
+    }
+
 }

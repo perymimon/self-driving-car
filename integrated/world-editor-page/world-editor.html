@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="world-editor.css">
 </head>
 <body>
-<div id="study" class="page-left-side">
+<div id="study" class="main-section">
     <h1>Study</h1>
     Interface for training a self-driving car using a neural network and visualizing it via the Canvas API.
     <dl>
@@ -38,7 +38,7 @@
         window.Prism.highlightAll();
     </script>
 </div>
-<div id="project" class="page-right-side">
+<div id="project" class="main-section">
     <div id="controls">
         <div class="toolbar">
             <button id="disposeButton" onclick="dispose()">🗑️</button>
@@ -57,7 +57,7 @@
             <label title="stop editor">🔴<input type="radio" name="graph" value="stop"/></label>
         </form>
         <vr></vr>
-        <form id="construction" class="toolbar" groupname="with" onsubmit="event.preventDefault()"
+        <form id="construction" class="toolbar" groupname="With" onsubmit="event.preventDefault()"
               onchange="generate2(event)">
             <label title="roadBorders"><input name="roadBorders" type="checkbox" onclick="">🛡️</label>
             <label title="building"><input name="buildings" type="checkbox" onclick="">🏨</label>
@@ -85,11 +85,13 @@
             <div class="controls">
                 <button id="processModalBtn" onclick="parseOsmData(this)">Process</button>
                 <button id="closeModalBtn" onclick="osmmodal.close()">Close</button>
-                <canvas id="miniMapCanvas"></canvas>
             </div>
         </dialog>
     </div>
     <canvas id="editorCanvas"></canvas>
+    <div id="visualizer">
+        <canvas id="miniMapCanvas"></canvas>
+    </div>
 
 </div>
 <a href="../training-world-page/training-world.html" class="next" page="training world">training world</a>
