@@ -105,14 +105,27 @@ export async function fetchLastFile(memoName, defaultPath) {
     }
 }
 
-export function onElementResize(element, callback) {
+function debounce(fn, delay) {
+    let timer = null;
+    return function (...args) {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+            fn.apply(this, args);
+            timer = null;
+        }, delay);
+    };
+}
+
+export function onElementResize(element, callback, delay = 200) {
+    const debounceCallback = debounce(callback, delay)
+
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
-            callback(entry.contentRect, entry.target);
+            debounceCallback(entry.contentRect, entry.target);
         }
     });
     var rect = element.getBoundingClientRect()
-    callback(rect, element);
+    debounceCallback(rect, element);
     resizeObserver.observe(element);
     return resizeObserver; // Return observer in case you want to disconnect later
 }

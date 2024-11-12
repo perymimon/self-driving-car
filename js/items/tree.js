@@ -1,5 +1,6 @@
-import {add, lerp, lerp2D, pseudoRandom, scale, subtract, translate} from "../utils/algebra-math-utils.js";
+import {add, lerp, lerp2D, scale, subtract, translate} from "../utils/algebra-math-utils.js";
 import Polygon from "../primitives/polygon.js";
+import {pseudoRandom} from "../utils/math-utils.js";
 
 export default class Tree {
     heightCoef = 0.2

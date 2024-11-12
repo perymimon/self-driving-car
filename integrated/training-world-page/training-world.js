@@ -1,3 +1,4 @@
+import {CANCEL, PolygonSelector, SELECTED} from "../../js/editors/polygonSelector.js";
 import Graph from '../../js/math/graph.js'
 import {fetchJSONFile, fetchLastFile, onElementResize} from "../../js/utils/codeflow-utils.js";
 import ViewPort from "../../js/viewport.js";
@@ -9,6 +10,7 @@ import "../../webCompoents/statusbar-2/status-bar.js"
 onElementResize(carCanvas, function (rect, element) {
     element.width = rect.width;
     element.height = rect.height
+    console.log(rect)
 })
 onElementResize(miniMapCanvas, function (rect, element) {
     element.width = rect.width;
@@ -31,6 +33,16 @@ let carMold = await fetchJSONFile(carFilename)
 var viewPort = new ViewPort(carCanvas, 1, world.offset)
 carFileNameView.textContent = carFilename
 
+var carSelector = new PolygonSelector(viewPort,[])
+carSelector.addEventListener(SELECTED, (event)=>{
+    let car = event.target
+    carStatusbar.data = car
+})
+carSelector.addEventListener(CANCEL, (event)=>{
+    debugger
+    carStatusbar.data = null
+})
+
 const carCtx = carCanvas.getContext('2d');
 const networkCtx = networkCanvas.getContext('2d');
 var miniMap = null
@@ -41,6 +53,9 @@ function reload(world) {
     world.cars.length = 0
     world.addGenerateCars({N:1, type: 'KEYS', carMold, color: 'gray', name: 'Me'})
     // world.addGenerateCars({N: 30, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
+
+    carSelector.setPolygons(world.cars)
+
     for (let car of world.cars) {
         car.noDamageMode = true
     }
@@ -50,7 +65,7 @@ function reload(world) {
     miniMap = new MiniMap(miniMapCanvas, world.graph, 200);
     world.bestCar = myCar
     selectedCar = myCar
-    carMoldStatusbar.data = world.bestCar
+    carStatusbar.data = world.bestCar
 }
 
 update()

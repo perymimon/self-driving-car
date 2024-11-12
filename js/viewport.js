@@ -23,6 +23,7 @@ export default class Viewport extends DispatcherWithWeakRef {
         }
 
         this.#addEventListener()
+
     }
 
     getRenderBox() {
@@ -79,7 +80,8 @@ export default class Viewport extends DispatcherWithWeakRef {
     }
 
     reset() {
-        let {ctx, canvas, center, zoom} = this
+        let {ctx, canvas, zoom} = this
+        let center = this.center = new Point(canvas.width / 2, canvas.height / 2);
         ctx.restore()
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.save()

@@ -28,6 +28,29 @@ export function getNearestSegment(point, segments, threshold = Number.MAX_SAFE_I
     }
     return nearest
 }
+
+export function getNearestPolygon(point, polygons, threshold = Number.MAX_SAFE_INTEGER) {
+    if (polygons.length === 0) return null;
+
+    let nearestPolygon = null;
+    let minDist = threshold;
+
+    for (const poly of polygons) {
+        // Quick check: distance from polygon's centroid to the point minus radius
+        const roughDist = distance(point, poly.centeroid) - poly.radius;
+        // Skip this polygon if rough distance is greater than the current minimum distance
+        if (roughDist > minDist) continue;
+        // If within range, calculate the exact distance
+        const dist = poly.distanceToPoint(point);
+        if (dist < minDist) {
+            minDist = dist;
+            nearestPolygon = poly;
+        }
+    }
+
+    return minDist <= threshold ? nearestPolygon : null;
+}
+
 export function vector3d(horAngle,  verAngle, length){
     return new Point(
         Math.cos(horAngle) * Math.cos(verAngle) * length, // X component
@@ -181,20 +204,6 @@ export function polysIntersect(poly1, poly2) {
             if (touch) return true
         }
     return false
-}
-
-
-export function random(min, max, integer = true) {
-    let result = Math.random() * (max - min + 1) + min;
-    if (integer)
-        return Math.floor(result)
-    return result
-}
-
-export function pseudoRandom(sid) {
-    sid = String(sid / 17)
-    let hash = Array.from(sid).reduce((sum, c) => sum * 31 + sid.charCodeAt(c))
-    return Math.abs(Math.cos(Number(hash)));
 }
 
 export function isPointIntoPolygon(point, poly) {

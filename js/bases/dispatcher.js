@@ -42,8 +42,8 @@ export class DispatcherWithWeakRef {
             }
         }
     }
-    trigger(eventName, detail = {}) {
-        const event = new CustomEvent(eventName, {detail});
+    trigger(eventName, target = {}) {
+        const event = new CustomEvent(eventName, {target});
         this.dispatchEvent(event);
     }
     dispatchEvent(event) {

@@ -46,8 +46,8 @@
 <div id="project" class="main-section">
     <div id="controls" class="component-base group-base">
         <div >
-            <label role="button">📁<input type="file" id="fileInput" title="load world" accept='.world'>world </label>
-            <label role="button">📁<input type="file" id="fileInput" title="load world" accept='.world'>car</label>
+            <label role="button">📁<input type="file" id="worldFileInput" title="load world" accept='.world'>world </label>
+            <label role="button">📁<input type="file" id="carFileInput" title="load world" accept='.world'>car</label>
         </div>
         <div class="kv-list horizontal compact">
             <div class="kv-group-label">Loaded</div>
@@ -62,11 +62,10 @@
 
 
         </div>
-        <!--        <div style="width:100%;">-->
-        <status-bar id="carMoldStatusbar"></status-bar>
-        <!--        </div>-->
+        <!-- show data on selected car -->
+        <status-bar id="carStatusbar"></status-bar>
     </div>
-    <canvas id="carCanvas" class="main-section"></canvas>
+    <canvas id="carCanvas" ></canvas>
     <div id="visualizer">
         <canvas id="networkCanvas"></canvas>
         <canvas id="miniMapCanvas"></canvas>

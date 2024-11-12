@@ -289,8 +289,6 @@ export default class World extends DispatcherWithWeakRef{
         return trees
     }
 
-    inRenderBox
-
     draw(ctx, viewPort, {
         showStartMarkings = true, showItems = Infinity, showLane = true,
         showCorridorBorder = true, showCorridorSkeleton = true,

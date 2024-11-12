@@ -20,3 +20,16 @@ export function normAngle(a) {
     let halfCircle = Math.PI
     return (a % fullCircle + fullCircle) % fullCircle - halfCircle
 }
+
+export function random(min, max, integer = true) {
+    let result = Math.random() * (max - min + 1) + min;
+    if (integer)
+        return Math.floor(result)
+    return result
+}
+
+export function pseudoRandom(sid) {
+    sid = String(sid / 17)
+    let hash = Array.from(sid).reduce((sum, c) => sum * 31 + sid.charCodeAt(c))
+    return Math.abs(Math.cos(Number(hash)));
+}

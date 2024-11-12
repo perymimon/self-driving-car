@@ -1,69 +1,35 @@
 #project {
     display: grid;
-    grid-template-areas:
-    "a a"
-    "b c";
-    grid-template-rows: max-content;
+    grid-template-rows: max-content 1fr;
     position: relative;
     height: 100vh;
-    overflow: auto;
-    align-items: stretch;
-    justify-items: stretch;
+    /* overflow: auto; */
     min-width: 0;
     max-height: 100vh;
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    flex: 1 1 0;
+    width: 100%;
+    anchor-name: --project;
+    grid-template-columns: 100%;
 
     & #controls {
-        grid-area: a;
+        grid-row: 1;
+        grid-column: 1 / -1;
+        max-width: 100%;
         /* width: 50em; */
+        /* overflow: overlay; */
     }
-    & #carCanvas{
-        grid-area: b / b / b / c;
-        flex: 1;
+
+    & #carCanvas {
+        grid-row: 2 ;
+        flex: 1 1 0;
         width: 100%;
     }
+
     & #visualizer {
-        grid-area: c;
+        position: absolute;
+        grid-row: 2 / -1;
+        right: anchor(--project right);
+        inset: 0 0 0 auto;
     }
 }
 
@@ -71,18 +37,17 @@
     display: flex;
     flex-direction: column;
     gap: 0.2em;
-    inset: 0;
     opacity: 0.5;
-    margin-inline: .5em;
-    width:200px;
+    width: 200px;
     /* justify-content: space-around; */
 }
+
 #networkCanvas, #miniMapCanvas {
     background: rgba(149, 120, 149, 0.46);
     /* flex:1; */
 }
 
-#networkCanvas{
+#networkCanvas {
     height: 50%;
 }
 
@@ -106,12 +71,13 @@ canvas:focus {
 
 body {
     & > .main-section:nth-child(1) {
-        max-width: min(40em, 40vw);
+        width: min(40em, 40vw);
     }
+
     & > .main-section:nth-child(2) {
-        flex:1;
+        flex: 1;
         align-items: stretch;
-        width: max(60em,60vw);
+        width: max(60em, 60vw);
     }
 
 }

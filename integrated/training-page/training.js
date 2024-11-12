@@ -1,3 +1,4 @@
+import {random} from "../../js/utils/math-utils.js";
 import BrainVisualizer from "../../js/visualizer/brain-visualizer.js";
 import Car from "../../js/items/car.js";
 import PrimitiveRoad from "../../js/items/primitive-road.js"
