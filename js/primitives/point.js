@@ -12,13 +12,16 @@ export default class Point extends DispatcherWithWeakRef {
         this.#y = y;
         this.#z = z
         this.id = Point.count++
+
     }
-    move({x,y,z} = {}){
-        if(x) this.#x += x
-        if(y) this.#y += y
-        if(z) this.#z += z
-        this.trigger('change', {key:'xyz' , value: {x,y,z}})
+
+    move({x, y, z} = {}) {
+        if (x) this.#x += x
+        if (y) this.#y += y
+        if (z) this.#z += z
+        this.trigger('change', {key: 'xyz', value: {x, y, z}})
     }
+
     set x(v) {
         this.#x = v
         this.trigger('change', {key: 'x', value: v})
@@ -80,6 +83,13 @@ export default class Point extends DispatcherWithWeakRef {
 
     equal(p) {
         return p.x === this.x && p.y === this.y
+    }
+
+    * [Symbol.iterator]() {
+        yield ['x', this.x]
+        yield ['y', this.y]
+        if(this.z !== 0 )
+            yield ['z', this.z]
     }
 
 }

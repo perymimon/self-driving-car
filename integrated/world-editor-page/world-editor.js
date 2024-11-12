@@ -44,7 +44,7 @@ onElementResize(miniMapCanvas, function (rect, element) {
 })
 
 
-let worldJson = await fetchLastFile('last-world-saved', '../../saved/small_with_target.world')
+let worldJson = await fetchLastFile('worldFilename', '../../saved/small_with_target.world')
 // const worldString = localStorage.getItem('world')
 // const worldInfo = worldString ? JSON.parse(worldString) : null
 var world = worldJson ? World.Load(worldJson) : new World(new Graph())
@@ -120,7 +120,7 @@ async function load(event) {
         alert('No File selected')
         return
     }
-    let worldInfo = await readJsonFile(file, 'last-world-loaded')
+    let worldInfo = await readJsonFile(file, 'worldFilename')
     world = World.Load(worldInfo)
     restart()
 }
@@ -132,7 +132,6 @@ function parseOsmData() {
     world.graph.points = points
     world.graph.segments = segments
     var options = extractFormData(construction2)
-    debugger
     world.generate(options)
     osmmodal.close()
 }

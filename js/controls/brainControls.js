@@ -1,23 +1,35 @@
 import NeuralNetwork from "../math/network.js";
+import KeyboardControls from "./keyboardControls.js";
 
-export default class BrainControls {
-    constructor(brain, mutation = 0.1) {
-        if(mutation == 0)
-            this.brain = brain
-        else {
-            this.brain = NeuralNetwork.mutate(brain, mutation);
-        }
-
-        this.forward = false
-        this.left = false
-        this.right = false
-        this.reverse = false
+export default class BrainControls extends KeyboardControls {
+    constructor(sensors, brain, mutation = 0.1) {
+        super()
+        this.sensors = sensors;
+        const count = sensors.reduce((acc, b) => acc + b.sensorsCount, 0);
+        brain ??= new NeuralNetwork([count, 6, 4]);
+        this.brain = NeuralNetwork.mutate(brain, mutation);
+        this.state = 'auto'
+        this.gear(this.state)
     }
-    update(inputs){
+    gear(state = 'manual') {
+        this.state = state
+        if(state === 'manual'){
+            super.addKeyboardListeners()
+        }else{
+            this.removeEventListeners()
+        }
+    }
+    reading(){
+        return this.sensors.map(sensor => sensor.readings()).flat()
+    }
+    update() {
+        let inputs =this.reading()
         const outputs = NeuralNetwork.feedForward(inputs, this.brain)
-        this.forward = outputs[0]
-        this.left = outputs[1]
-        this.right = outputs[2]
-        this.reverse = outputs[3]
+        if(this.state === 'auto') {
+            this.forward = outputs[0]
+            this.left = outputs[1]
+            this.right = outputs[2]
+            this.reverse = outputs[3]
+        }
     }
 }

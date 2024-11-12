@@ -1,12 +1,28 @@
+@import url('./base.css');
+@import url('./kv-list.css');
 @import url('./prism.css');
 @import url('./components-style/button-next.css');
 @import url('./components-style/qna.css');
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-
+:root {
+    --status-primary: #2563eb;
+    --status-secondary: #16a34a;
+    --status-warning: #ca8a04;
+    --status-error: #dc2626;
+    --status-bar-bg: #1e293b;
+    --status-bar-text: #e2e8f0;
+    --status-bar-border: #334155;
+    --status-bar-hover: #334155;
+    --status-tooltip-bg: #1e293b;
+    --status-tooltip-border: #475569;
+}
 *, html {
     scroll-behavior: smooth;
     box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: var(--status-bar-border) var(--status-bar-bg);
+    /*background-color: var(--status-bar-bg);*/
 }
 
 body {
@@ -15,15 +31,17 @@ body {
     height: auto;
     /*font-family: 'Roboto', sans-serif;*/
     margin: 0;
-    background-color: #53dfd1;
     background-blend-mode: multiply;
-    background-image: url("./futuristic-car.webp");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    color: #fff;
     font-size: 1.3em;
+    background-color: #50a493;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 h1 {
@@ -143,10 +161,104 @@ vr {
     margin-inline:0.2em;
 }
 #controls{
-    display:flex;
+    display: flex;
     border-bottom: 1px solid;
-    /* gap: 0.2em; */
-    /* border-left: 1px solid; */
+    flex-wrap: wrap;
+    min-width: 0;
+    justify-content: space-between;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

@@ -7,11 +7,11 @@ export default class Dispatcher extends EventTarget {
 }
 
 export class DispatcherWithWeakRef {
-    constructor() {
-        // Map event types to arrays of WeakRefs to listeners
-        this.listenersMap = new Map();
+    // Map event types to arrays of WeakRefs to listeners
+    #listenersMap = new Map()
+    get listenersMap(){
+        return this.#listenersMap
     }
-
     addEventListener(type, callback) {
         if (typeof callback !== 'function') {
             throw new TypeError('Event listener must be a function');

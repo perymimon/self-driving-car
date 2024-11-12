@@ -41,7 +41,7 @@ reload(world)
 
 function reload(world) {
     world.cars.length = 0
-    carMold.noDamage = true
+    carMold.noDamageMode = true
 
     world.addGenerateCars({type: 'KEYS', carMold, color: 'gray', name: 'Me'})
     world.addGenerateCars({N: 10, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})

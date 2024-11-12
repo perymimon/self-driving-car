@@ -1,14 +1,20 @@
-export default class KeyboardControls {
+import Controls from "./controls.js";
+export default class KeyboardControls extends Controls {
     constructor() {
+        super();
         this.forward = false
         this.left = false
         this.right = false
         this.reverse = false
-        this.#addKeyboardListeners()
-
+        this.addKeyboardListeners()
     }
 
-    #addKeyboardListeners() {
+    removeEventListeners() {
+        document.onkeydown = null
+        document.onkeyup = null
+    }
+
+    addKeyboardListeners() {
         document.onkeydown = (e) => {
             switch (e.key) {
                 case 'ArrowUp':
@@ -44,5 +50,7 @@ export default class KeyboardControls {
             // console.table(this)
         }
     }
+
+
 
 }

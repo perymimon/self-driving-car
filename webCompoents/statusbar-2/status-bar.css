@@ -1,0 +1,265 @@
+:host {
+    width: 100%;
+    display: block;
+
+    --status-primary: var(--color-primary);
+    --status-secondary: var(--color-secondary);
+    --status-warning: var(--color-warning);
+    --status-error: var(--color-error);
+    --status-bar-bg: var(--component-bg);
+    --status-bar-text: var(--text-primary);
+    --status-bar-border: var(--component-border);
+    --status-bar-hover: var(--component-hover);
+    --status-tooltip-bg: var(--component-bg);
+    --status-tooltip-border: var(--color-border-hover);
+
+}
+
+.status-container {
+}
+
+.status-bar {
+    background-color: var(--status-bar-bg);
+    border: 1px solid var(--status-bar-border);
+    border-radius: 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: var(--status-bar-text);
+    display: flex;
+    flex-direction: row;
+    anchor-name: --status-bar-anchor;
+    min-height: 2em;
+}
+
+.status-bar-scroll {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--status-bar-border) var(--status-bar-bg);
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    scrollbar-gutter: stable;
+}
+
+.status-bar-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.status-bar-scroll::-webkit-scrollbar-track {
+    background: var(--status-bar-bg);
+}
+
+.status-bar-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--status-bar-border);
+    border-radius: 3px;
+}
+
+.status-bar-content {
+    display: flex;
+    align-items: center;
+    /* padding: 0.5rem; */
+    min-width: min-content;
+    flex-shrink: 0;
+    width: max-content;
+    flex-wrap: wrap;
+}
+
+.status-group {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 0.375rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--status-bar-border);
+}
+
+.status-item {
+    /* display: inline-flex; */
+    align-items: center;
+    font-size: 0.875rem;
+    padding: 0.125rem 0.375rem;
+    margin-right: 0.25rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+    cursor: pointer;
+
+
+}
+
+.tooltip-class-name, .status-class-name {
+    font-size: 0.75rem;
+    color: var(--status-bar-text);
+}
+.desc .desc .tooltip-class-name, .status-item.object:not(:has(> .desc)) > .status-class-name{
+    display: none;
+}
+
+.desc .status-value:has(~ .desc) {
+    display: none;
+}
+
+.status-item:hover {
+    background-color: var(--status-bar-hover);
+    anchor-name: --status-item-anchor;
+}
+
+.status-item.numeric {
+    color: #60a5fa;
+}
+
+.status-item.object {
+    color: #f87171;
+}
+
+.status-item.string {
+    color: #34d399;
+}
+
+.status-item.boolean {
+    color: #818cf8;
+}
+
+.status-label {
+    opacity: 0.7;
+    /* margin-right: 0.25rem; */
+}
+
+.toggle-button {
+    background: none;
+    color: var(--status-bar-text);
+    cursor: pointer;
+    padding: 0.375rem;
+    border-radius: 0.375rem;
+    /* margin-left: 0.5rem; */
+    transition: background-color 0.2s;
+    border: none;
+}
+
+.toggle-button:hover {
+    background-color: var(--status-bar-hover);
+}
+
+.details {
+    border-top: 1px solid var(--status-bar-border);
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    position: absolute;
+    position-anchor: --status-bar-anchor;
+    position-area: bottom center;
+    position-try: flip-inline, flip-block;
+    background-color: var(--status-bar-bg);
+    width: anchor-size(width, 100%);
+    z-index: var(--z-index-popover);
+    inset: 0;
+    overflow-y: overlay;
+    height: 20em;
+    display: inline-grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.details-tree {
+    padding-left: 1rem;
+    position: absolute;
+    background-color: var(--status-tooltip-bg);
+    border: 1px solid var(--status-tooltip-border);
+    z-index: var(--z-index-popover);
+}
+
+.details-item {
+    margin-bottom: 0.375rem;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+}
+
+.details-item:hover {
+    background-color: var(--status-bar-hover);
+}
+
+.tooltip {
+    background-color: var(--status-tooltip-bg);
+    border: 1px solid var(--status-tooltip-border);
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    max-width: max-content;
+    max-height: 400px;
+    overflow: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* opacity: 0; */
+    transition: opacity 0.2s;
+
+    &.tooltip-popover {
+        position: fixed;
+        z-index: var(--z-index-tooltip);
+        inset: unset;
+        position-anchor: --status-item-anchor;
+        position-area: bottom center;
+        margin: 0;
+        /* left: anchor(left); */
+        /* top: anchor(--status-item-anhor bottom); */
+        /* bottom: auto; */
+        /* right: auto; */
+        position-try-fallbacks: bottom, bottom left, bottom center;
+    }
+
+    &::backdrop {
+        /* backdrop-filter: blur(2px); */
+    }
+}
+
+.tooltip.visible {
+    /* opacity: 1; */
+    /* pointer-events: auto; */
+}
+
+.tooltip-tree {
+    margin: 0;
+    margin-left: 1.25rem;
+    list-style: none;
+    padding: 0;
+}
+
+.tooltip-tree li {
+    position: relative;
+}
+
+.tooltip-tree li::before {
+    content: "├─";
+    position: absolute;
+    left: -1.25rem;
+    color: var(--status-bar-border);
+}
+
+.tooltip-tree li:last-child::before {
+    content: "└─";
+}
+
+.expand-button {
+    background: none;
+    border: none;
+    color: var(--status-bar-text);
+    cursor: pointer;
+    padding: 0 0.25rem;
+}
+
+.circular-ref {
+    color: var(--status-warning);
+    font-style: italic;
+}
+
+.container-html-element {
+    /*position: relative;*/
+    /*display: inline-block;*/
+    /*!* width: 2em; *!*/
+    /*!* max-height: 100%; *!*/
+    /*min-height: 1em;*/
+    /*> *{*/
+    /*    position: absolute;*/
+    /*    !* position-area: top left; *!*/
+    /*    height: 2em;*/
+    /*    left: anchor(left);*/
+    /*    top: anchor(top);*/
+    /*}*/
+    display: flex;
+    /* justify-content: center; */
+}

@@ -8,9 +8,11 @@ export default class SensorCompass {
     constructor(car) {
         this.car = car
         this.nearSeg = null
+        this.sensorsCount = 1
     }
 
     update(segments){
+        if(!segments || segments.length === 0) return 0
         this.nearSeg = getNearestSegment(this.car,segments)
         let targetPoint = this.nearSeg.p2
         let a = angle(subtract(targetPoint, this.car)) - Math.PI /*0ang is up*/

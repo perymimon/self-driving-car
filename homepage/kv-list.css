@@ -1,0 +1,125 @@
+/* Add these rules to your existing design-system.css */
+
+/* Key-Value Base Styles */
+.kv-list {
+    display: grid;
+    gap: var(--space-1);
+    font-family: var(--font-family-mono);
+    margin: 0;
+}
+
+/* Horizontal Layout */
+.kv-list.horizontal {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: var(--space-4);
+    align-items: center;
+    overflow-x: auto;
+    padding: var(--space-2);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted) transparent;
+}
+
+.kv-list.horizontal::-webkit-scrollbar {
+    height: 6px;
+}
+
+.kv-list.horizontal::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kv-list.horizontal::-webkit-scrollbar-thumb {
+    background-color: var(--color-muted);
+    border-radius: var(--radius-full);
+}
+
+/* Vertical Layout */
+.kv-list.vertical {
+    grid-template-columns: max-content 1fr;
+    align-items: start;
+}
+
+/* Term (Key) Styles */
+.kv-term {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    white-space: nowrap;
+}
+
+/* Description (Value) Styles */
+.kv-desc {
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+}
+
+/* Value Types */
+.kv-desc.numeric {
+    font-family: var(--font-family-mono);
+    color: var(--color-primary);
+}
+
+.kv-desc.string {
+    color: var(--color-secondary);
+}
+
+.kv-desc.boolean {
+    color: var(--color-warning);
+}
+
+.kv-desc.object {
+    color: var(--color-error);
+    cursor: pointer;
+}
+
+/* Group Styles */
+.kv-group {
+    display: contents;
+}
+
+.kv-group-label {
+    grid-column: 1 / -1;
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--space-2) var(--space-2) var(--space-1);
+    /* border-bottom: 1px solid var(--component-border); */
+    /* margin-top: var(--space-2); */
+}
+
+/* Container Styles */
+.kv-container {
+    background-color: var(--component-bg);
+    border: 1px solid var(--component-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+/* Compact Mode */
+.kv-list.compact {
+    gap: 0;
+    &.horizontal {
+        padding: 0;
+    }
+}
+
+.kv-list.compact .kv-term,
+.kv-list.compact .kv-desc {
+    padding: var(--space-1);
+    font-size: var(--font-size-xs);
+}
+
+/* Interactive States */
+.kv-desc.interactive {
+    cursor: pointer;
+    transition: background-color var(--transition-normal);
+}
+
+.kv-desc.interactive:hover {
+    background-color: var(--component-hover);
+}

@@ -1,7 +1,10 @@
-export default class PhoneControls {
+import Controls from "./controls.js";
+
+export default class PhoneControls extends Controls {
 
 
     constructor(canvas) {
+        super()
         this.tilt = 0
         this.tilt2 = 0
         this.canvas = canvas

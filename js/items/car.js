@@ -1,15 +1,14 @@
+import BrainControls from "../controls/brainControls.js";
+import DummyControls from "../controls/dummyControls.js";
+import NeuralNetwork from "../math/network.js"
+import Point from "../primitives/point.js";
+import Polygon from "../primitives/polygon.js";
+import Segment from "../primitives/segment.js";
+import {getNearestSegment, magnitude, normalize, subtract} from "../utils/algebra-math-utils.js";
+import {getMaxItem, TrackCounter} from "../utils/codeflow-utils.js";
+import {clap, isCloseZero, reduceToZero} from "../utils/math-utils.js";
 import Sensor from "./sensor.js";
 import SensorCompass from "./sensorCompass.js";
-import Polygon from "../primitives/polygon.js";
-import Point from "../primitives/point.js";
-import {clap, isCloseZero, reduceToZero} from "../utils/math-utils.js";
-import {getMaxItem, TrackCounter} from "../utils/codeflow-utils.js";
-import NeuralNetwork from "../math/network.js"
-import KeyboardControls from "../controls/keyboardControls.js"
-import DummyControls from "../controls/dummyControls.js";
-import BrainControls from "../controls/brainControls.js";
-import {getNearestSegment, magnitude, normalize, subtract} from "../utils/algebra-math-utils.js";
-import Segment from "../primitives/segment.js";
 
 const carImg = new Image();
 carImg.src = "../../assets/car.png"
@@ -47,33 +46,30 @@ export default class Car {
         this.damage = false
         this.label = label
         this.fitness = 0
-        this.noDamage = noDamage
+        this.noDamageMode = noDamage
 
-        this.useBrain = type == 'AI'
+        this.useBrain = ['AI', 'KEYS'].includes(type)
+
         this.engine = null
         this.progress = 0;
 
         this.polygons = this.#createPolygon()
-
-        if (type != "DUMMY") {
-            this.sensor = new Sensor(this)
-            this.pathCompass = new SensorCompass(this)
-        }
 
         switch (type) {
             case 'DUMMY':
                 this.controls = new DummyControls()
                 break
             case 'AI':
-                if (!brain) {
-                    let brain = new NeuralNetwork([this.sensor.rayCount + 1, 6, 4]);
-                    this.controls = new BrainControls(brain, 0)
-                } else {
-                    this.controls = new BrainControls(brain, mutation)
-                }
-                break
             case 'KEYS':
-                this.controls = new KeyboardControls()
+                this.sensor = new Sensor(this, {
+                    rayCount: 6, rayLength: 150,
+                    raySpread: Math.PI / 2, rayOffset: 0
+                })
+                this.sensorPathCompass = new SensorCompass(this)
+                const sensors = [this.sensor, this.sensorPathCompass]
+                this.controls = new BrainControls(sensors, brain, brain ? mutation : 0)
+                if (type == 'KEYS')
+                    this.controls.gear('manual')
                 break
             // case 'CAMERA':
             //     this.controls
@@ -90,6 +86,13 @@ export default class Car {
         this.setColor(color)
 
 
+    }
+
+    * [Symbol.iterator]() {
+        for (let [key, value] of Object.entries(this)) {
+            if (value == null) continue
+            yield [key, value]
+        }
     }
 
     setColor(color) {
@@ -161,8 +164,14 @@ export default class Car {
 
     trackStopped = new TrackCounter(60)
 
-    update(roadBorders, traffic = [], pathTracking) {
+    update(roadBorders, traffic = [], pathTracking = []) {
         if (this.damage) return false
+
+        if (this.sensor && this.useBrain) {
+            this.sensor.update(roadBorders, traffic)
+            this.sensorPathCompass.update(pathTracking)
+            this.controls.update()
+        }
 
         this.#move()
 
@@ -174,7 +183,7 @@ export default class Car {
         }
 
         this.damage = this.#assessDamage(roadBorders, traffic)
-        if (this.damage && this.noDamage == true) {
+        if (this.damage && this.noDamageMode == true) {
             this.#bounceCar(roadBorders)
             this.damage = false
         }
@@ -182,31 +191,19 @@ export default class Car {
             this.speed = 0
         }
         // if car not move for X frame it consider damaged
-        if (!this.damage && this.trackStopped.trackDown(isCloseZero(this.speed) && this.useBrain)) {
-            this.damage = true
-        }
-        if (this.sensor) {
-            this.sensor?.update(roadBorders, traffic)
-            if (pathTracking) this.pathCompass.update(pathTracking)
-            if (this.useBrain) {
-                const offsets = this.sensor.readings.map(s => s == null ? 0 : 1 - s.offset)
-                /* Add compass reading */
-                if (pathTracking) offsets.push(this.pathCompass.readings())
+        if (!this.damage && this.type === 'AI')
+            // Is it consistently positive?
+            if (this.trackStopped.trackDown(isCloseZero(this.speed) && this.useBrain))
+                this.damage = true
 
-                this.controls?.update(offsets)
-                // const outputs = NeuralNetwork.feedForward(offsets, this.brain)
-                // this.controls.forward = outputs[0]
-                // this.controls.left = outputs[1]
-                // this.controls.right = outputs[2]
-                // this.controls.reverse = outputs[3]
-            }
-        }
 
         if (this.engine) {
             let percent = Math.abs(this.speed / this.maxSpeed)
-            this.engine.setVolume(percent)
-            this.engine.setPitch(percent)
+            this.engine
+                .setVolume(percent)
 
+            this.engine
+                .setPitch(percent)
         }
 
         return true
@@ -307,7 +304,7 @@ export default class Car {
             this.setColor(color)
         }
         drawSensor && this.sensor?.draw(ctx)
-        drawSensor && this.pathCompass?.draw(ctx)
+        drawSensor && this.sensorPathCompass?.draw(ctx)
 
         ctx.save();
         ctx.translate(this.x, this.y);

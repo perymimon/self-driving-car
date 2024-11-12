@@ -51,7 +51,7 @@ export class TrackCounter {
     }
 
     trackDown(condition) {
-        return  condition? this.counting(): this.reset()
+        return condition ? this.counting() : this.reset()
     }
 
     reset() {
@@ -63,8 +63,8 @@ export class TrackCounter {
 
 export function downloadJSON(json, defFilename = 'default', extension = 'json') {
     var filename = prompt('Enter the file name:', defFilename);
-    if(!filename) return false
-    if(!filename.endsWith(`.${extension}`)) filename += `.${extension}`
+    if (!filename) return false
+    if (!filename.endsWith(`.${extension}`)) filename += `.${extension}`
     var a = document.createElement('a')
     a.setAttribute('href', `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(json))}`)
     a.setAttribute('download', filename)
@@ -98,11 +98,10 @@ export async function fetchJSONFile(fileName) {
 
 
 export async function fetchLastFile(memoName, defaultPath) {
-    var filename = localStorage.getItem(memoName);
-    if (filename)
-        return fetchJSONFile(filename)
-    else {
-        return fetchJSONFile(defaultPath)
+    var filename = localStorage.getItem(memoName) ?? defaultPath;
+    return {
+        content: await fetchJSONFile(filename),
+        filename,
     }
 }
 
@@ -148,22 +147,25 @@ export function extractFormData(form) {
 
 export function $get(object, path, defaultValue) {
     // If the path is a string, convert it to an array
-    if (typeof path === 'string') {
-        // Handle both dot notation and bracket notation
-        path = path.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, '').split('.');
-    }
+    // Handle both dot notation and bracket notation
+    path = path === 'string' ? path.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, '').split('.') : []
+    var value = path.reduce((o, i) => o?.[i], object);
+    return value ?? defaultValue
+}
 
-    // Iterate over the path array to access nested properties
-    let result = object;
-    for (let key of path) {
-        if (result != null && key in result) {
-            result = result[key];
-        } else {
-            // Return default value if the property doesn't exist
-            return defaultValue;
-        }
-    }
-    return result;
+export function getValueByKey(obj, key = '') {
+    if (!key) return obj;
+    return key.split('.').reduce((o, i) => o?.[i], obj);
+}
+
+export function getPathByKey(obj, key) {
+    var path = []
+    if (!key) return path
+    key.split('.').reduce((o, i) => {
+        path.push(o)
+        return o?.[i]
+    }, obj);
+    return path;
 }
 
 export function copyToClipboard(text) {
@@ -174,4 +176,83 @@ export function copyToClipboard(text) {
         .catch(err => {
             console.error('Failed to copy text: ', err);
         });
+}
+
+//todo: not review or tested
+export function createElement(selector = '') {
+    // Match and create the tag
+    const tagName = selector.match(/^[a-z]+/i)?.[0] || 'div';
+    const element = document.createElement(tagName);
+
+    // Set ID if specified
+    const idMatch = selector.match(/#([\w-]+)/);
+    if (idMatch) element.id = idMatch[1];
+
+    // Set classes if specified
+    const classMatches = selector.match(/\.[\w-]+/g);
+    if (classMatches) {
+        element.classList.add(...classMatches.map(cls => cls.slice(1)));
+    }
+
+    // Set attributes if specified
+    const attrMatches = [...selector.matchAll(/\[([\w-]+)(?:=("[^"]*"|'[^']*'|[^\]]+))?\]/g)];
+    attrMatches.forEach(match => {
+        const attrName = match[1];
+        let attrValue = match[2] || '';
+        attrValue = attrValue.replace(/^["']|["']$/g, ''); // Remove quotes if present
+        element.setAttribute(attrName, attrValue);
+    });
+
+    return element;
+}
+
+// export function entries(obj) {
+//     let properties = new Map()
+//     var propertiesObj = obj
+//     while (propertiesObj !== null) {
+//         for (let key of Object.getOwnPropertyNames(propertiesObj)){
+//             if(key == '__proto__') continue;
+//             var value = obj[key]
+//             if(typeof value === 'function') continue;
+//             properties.set(key, value);
+//         }
+//         propertiesObj = Object.getPrototypeOf(propertiesObj);
+//     }
+//     return Array.from(properties);
+// }
+
+export function entries(obj) {
+    if (isObjIterable(obj)) {
+        return Array.from(obj)
+    }
+
+    let properties = new Map()
+    var propertiesObjs = [obj, Object.getPrototypeOf(obj)]
+
+    for (let propertyObj of propertiesObjs) {
+        for (let key of Object.getOwnPropertyNames(propertyObj)) {
+            if (key == '__proto__') continue;
+            var value = obj[key]
+            if (typeof value === 'function') continue;
+            properties.set(key, value);
+        }
+    }
+    return Array.from(properties);
+}
+
+export function isObjIterable(obj) {
+    if (typeof obj !== 'object') return false;
+    return obj != null && typeof obj[Symbol.iterator] === 'function';
+}
+
+export function run(fn) {
+    return fn()
+}
+
+export function camelToSnakeCase(str) {
+    return str.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+}
+
+export function splitCamelCase(str) {
+    return str.split(/(?=[A-Z])/).map(word => word.toLowerCase());
 }

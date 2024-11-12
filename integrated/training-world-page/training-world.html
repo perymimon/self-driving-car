@@ -7,8 +7,8 @@
     <link href="../style.css" rel="stylesheet">
     <link href="./training-world.css" rel="stylesheet">
 </head>
-<body>
-<div id="study">
+<body data-theme="dark">
+<div id="study" class="main-section">
     <h1>Study</h1>
     Interface for training a self-driving car using a neural network and visualizing it via the Canvas API.
     <dl>
@@ -44,12 +44,27 @@
     </div>
 </div>
 <div id="project" class="main-section">
-    <div id="controls">
-        <label>📁<input type="file" id="fileInput" title="load world" accept='.world'>world </label>
-        <div id="banner-notification">
-            <label>world loaded</label>
-            <label>car loaded</label>
+    <div id="controls" class="component-base group-base">
+        <div >
+            <label role="button">📁<input type="file" id="fileInput" title="load world" accept='.world'>world </label>
+            <label role="button">📁<input type="file" id="fileInput" title="load world" accept='.world'>car</label>
         </div>
+        <div class="kv-list horizontal compact">
+            <div class="kv-group-label">Loaded</div>
+            <div class="kv-container">
+                <div class="kv-term">car</div>
+                <div class="kv-desc string" id="carFileNameView">file name</div>
+            </div>
+            <div class="kv-container">
+                <div class="kv-term">world</div>
+                <div class="kv-desc string" id="worldFileNameView">file name</div>
+            </div>
+
+
+        </div>
+        <!--        <div style="width:100%;">-->
+        <status-bar id="carMoldStatusbar"></status-bar>
+        <!--        </div>-->
     </div>
     <canvas id="carCanvas" class="main-section"></canvas>
     <div id="visualizer">

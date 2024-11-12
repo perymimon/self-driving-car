@@ -21,6 +21,7 @@ export default class NeuralNetwork {
     }
 
     static mutate(brain, amount = 1) {
+        if(amount == 0) return brain
         let network = structuredClone(brain)
         for (let level of network.levels) {
             level.biases = level.biases.map(b => lerp(b, Math.random() * 2 - 1, amount))

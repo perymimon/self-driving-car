@@ -1,5 +1,8 @@
-export default class DummyControls {
-    constructor(canvas) {
-       this.forward = true
+import Controls from "./controls.js";
+
+export default class DummyControls extends Controls {
+    constructor() {
+        super()
+        this.forward = true
     }
 }

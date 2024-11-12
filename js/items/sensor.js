@@ -13,9 +13,11 @@ export default class Sensor {
         this.rayOffset = rayOffset
 
         this.rays = []
-        this.readings = []
+        this.collectReadings = []
         this.region = new Region(this.car, this.rayLength * 3, this.rayLength)
         this.bordersRegion = null
+
+        this.sensorsCount = rayLength
     }
 
     update(roadBorders, traffic) {
@@ -26,13 +28,16 @@ export default class Sensor {
             )
         }
         this.#castRays()
-        this.readings = []
+        this.collectReadings = []
         for (let ray of this.rays) {
             let firstTouch  = this.#getReading(ray, this.bordersRegion, traffic)
-            this.readings.push(firstTouch)
+
+            this.collectReadings.push(firstTouch)
         }
     }
-
+    readings(){
+        return this.collectReadings.map(s => s == null ? 0 : 1 - s.offset)
+    }
     #getReading(ray, roadBorders, traffic) {
         let touches = []
         for (let border of roadBorders) {

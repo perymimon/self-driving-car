@@ -3,7 +3,7 @@ import {clearCircle, getRGBA} from "../utils/canvas-utils.js";
 
 export default class BrainVisualizer {
     static drawNetwork(ctx, network) {
-        const margin = 50
+        const margin = 25
         const left = margin
         const top = margin
         const width = ctx.canvas.width - margin * 2;
@@ -14,13 +14,11 @@ export default class BrainVisualizer {
         const levelsCount = levels.length
         const levelHeight = height / levelsCount
 
-        var symbols = ['🠉','🠈','🠊','🠋']
+        var symbols = ['🠉', '🠈', '🠊', '🠋']
         for (let i = levelsCount - 1; 0 <= i; i--) {
             const offset = levelsCount == 1 ? 0.5 : i / (levelsCount - 1)
             const levelTop = top + lerp(height - levelHeight, 0, offset)
-            BrainVisualizer.drawLevel(ctx, levels[i], left, levelTop, width, levelHeight,
-                symbols
-            )
+            BrainVisualizer.drawLevel(ctx, levels[i], left, levelTop, width, levelHeight, symbols)
             symbols = null
         }
 
@@ -42,7 +40,7 @@ export default class BrainVisualizer {
                 ctx.lineTo(xOutput, top)
                 ctx.lineWidth = 4
                 ctx.setLineDash([4, 4])
-                ctx.strokeStyle = getRGBA(weights[i][j])
+                ctx.strokeStyle = getRGBA( weights[i][j])
                 ctx.stroke()
             }
         }
@@ -50,7 +48,7 @@ export default class BrainVisualizer {
         for (let i = 0; i < inputs.length; i++) {
             const x = BrainVisualizer.#getNodeX(inputs, i, left, right)
             clearCircle(ctx, x, bottom, nodeRadius)
-            clearCircle(ctx, x, bottom, nodeRadius)
+            // clearCircle(ctx, x, bottom, nodeRadius)
             ctx.beginPath()
             ctx.arc(x, bottom, nodeRadius * 0.8, 0, 2 * Math.PI)
             ctx.fillStyle = getRGBA(inputs[i])
@@ -74,16 +72,16 @@ export default class BrainVisualizer {
             ctx.stroke()
             ctx.setLineDash([])
 
-            if(symbols) {
+            if (symbols) {
                 ctx.beginPath()
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
                 ctx.fillStyle = 'black'
                 ctx.strokeStyle = 'white'
                 ctx.font = `${nodeRadius * 1.4}px Arial`
-                ctx.fillText(symbols[i],x, top )
+                ctx.fillText(symbols[i], x, top)
                 ctx.lineWidth = .5
-                ctx.strokeText(symbols[i],x, top)
+                ctx.strokeText(symbols[i], x, top)
             }
         }
 

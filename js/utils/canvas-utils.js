@@ -1,5 +1,5 @@
 export function getRGBA(value) {
-    const a = Math.abs(value)
+    const a = .1 + Math.abs(value)
     const R = value < 0 ? 0 : 255
     const G = R
     const B = value > 0 ? 0 : 255

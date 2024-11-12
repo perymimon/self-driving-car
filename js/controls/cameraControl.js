@@ -1,10 +1,12 @@
 import MarkerDetector from "../math/markerDetector.js";
 import {waitToEvent} from "../utils/codeflow-utils.js";
+import Controls from "./controls.js";
 
-export default class CameraControl {
+export default class CameraControl extends Controls{
     sizeChangeThreshold = 0.7;
 
     constructor(canvas) {
+        super()
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d',{willReadFrequently :true});
         this.tilt = 0

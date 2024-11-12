@@ -1,17 +1,3 @@
-#project {
-    display: grid;
-    grid-template-areas: "a a" "b c";
-
-    & #controls {
-        grid-area: a;
-    }
-    & #carCanvas{
-        grid-area: b;
-    }
-    & #networkCanvas {
-        grid-area: c;
-    }
-}
 
 #carCanvas {
     background: #939191;

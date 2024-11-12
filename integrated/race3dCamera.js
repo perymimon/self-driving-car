@@ -42,9 +42,9 @@ reload(world)
 
 function reload(world) {
     world.cars.length = 0
-    carMold.noDamage = true
+    carMold.noDamageMode = true
 
-    world.addGenerateCars({type: 'CUSTOM', carMold:{noDamage:true} , color: 'gray', name: 'Me'})
+    world.addGenerateCars({type: 'CUSTOM', carMold:{noDamageMode:true} , color: 'gray', name: 'Me'})
     world.addGenerateCars({N:10, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
     myCar = world.cars.at(0)
     camera = new Camera(myCar)
