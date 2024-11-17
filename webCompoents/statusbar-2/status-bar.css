@@ -15,10 +15,8 @@
 
 }
 
-.status-container {
-}
-
 .status-bar {
+    position: relative;
     background-color: var(--status-bar-bg);
     border: 1px solid var(--status-bar-border);
     border-radius: 0.5rem;
@@ -28,6 +26,11 @@
     flex-direction: row;
     anchor-name: --status-bar-anchor;
     min-height: 2em;
+
+   .class-name {
+        position: fixed;
+        font-size: 9px;
+    }
 }
 
 .status-bar-scroll {
@@ -38,6 +41,7 @@
     max-width: 100%;
     width: 100%;
     scrollbar-gutter: stable;
+    position: relative;
 }
 
 .status-bar-scroll::-webkit-scrollbar {
@@ -91,7 +95,8 @@
     font-size: 0.75rem;
     color: var(--status-bar-text);
 }
-.desc .desc .tooltip-class-name, .status-item.object:not(:has(> .desc)) > .status-class-name{
+
+.desc .desc .tooltip-class-name, .status-item.object:not(:has(> .desc)) > .status-class-name {
     display: none;
 }
 

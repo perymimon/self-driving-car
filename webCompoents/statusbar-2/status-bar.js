@@ -1,10 +1,10 @@
 import {
-    camelToSnakeCase,
     createElement,
     entries,
     getPathByKey,
     getValueByKey,
-    isObjIterable, splitCamelCase
+    isObjIterable,
+    splitCamelCase
 } from "../../js/utils/codeflow-utils.js";
 
 class StatusBar extends HTMLElement {
@@ -21,7 +21,7 @@ class StatusBar extends HTMLElement {
         const cssUrl = new URL('./status-bar.css', moduleUrl);
         this.shadowRoot.innerHTML = `
             <link rel="stylesheet" href="${cssUrl}">
-            <div class="status-container">Loading...</div>
+            <div class="status-bar">Loading...</div>
         `;
         //    setupEventListeners
         this.shadowRoot.addEventListener('click', (e) => {
@@ -105,18 +105,19 @@ class StatusBar extends HTMLElement {
     }
 
     render() {
-        const container = this.shadowRoot.querySelector('.status-container');
+        const container = this.shadowRoot.querySelector('.status-bar');
         if (!container) return;
         const groupedData = this.groupData(this._data);
 
+        // <button class="toggle-button"
+        //     aria-expanded="${this._isOpen}" aria-controls="details-panel"
+        //     title="${this._isOpen ? 'Hide' : 'Show'} details"
+        // >${this._isOpen ? '▲' : '▼'}</button>
+        //
+
         container.innerHTML = `
-                    <div class="status-bar">
-                    <button class="toggle-button" 
-                        aria-expanded="${this._isOpen}" aria-controls="details-panel"
-                        title="${this._isOpen ? 'Hide' : 'Show'} details"
-                    >${this._isOpen ? '▲' : '▼'}</button>
-                    
                     <div class="status-bar-scroll">
+                     <div class="class-name status-class-name">${renderBasicClassName(this._data)}</div>
                         <div class="status-bar-content">
                             ${Object.entries(groupedData).map(([groupName, items]) => `
                                 <div class="status-group">
@@ -131,8 +132,9 @@ class StatusBar extends HTMLElement {
                                 
                         </div>
                     </div>
+                      </div>
                        
-                    </div>
+                   
                      ${this._isOpen ? `
                             <div id="details-panel" class="details">
                                 ${this.renderDetailTree(this._data)}
