@@ -37,21 +37,23 @@ export function getNearestPolygon(point, polygons, threshold = Number.MAX_SAFE_I
 
     for (const poly of polygons) {
         // Quick check: distance from polygon's centroid to the point minus radius
-        const roughDist = distance(point, poly.centeroid) - poly.radius;
         // Skip this polygon if rough distance is greater than the current minimum distance
-        if (roughDist > minDist) continue;
+        if (distance(point, poly.centeroid) > (poly.radius + threshold)) continue
         // If within range, calculate the exact distance
+        let pointInside = poly.containsPoint(point)
+        if (pointInside) return poly
+
         const dist = poly.distanceToPoint(point);
-        if (dist < minDist) {
+        if (dist < minDist  ) {
             minDist = dist;
             nearestPolygon = poly;
         }
     }
 
-    return minDist <= threshold ? nearestPolygon : null;
+    return nearestPolygon
 }
 
-export function vector3d(horAngle,  verAngle, length){
+export function vector3d(horAngle, verAngle, length) {
     return new Point(
         Math.cos(horAngle) * Math.cos(verAngle) * length, // X component
         Math.sin(horAngle) * Math.cos(verAngle) * length, // Y component
