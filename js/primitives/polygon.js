@@ -1,12 +1,13 @@
-import Segment from "./segment.js";
 import {average, distance} from "../utils/algebra-math-utils.js"
-import Point from "./point.js";
 import {drawText, getRandomColor, style} from "../utils/canvas-utils.js";
+import Point from "./point.js";
+import Segment from "./segment.js";
 
 export default class Polygon {
     static count = 0
-    #center = null
+    #centeroid = null
     #radius = null
+    #angle = 0
 
     constructor(points, label) {
         this.points = points;
@@ -17,23 +18,57 @@ export default class Polygon {
 
         // for (let p of this.points)
         //     p.addEventListener('change', () => {
-        //         this.#center = null
+        //         this.#centeroid = null
         //         this.#radius = null
         //     })
     }
 
+    draw(ctx, {
+        stroke = 'blue', lineWidth = 2, fill = "rgba(0,0,255,0.3)", join = "miter",
+        drawCenter = false, drawId = false
+    } = {}) {
+        if (!this.points?.length) return;
+        ctx.beginPath()
+        style(ctx, {fill, stroke, lineWidth, join})
+        ctx.moveTo(this.points[0].x, this.points[0].y)
+        for (let i = 1; i < this.points.length; i++) {
+            ctx.lineTo(this.points[i].x, this.points[i].y)
+        }
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+        // my extra
+        if (drawCenter || drawId) {
+            if (drawCenter) center.draw(ctx, {color: 'purple'})
+            if (drawId) drawText(ctx, this.id, this.centeroid.x, this.centeroid.y)
+        }
+        if (this.label) drawText(ctx, this.label, this.centeroid.x, this.centeroid.y, {color: 'black'})
+    }
+
     move(positionVector) {
-        for(let point of this.points){
+        for (let point of this.points) {
             point.move(positionVector)
         }
-        for(let seg of this.segments){
+        for (let seg of this.segments) {
             seg.dirty()
         }
         this.dirty()
         return this
     }
-    dirty(){
-        this.#center = null
+
+    rotate(angle, origin) {
+        var theta =  this.#angle - angle
+        for (let point of this.points) {
+            point.rotate(theta, origin)
+        }
+        this.#angle = angle
+        for (let seg of this.segments) seg.dirty()
+        this.dirty()
+
+    }
+
+    dirty() {
+        this.#centeroid = null
         this.#radius = null
     }
 
@@ -140,7 +175,7 @@ export default class Polygon {
     }
 
     get centeroid() {
-        if (this.#center) return this.#center
+        if (this.#centeroid) return this.#centeroid
         let {points} = this
         let xSum = 0;
         let ySum = 0;
@@ -148,10 +183,10 @@ export default class Polygon {
 
         const numPoints = points.length;
         if (numPoints == 1) {
-            this.#center = points.at(0);
+            this.#centeroid = points.at(0);
         } else if (numPoints == 2) {
             let [p1, p2] = points
-            this.#center = average(p1, p2);
+            this.#centeroid = average(p1, p2);
         } else {
             for (let i = 0; i < numPoints; i++) {
                 const x0 = points[i].x;
@@ -169,9 +204,9 @@ export default class Polygon {
             const Cx = xSum / (6 * signedArea);
             const Cy = ySum / (6 * signedArea);
 
-            this.#center = new Point(Cx, Cy);
+            this.#centeroid = new Point(Cx, Cy);
         }
-        return this.#center
+        return this.#centeroid
     }
 
     drawSegment(ctx) {
@@ -267,30 +302,4 @@ export default class Polygon {
         }
     }
 
-    draw(ctx, {
-        stroke = 'blue',
-        lineWidth = 2,
-        fill = "rgba(0,0,255,0.3)",
-        join = "miter",
-        drawCenter = false,
-        drawId = false
-    } = {}) {
-        if (!this.points?.length) return;
-        ctx.beginPath()
-        style(ctx, {fill, stroke, lineWidth, join})
-        ctx.moveTo(this.points[0].x, this.points[0].y)
-        for (let i = 1; i < this.points.length; i++) {
-            ctx.lineTo(this.points[i].x, this.points[i].y)
-        }
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        // my extra
-        if (drawCenter || drawId) {
-            if (drawCenter) center.draw(ctx, {color: 'purple'})
-            if (drawId) drawText(ctx, this.id, this.centeroid.x, this.centeroid.y)
-        }
-        if (this.label) drawText(ctx, this.label, this.centeroid.x, this.centeroid.y, {color: 'black'})
-
-    }
 }

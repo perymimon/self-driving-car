@@ -35,8 +35,11 @@ export default class Sensor {
             this.collectReadings.push(firstTouch)
         }
     }
-    readings(){
-        return this.collectReadings.map(s => s == null ? 0 : 1 - s.offset)
+    get readings(){
+        return this.collectReadings.map(s =>({
+            ...s,
+            offset: s == null ? 0 : 1 - s.offset
+        }) )
     }
     #getReading(ray, roadBorders, traffic) {
         let touches = []
@@ -81,8 +84,7 @@ export default class Sensor {
         ctx.save()
         for (let [i, ray] of this.rays.entries()) {
             let read = this.readings[i]
-            let end = read ? read : ray.p2
-
+            let end = read ?? ray.p2
             ctx.beginPath()
             ctx.lineWidth = 2
             ctx.strokeStyle = 'yellow'

@@ -22,6 +22,15 @@ export default class Point extends DispatcherWithWeakRef {
         this.trigger('change', {key: 'xyz', value: {x, y, z}})
     }
 
+    rotate(angle, origin, pivot = 'z') {
+        var xTag = this.#x - origin.x
+        var yTag = this.#y - origin.y
+        // pivot is z axis
+        this.#x = origin.x + xTag * Math.cos(angle) - yTag * Math.sin(angle)
+        this.#y = origin.y + xTag * Math.sin(angle) + yTag * Math.cos(angle)
+
+    }
+
     set x(v) {
         this.#x = v
         this.trigger('change', {key: 'x', value: v})
@@ -88,7 +97,7 @@ export default class Point extends DispatcherWithWeakRef {
     * [Symbol.iterator]() {
         yield ['x', this.x]
         yield ['y', this.y]
-        if(this.z !== 0 )
+        if (this.z !== 0)
             yield ['z', this.z]
     }
 

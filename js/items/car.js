@@ -228,6 +228,7 @@ export default class Car {
     }
 
     #assessDamage(roadBorders, traffic) {
+        return false
         for (let seg of roadBorders) {
             if (this.polygons.intersectSeg(seg))
                 return true
@@ -295,14 +296,18 @@ export default class Car {
         this.y -= Math.cos(this.angle) * this.speed
         var positionPoint = subtract(this, {x, y})
         this.polygons.move(positionPoint)
+        this.polygons.rotate(this.angle, this)
         return positionPoint
     }
 
     draw(ctx, {drawSensor = false, color} = {}) {
-        if (!carImg.complete) return
+        /* In a race car rich to the end*/
+        // if (!carImg.complete) return
+        /* If car's color change create it again */
         if (color && this.color != color) {
             this.setColor(color)
         }
+        /* draw sensors */
         drawSensor && this.sensor?.draw(ctx)
         drawSensor && this.sensorPathCompass?.draw(ctx)
 

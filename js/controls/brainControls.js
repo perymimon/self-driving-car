@@ -20,11 +20,12 @@ export default class BrainControls extends KeyboardControls {
         }
     }
     reading(){
-        return this.sensors.map(sensor => sensor.readings()).flat()
+        return this.sensors.map(sensor => sensor.readings).flat()
     }
     update() {
         let inputs =this.reading()
-        const outputs = NeuralNetwork.feedForward(inputs, this.brain)
+        const offsets = inputs.map(i=> i.offset)
+        const outputs = NeuralNetwork.feedForward(offsets, this.brain)
         if(this.state === 'auto') {
             this.forward = outputs[0]
             this.left = outputs[1]

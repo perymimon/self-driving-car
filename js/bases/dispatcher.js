@@ -42,11 +42,11 @@ export class DispatcherWithWeakRef {
             }
         }
     }
-    trigger(eventName, target = {}) {
-        const event = new CustomEvent(eventName, {target});
-        this.dispatchEvent(event);
+    trigger(eventName, detail = {}, target) {
+        const event = new CustomEvent(eventName, {detail});
+        this.dispatchEvent(event, target);
     }
-    dispatchEvent(event) {
+    dispatchEvent(event, target) {
         const type = event.type;
         let listeners = this.listenersMap.get(type);
         if (listeners) {

@@ -322,14 +322,6 @@ export default class World extends DispatcherWithWeakRef{
                 seg.draw(ctx, {color: 'yellow', width: 4});
             }
 
-
-        ctx.globalAlpha = .2
-        for (let car of this.cars) {
-            car.draw(ctx, {drawSensor: false})
-        }
-        ctx.globalAlpha = 1
-        this.bestCar?.draw(ctx, {drawSensor})
-
         // todo:draw each layer on different image and draw all layer
         // if(!viewPoint.equal(this.#lastViewPoint)) {
         if (showItems) {
@@ -349,9 +341,13 @@ export default class World extends DispatcherWithWeakRef{
             for (const seg of this.laneGuides) {
                 seg.draw(ctx, {color: '#7f0505'})
             }
-    }
 
-    // this.#lastViewPoint = viewPoint
-    // }
+        ctx.globalAlpha = .2
+        for (let car of this.cars) {
+            car.draw(ctx, {drawSensor: false})
+        }
+        ctx.globalAlpha = 1
+        this.bestCar?.draw(ctx, {drawSensor})
+    }
 
 }
