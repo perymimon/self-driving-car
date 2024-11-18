@@ -1,9 +1,9 @@
-import {DispatcherWithWeakRef} from "../bases/dispatcher.js";
+import Dispatcher, {DispatcherWithWeakRef} from "../bases/dispatcher.js";
 import {getNearestPolygon} from "../utils/algebra-math-utils.js";
 
 export const SELECTED = 'selected', CANCEL = 'cancel'
 
-export class PolygonSelector extends DispatcherWithWeakRef {
+export class PolygonSelector extends Dispatcher {
 
     constructor(viewPort, polygons) {
         super()
@@ -15,6 +15,7 @@ export class PolygonSelector extends DispatcherWithWeakRef {
         }
         this.intent = null
         this.selected = null
+        this.enable()
     }
     setPolygons(polygons) {
         this.polygons = polygons;
@@ -24,15 +25,15 @@ export class PolygonSelector extends DispatcherWithWeakRef {
 
     #addEventListeners() {
         for (const [event, handler] of Object.entries(this.listeners)) {
-            this.canvas.addEventListener(event, handler, {passive: true});
+            this.viewPort.canvas.addEventListener(event, handler, {passive: true});
         }
 
-        this.canvas.addEventListener('contextmenu', (e) => e.preventDefault())
+        this.viewPort.canvas.addEventListener('contextmenu', (e) => e.preventDefault())
     }
 
     #removeEventListener() {
         for (const [event, handler] of Object.entries(this.listeners)) {
-            this.canvas.removeEventListener(event, handler, {passive: true});
+            this.viewPort.canvas.removeEventListener(event, handler, {passive: true});
         }
     }
 
@@ -45,7 +46,7 @@ export class PolygonSelector extends DispatcherWithWeakRef {
     }
 
     #handleMouseMove(evt) {
-        this.mouse = this.viewport.getMouse(evt, true)
+        this.mouse = this.viewPort.getMouse(evt, true)
 
         this.intent = getNearestPolygon(
             this.mouse,
@@ -60,7 +61,7 @@ export class PolygonSelector extends DispatcherWithWeakRef {
             if (this.intent) {
                 this.selected = this.intent
                 this.intent = null
-                this.trigger(SELECTED, this.selected)
+                this.trigger(SELECTED, this.selected, this.selected)
             }
         }
         if (evt.button == 2) {// right click

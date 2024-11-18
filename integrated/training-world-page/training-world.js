@@ -8,17 +8,17 @@ import World from "../../js/world.js"
 import "../../webCompoents/statusbar-2/status-bar.js"
 
 onElementResize(carCanvas, function (rect, element) {
-    element.width = rect.width;
-    element.height = rect.height
+    element.width = Math.floor(rect.width)
+    element.height = Math.floor(rect.height)
     console.log(rect)
 })
 onElementResize(miniMapCanvas, function (rect, element) {
-    element.width = rect.width;
-    element.height = rect.height
+    element.width = Math.floor(rect.width)
+    element.height = Math.floor(rect.height)
 })
 onElementResize(networkCanvas, function (rect, element) {
-    element.width = rect.width;
-    element.height = rect.height
+    element.width = Math.floor(rect.width)
+    element.height = Math.floor(rect.height)
 })
 
 
@@ -33,15 +33,19 @@ let carMold = await fetchJSONFile(carFilename)
 var viewPort = new ViewPort(carCanvas, 1, world.offset)
 carFileNameView.textContent = carFilename
 
+/* car selector */
 var carSelector = new PolygonSelector(viewPort,[])
-carSelector.addEventListener(SELECTED, (event)=>{
-    let car = event.target
-    carStatusbar.data = car
-})
-carSelector.addEventListener(CANCEL, (event)=>{
+function selectCar(event){
+    let polygon = event.detail
+    let car = world.cars.find(c=> c.polygons == polygon)
     debugger
-    carStatusbar.data = null
-})
+    carStatusbar.data = car
+}
+carSelector.addEventListener(SELECTED, selectCar)
+// carSelector.addEventListener(CANCEL, (event)=>{
+//     debugger
+//     carStatusbar.data = null
+// })
 
 const carCtx = carCanvas.getContext('2d');
 const networkCtx = networkCanvas.getContext('2d');
@@ -54,11 +58,11 @@ function reload(world) {
     world.addGenerateCars({N:1, type: 'KEYS', carMold, color: 'gray', name: 'Me'})
     // world.addGenerateCars({N: 30, type: 'AI', carMold, mutation: 0.2, name: 'AI{i}'})
 
-    carSelector.setPolygons(world.cars)
+    carSelector.setPolygons(world.cars.map(c=>c.polygons))
 
-    for (let car of world.cars) {
-        car.noDamageMode = true
-    }
+    // for (let car of world.cars) {
+    //     car.noDamageMode = true
+    // }
 
     myCar = world.cars.at(0)
     // viewPort = new ViewPort(carCanvas, 1, world.offset)
@@ -68,26 +72,14 @@ function reload(world) {
     carStatusbar.data = world.bestCar
 }
 
-update()
 
-async function update(time) {
+animate()
+function animate() {
     for (let car of world.cars.filter(car => !car.damage)) {
         car.update(world.roadBorders, [], world?.corridor.skeleton)
     }
     world.cars.sort((carA, carB) => carB.progress - carA.progress)
-    animate(time)
-    requestAnimationFrame(update)
 
-}
-
-// var animationFrameId = 0
-// viewPort.addEventListener('change', () => {
-//     cancelAnimationFrame(animationFrameId)
-//     animationFrameId = requestAnimationFrame(animate)
-// })
-
-
-function animate() {
     if (myCar && !myCar.damage) {
         viewPort.offset.x = -myCar.x
         viewPort.offset.y = -myCar.y
@@ -95,7 +87,13 @@ function animate() {
 
     viewPort.reset()
     world.draw(carCtx, viewPort, {showCorridorBorder: false, drawSensor: true})
+
+    carSelector.intent?.draw(carCtx,{color:'orange'})
+
+    world.bestCar.draw(carCtx,{color:'orange'})
     miniMap.update(viewPort, world.cars)
     BrainVisualizer.drawNetwork(networkCtx, selectedCar.controls.brain)
+
+    requestAnimationFrame(animate)
 }
 

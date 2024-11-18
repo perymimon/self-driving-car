@@ -22,7 +22,7 @@
     box-sizing: border-box;
     scrollbar-width: thin;
     scrollbar-color: var(--status-bar-border) var(--status-bar-bg);
-    /*background-color: var(--status-bar-bg);*/
+    /* background-color: var(--status-bar-bg); */
 }
 
 body {

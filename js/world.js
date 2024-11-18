@@ -1,10 +1,4 @@
-import Envelope from "./primitives/envelope.js";
-import Polygon from "./primitives/polygon.js";
-import {add, angle, distance, eps, lerp, scale} from "./utils/algebra-math-utils.js";
-import Segment from "./primitives/segment.js";
-import Tree from "./items/tree.js";
-import Building from "./items/building.js";
-import Graph from "./math/graph.js";
+import {DispatcherWithWeakRef} from "./bases/dispatcher.js";
 import Cross from "./editors/markings/cross.js";
 import Light from "./editors/markings/light.js";
 import Parking from "./editors/markings/parking.js";
@@ -12,9 +6,15 @@ import Start from "./editors/markings/start.js";
 import Stop from "./editors/markings/stop.js";
 import Target from "./editors/markings/target.js";
 import Yield from "./editors/markings/yield.js";
-import Point from "./primitives/point.js";
+import Building from "./items/building.js";
 import Car from "./items/car.js";
-import {DispatcherWithWeakRef} from "./bases/dispatcher.js";
+import Tree from "./items/tree.js";
+import Graph from "./math/graph.js";
+import Envelope from "./primitives/envelope.js";
+import Point from "./primitives/point.js";
+import Polygon from "./primitives/polygon.js";
+import Segment from "./primitives/segment.js";
+import {add, angle, distance, eps, lerp, scale} from "./utils/algebra-math-utils.js";
 
 const Markings = {
     'cross': Cross,
@@ -27,7 +27,7 @@ const Markings = {
     Cross, Light, Parking, Start, Stop, Target, Yield,
 }
 
-export default class World extends DispatcherWithWeakRef{
+export default class World extends DispatcherWithWeakRef {
     roadWidth = 100
     roadRoundness = 6
     buildingWidth = 150
@@ -101,8 +101,10 @@ export default class World extends DispatcherWithWeakRef{
     }
 
     generate(options = {}) {
-        let {corridor = false, buildings = false,
-            trees = false, roadBorders = false, laneGuides = false} = options
+        let {
+            corridor = false, buildings = false,
+            trees = false, roadBorders = false, laneGuides = false
+        } = options
         let specific = Object.values(options).some(Boolean)
         let all = !specific
 
@@ -291,8 +293,7 @@ export default class World extends DispatcherWithWeakRef{
 
     draw(ctx, viewPort, {
         showStartMarkings = true, showItems = Infinity, showLane = true,
-        showCorridorBorder = true, showCorridorSkeleton = true,
-        drawSensor = true
+        showCorridorBorder = true, showCorridorSkeleton = true, drawSensor = true
     } = {}) {
         let viewPoint = scale(viewPort.getOffset(), -1)
 
@@ -300,10 +301,6 @@ export default class World extends DispatcherWithWeakRef{
             env.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
         }
 
-        for (let marking of this.markings) {
-            if (showStartMarkings == false && marking instanceof Start) continue
-            marking.draw(ctx);
-        }
 
         for (let seg of this.graph.segments) {
             seg.draw(ctx, {dash: [10, 10], color: 'white', width: 4});
@@ -342,6 +339,10 @@ export default class World extends DispatcherWithWeakRef{
                 seg.draw(ctx, {color: '#7f0505'})
             }
 
+        for (let marking of this.markings) {
+            if (showStartMarkings == false && marking instanceof Start) continue
+            marking.draw(ctx);
+        }
         ctx.globalAlpha = .2
         for (let car of this.cars) {
             car.draw(ctx, {drawSensor: false})
