@@ -38,7 +38,7 @@ export default class BrainControls extends KeyboardControls {
         this.pathSensor.update(pathTracking)
 
         let offsets = this.sensors.map(sensor => sensor.readings).flat().map(input => input.offset)
-        console.table(offsets)
+        // console.table(offsets)
         const outputs = NeuralNetwork.feedForward(offsets, this.brain)
         if (this.state === 'auto') {
             this.forward = outputs[0]

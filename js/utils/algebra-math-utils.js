@@ -44,7 +44,7 @@ export function getNearestPolygon(point, polygons, threshold = Number.MAX_SAFE_I
         if (pointInside) return poly
 
         const dist = poly.distanceToPoint(point);
-        if (dist < minDist  ) {
+        if (dist < minDist) {
             minDist = dist;
             nearestPolygon = poly;
         }
@@ -67,6 +67,18 @@ export function distance(p1, p2) {
 
 export function subtract(p1, p2) {
     return new Point(p1.x - p2.x, p1.y - p2.y)
+}
+
+export function angle2P(p1, p2) {
+    return Math.atan2(p1.y - p2.y, p1.x - p2.x)
+}
+
+export function angle2PScreen(p1, p2) {
+    return Math.atan2(p1.y - p2.y, p2.x - p1.x) - Math.PI / 2 // zero is up
+}
+
+export function angle(p) {
+    return Math.atan2(p.y, p.x)
 }
 
 export function add(p1, p2) {
@@ -114,20 +126,17 @@ export function translate3d(point, offset, angle, angle2 = 0) {
     )
 }
 
-export function angle(p) {
-    return Math.atan2(p.y, p.x)
-}
-
-export function angle2P(p1, p2) {
-    return Math.atan2(p1.y - p2.y, p1.x - p2.x)
-}
 
 export function radToDeg(rad) {
-    return (180 / Math.PI) * rad
+    return ((180 / Math.PI) * rad).toFixed(3)
 }
 
+console.assert(radToDeg(Math.PI / 4) == 45)
+console.assert(radToDeg(Math.PI / 3) == 60)
+console.assert(radToDeg(Math.PI) == 180)
+
 export function degToRad(deg) {
-    return (Math.PI / 180) * deg
+    return ((Math.PI / 180) * deg).toFixed(3)
 }
 
 export function lerp(A, B, t) {

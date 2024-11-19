@@ -1,6 +1,13 @@
 import Sensor from "./sensor.js";
-import {getNearestSegment, subtract,angle} from "../utils/algebra-math-utils.js";
-import {normAngle} from "../utils/math-utils.js";
+import {
+    getNearestSegment,
+    subtract,
+    angle,
+    radToDeg,
+    angle2P,
+    angle2PScreen
+} from "../utils/algebra-math-utils.js";
+import {simpleAngle} from "../utils/math-utils.js";
 import Segment from "../primitives/segment.js";
 
 export default class SensorCompass {
@@ -15,10 +22,9 @@ export default class SensorCompass {
         if(!segments || segments.length === 0) return 0
         this.nearSeg = getNearestSegment(this.car,segments)
         let targetPoint = this.nearSeg.p2
-        let a = angle(subtract(targetPoint, this.car)) - Math.PI /*0ang is up*/
-        let carA = normAngle(this.car.angle)
-        let delta = (a - carA)
-        this.normDeleta = delta/ 180
+        let alpha = angle2PScreen(this.car, targetPoint)  /*0ang is up*/
+        let delta = simpleAngle(alpha - this.car.angle)
+        this.normDeleta = delta / Math.PI
     }
 
     get readings(){

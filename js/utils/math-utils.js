@@ -14,12 +14,19 @@ export function reduceToZero(value, friction) {
 export function clap(value, min, max) {
     return Math.max(Math.min(value, max), min)
 }
+
 /** get angle -inf to inf and return angle -PI to PI */
-export function normAngle(a) {
+export function simpleAngle(angle) {
     let fullCircle = Math.PI * 2
     let halfCircle = Math.PI
-    return (a % fullCircle + fullCircle) % fullCircle - halfCircle
+    angle = (angle + halfCircle) % fullCircle //gpt
+    angle += (angle < 0 ? halfCircle : -halfCircle)
+    return angle
 }
+
+console.assert(simpleAngle(Math.PI + 1) === -Math.PI + 1)
+console.assert(simpleAngle(Math.PI - 1) === Math.PI - 1)
+console.assert(simpleAngle(2 * Math.PI - 1) === -1)
 
 export function random(min, max, integer = true) {
     let result = Math.random() * (max - min + 1) + min;
