@@ -18,11 +18,11 @@ export default class SensorCompass {
         let a = angle(subtract(targetPoint, this.car)) - Math.PI /*0ang is up*/
         let carA = normAngle(this.car.angle)
         let delta = (a - carA)
-        this.normDeleta ={ offset: delta/ 180}
+        this.normDeleta = delta/ 180
     }
 
-    readings(){
-        return this.normDeleta
+    get readings(){
+        return { offset: this.normDeleta }
     }
 
     draw(ctx){

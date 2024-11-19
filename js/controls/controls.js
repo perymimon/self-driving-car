@@ -8,4 +8,7 @@ export default class Controls {
     update() {
 
     }
+    draw(ctx){
+
+    }
 }

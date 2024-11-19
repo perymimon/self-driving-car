@@ -1,6 +1,5 @@
 import BrainControls from "../controls/brainControls.js";
 import DummyControls from "../controls/dummyControls.js";
-import NeuralNetwork from "../math/network.js"
 import Point from "../primitives/point.js";
 import Polygon from "../primitives/polygon.js";
 import Segment from "../primitives/segment.js";
@@ -8,7 +7,6 @@ import {getNearestSegment, magnitude, normalize, subtract} from "../utils/algebr
 import {getMaxItem, TrackCounter} from "../utils/codeflow-utils.js";
 import {clap, isCloseZero, reduceToZero} from "../utils/math-utils.js";
 import Sensor from "./sensor.js";
-import SensorCompass from "./sensorCompass.js";
 
 const carImg = new Image();
 carImg.src = "../../assets/car.png"
@@ -25,7 +23,7 @@ export default class Car {
         type, angle = 0, maxSpeed = 2, color = "blue", label = '',
         acceleration = 0.2, maxReverseSpeed = -1.5, friction = 0.05,
         brain, mutation = 0.1,
-        noDamage = false
+        noDamage = false, sensor
     } = {}) {
         this.id = ++Car.index
         this.x = x;
@@ -61,13 +59,7 @@ export default class Car {
                 break
             case 'AI':
             case 'KEYS':
-                this.sensor = new Sensor(this, {
-                    rayCount: 6, rayLength: 150,
-                    raySpread: Math.PI / 2, rayOffset: 0
-                })
-                this.sensorPathCompass = new SensorCompass(this)
-                const sensors = [this.sensor, this.sensorPathCompass]
-                this.controls = new BrainControls(sensors, brain, brain ? mutation : 0)
+                this.controls = new BrainControls(this, brain, mutation, sensor)
                 if (type == 'KEYS')
                     this.controls.gear('manual')
                 break
@@ -85,6 +77,18 @@ export default class Car {
         this.update([], [])
         this.setColor(color)
 
+
+    }
+
+    static load(info, mutation) {
+        var {x, y, width, height, brain} = info
+        var car = new Car(x, y, width, height, info)
+        // if (brain) {
+        //     car.controls = new BrainControls(car, brain, mutation , info.sensor)
+        //     // car.controls.distanceSensor = new Sensor(car, info.sensor)
+        // }
+
+        return car
 
     }
 
@@ -109,39 +113,6 @@ export default class Car {
         })
     }
 
-    load(info) {
-        this.brain = info.brain
-        // this.maxSpeed = info.maxSpeed
-        // this.friction = info.friction
-        this.type = info.control
-        this.acceleration = info.acceleration
-        this.sensor.rayCount = info.sensor.rayCount
-        this.sensor.raySpread = info.sensor.raySpread
-        this.sensor.rayLength = info.sensor.rayLength
-        this.sensor.rayOffset = info.sensor.rayOffset
-    }
-
-    static load(info, mutation) {
-        var {x, y, width, height} = info
-        var car = new Car(x, y, width, height, info)
-        if (info.sensor)
-            car.sensor = new Sensor(car, {
-                rayCount: info.sensor.rayCount,
-                raySpread: info.sensor.raySpread,
-                rayLength: info.sensor.rayLength,
-                rayOffset: info.sensor.rayOffset,
-                radius: info.sensor.radius,
-            })
-        if (info.brain) {
-            let brain = structuredClone(info.brain)
-            if (mutation)
-                brain = NeuralNetwork.mutate(brain, mutation)
-            car.controls.brain = brain
-        }
-
-        return car
-
-    }
 
     #bounceCar(roadBorders) {
         var seg = getNearestSegment(this, roadBorders)
@@ -167,12 +138,7 @@ export default class Car {
     update(roadBorders, traffic = [], pathTracking = []) {
         if (this.damage) return false
 
-        if (this.sensor && this.useBrain) {
-            this.sensor.update(roadBorders, traffic)
-            this.sensorPathCompass.update(pathTracking)
-            this.controls.update()
-        }
-
+        this.controls.update(roadBorders, traffic, pathTracking)
         this.#move()
 
         if (pathTracking) {
@@ -308,9 +274,7 @@ export default class Car {
             this.setColor(color)
         }
         /* draw sensors */
-        drawSensor && this.sensor?.draw(ctx)
-        drawSensor && this.sensorPathCompass?.draw(ctx)
-
+        this.controls.draw(ctx)
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(-this.angle);

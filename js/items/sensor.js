@@ -1,6 +1,7 @@
-import Segment from "../primitives/segment.js";
 import Region from "../math/region.js";
+import Segment from "../primitives/segment.js";
 import {lerp} from "../utils/algebra-math-utils.js"
+
 export default class Sensor {
     constructor(car, {
         rayCount = 6, rayLength = 150,
@@ -14,33 +15,29 @@ export default class Sensor {
 
         this.rays = []
         this.collectReadings = []
-        this.region = new Region(this.car, this.rayLength * 3, this.rayLength)
-        this.bordersRegion = null
+        this.region = new Region(rayLength * 3, rayLength)
 
-        this.sensorsCount = rayLength
+        this.sensorsCount = rayCount
     }
 
     update(roadBorders, traffic) {
-        let {region} = this
-        if (region.update(this.car) || !this.bordersRegion) {
-            this.bordersRegion = roadBorders.filter(seg =>
-                region.inside(seg.p1) || region.inside(seg.p2)
-            )
-        }
+        let {car, region} = this
+        this.segments = region.geometriesCloseTo(car, roadBorders, seg => [seg.p1, seg.p2])
         this.#castRays()
         this.collectReadings = []
         for (let ray of this.rays) {
-            let firstTouch  = this.#getReading(ray, this.bordersRegion, traffic)
-
+            let firstTouch = this.#getReading(ray, this.segments, traffic)
             this.collectReadings.push(firstTouch)
         }
     }
-    get readings(){
-        return this.collectReadings.map(s =>({
+
+    get readings() {
+        return this.collectReadings.map(s => ({
             ...s,
             offset: s == null ? 0 : 1 - s.offset
-        }) )
+        }))
     }
+
     #getReading(ray, roadBorders, traffic) {
         let touches = []
         for (let border of roadBorders) {
@@ -83,7 +80,7 @@ export default class Sensor {
     draw(ctx) {
         ctx.save()
         for (let [i, ray] of this.rays.entries()) {
-            let read = this.readings[i]
+            let read = this.collectReadings[i]
             let end = read ?? ray.p2
             ctx.beginPath()
             ctx.lineWidth = 2
