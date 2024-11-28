@@ -20,6 +20,14 @@ export default class Sensor {
         this.sensorsCount = rayCount
     }
 
+    toJSON(){
+        var {rayCount, rayLength, raySpread,rayOffset} = this
+        return {rayCount, rayLength, raySpread, rayOffset}
+    }
+    static FromJSON(car, json) {
+        return new Sensor(car, json)
+    }
+
     update(roadBorders, traffic) {
         let {car, region} = this
         this.segments = region.geometriesCloseTo(car, roadBorders, seg => [seg.p1, seg.p2])

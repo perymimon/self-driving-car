@@ -34,7 +34,6 @@ export default class Building {
 
         }
 
-        let style = {fill: 'white', stroke: '#ccc'}
 
         sides
             .sort((a, b) =>
@@ -63,15 +62,17 @@ export default class Building {
             ])
         ];
 
-
         roofPolys.sort(
             (a, b) =>
                 b.distanceToPoint(viewPoint) -
                 a.distanceToPoint(viewPoint)
         );
+
+        let style = {fill: '--color-building-wall', stroke: '--color-building-wall-stroke'}
+
         this.base.draw(ctx, style);
         sides.forEach(side => side.draw(ctx, style));
-        ceiling.draw(ctx, {fill: 'white', stroke: 'white'});
-        roofPolys.forEach(poly => poly.draw(ctx, {fill: "#D44", stroke: "#C44", lineWidth: 8, join: "round"}))
+        ceiling.draw(ctx, {fill: '--color-building-wall', stroke: '--color-building-wall-stroke'});
+        roofPolys.forEach(poly => poly.draw(ctx, {fill: "--color-building-roof", stroke: "--color-building-roof", lineWidth: 8, join: "round"}))
     }
 }

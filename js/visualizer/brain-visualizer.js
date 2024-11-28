@@ -1,5 +1,6 @@
 import {lerp} from "../utils/algebra-math-utils.js"
-import {clearCircle, getRGBA} from "../utils/canvas-utils.js";
+import {clearCircle, drawCircle, drawLine, drawText, getProperty} from "../utils/canvas-utils.js";
+import {clamp} from "../utils/math-utils.js";
 
 export default class BrainVisualizer {
     static drawNetwork(ctx, network) {
@@ -30,66 +31,66 @@ export default class BrainVisualizer {
         const nodeRadius = 18
 
         const {inputs, outputs, weights, biases} = level
+        const getColor = colorFactory(ctx, '--color-neuron-negative', '--color-neuron-positive')
 
         for (let i = 0; i < inputs.length; i++) {
             for (let j = 0; j < outputs.length; j++) {
                 const xOutput = BrainVisualizer.#getNodeX(outputs, j, left, right)
                 const xInput = BrainVisualizer.#getNodeX(inputs, i, left, right)
-                ctx.beginPath()
-                ctx.moveTo(xInput, bottom)
-                ctx.lineTo(xOutput, top)
-                ctx.lineWidth = 4
-                ctx.setLineDash([4, 4])
-                ctx.strokeStyle = getRGBA( weights[i][j])
-                ctx.stroke()
+                var start = {x: xInput, y: bottom}, end = {x: xOutput, y: top}
+
+                drawLine(ctx, start, end, {
+                    lineWidth: 2, dash: [2, 4], stroke: getColor(weights[i][j])
+                })
             }
         }
 
         for (let i = 0; i < inputs.length; i++) {
             const x = BrainVisualizer.#getNodeX(inputs, i, left, right)
             clearCircle(ctx, x, bottom, nodeRadius)
-            // clearCircle(ctx, x, bottom, nodeRadius)
-            ctx.beginPath()
-            ctx.arc(x, bottom, nodeRadius * 0.8, 0, 2 * Math.PI)
-            ctx.fillStyle = getRGBA(inputs[i])
-            ctx.fill()
+            drawCircle(ctx, x, bottom, nodeRadius * 0.8, {fill: getColor(inputs[i])})
+
         }
 
         for (let i = 0; i < outputs.length; i++) {
             const x = BrainVisualizer.#getNodeX(outputs, i, left, right)
-
             clearCircle(ctx, x, top, nodeRadius)
-
-            ctx.beginPath()
-            ctx.arc(x, top, nodeRadius * 0.8, 0, 2 * Math.PI)
-            ctx.fillStyle = getRGBA(outputs[i])
-            ctx.fill()
-
-            ctx.beginPath()
-            ctx.arc(x, top, nodeRadius, 0, 2 * Math.PI)
-            ctx.fillStyle = getRGBA(biases[i])
-            ctx.setLineDash([7, 3])
-            ctx.stroke()
+            drawCircle(ctx, x, top, nodeRadius * 0.8, {fill: getColor(outputs[i])})
+            drawCircle(ctx, x, top, nodeRadius, {fill: getColor(biases[i]), dash: [7, 3]})
             ctx.setLineDash([])
 
             if (symbols) {
-                ctx.beginPath()
-                ctx.textAlign = 'center'
-                ctx.textBaseline = 'middle'
-                ctx.fillStyle = 'black'
-                ctx.strokeStyle = 'white'
-                ctx.font = `${nodeRadius * 1.4}px Arial`
-                ctx.fillText(symbols[i], x, top)
-                ctx.lineWidth = .5
-                ctx.strokeText(symbols[i], x, top)
+                drawText(ctx, symbols[i], x, top, {
+                    fillStyle: 'black', fontSize: nodeRadius * 1.4, lineWidth: .5
+                })
             }
         }
-
-
     }
 
     static #getNodeX(nodes, index, left, right) {
         const offset = nodes.length == 1 ? 0.5 : index / (nodes.length - 1)
         return lerp(left, right, offset)
+    }
+}
+
+
+// function getColor(ctx, value) {
+//     var colorNegative = hexToRgb(getProperty(ctx, '--color-neuron-negative'))
+//     var colorPositive = hexToRgb(getProperty(ctx, '--color-neuron-positive'))
+//
+//     const a = (.1 + Math.abs(value)).toFixed(2)
+//     const {r, g, b} = value > 0 ? colorPositive : colorNegative
+//     return `rgba(${r},${g},${b},${a})`
+// }
+
+function colorFactory(ctx, negative, positive) {
+    var colorNegative = getProperty(ctx, negative)
+    var colorPositive = getProperty(ctx, positive)
+
+    return function getColor(value) {
+        const a = Math.round(clamp((.1 + Math.abs(value)) , -1, 1) * 255)
+        const color = value > 0 ? colorPositive : colorNegative
+        // return `rgba(${r},${g},${b},${a})`
+        return color + a.toString(16)
     }
 }

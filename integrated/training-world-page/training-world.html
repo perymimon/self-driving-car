@@ -18,7 +18,7 @@
             sensor.js: Handles sensor data.
             control.js: Manages user/AI controls.
             track.js: Draws and manages the track.
-            network.js: Implements the neural network.
+            neuralNetwork.js: Implements the neural network.
         </dd>
 
         <dt>question 2</dt>
@@ -45,10 +45,15 @@
 </div>
 <div id="project" class="main-section">
     <div id="controls" class="component-base group-base">
-        <div >
-            <label role="button">📁<input type="file" id="worldFileInput" title="load world" accept='.world'>world </label>
-            <label role="button">📁<input type="file" id="carFileInput" title="load world" accept='.world'>car</label>
+        <div class="group-base">
+            <div class="label-base">🌏 World</div>
+            <label role="button">📁<input type="file" id="worldFileInput" title="load world" accept='.world'></label>
+            <button role="button">💾<input type="file" id="worldFileSave" title="load save" accept='.brain'></button>
+            <div class="label-base">🧠 brain</div>
+            <label role="button">📁<input type="file" id="carFileInput" title="load car" accept='.brain'></label>
+            <button role="button">💾<input type="file" id="carFileSave" title="load car" accept='.brain'></button>
         </div>
+
         <div class="kv-list horizontal compact">
             <div class="kv-group-label">Loaded</div>
             <div class="kv-container">
@@ -65,10 +70,12 @@
         <!-- show data on selected car -->
         <status-bar id="carStatusbar"></status-bar>
     </div>
-    <canvas id="carCanvas" ></canvas>
+    <canvas id="carCanvas"></canvas>
     <div id="visualizer">
         <canvas id="networkCanvas"></canvas>
-        <canvas id="miniMapCanvas"></canvas>
+        <div class="cliping-nonagon">
+            <canvas id="miniMapCanvas"></canvas>
+        </div>
     </div>
 </div>
 <a href="../race-page/race.html" class="next" page="race">race</a>

@@ -1,5 +1,6 @@
-import {scale} from "../utils/algebra-math-utils.js";
 import Point from "../primitives/point.js";
+import {scale} from "../utils/algebra-math-utils.js";
+import {drawCircle, getProperty} from "../utils/canvas-utils.js";
 
 export default class MiniMap {
     constructor(canvas, graph, size, cars) {
@@ -26,18 +27,20 @@ export default class MiniMap {
             offset.y + size / 2
         );
         ctx.scale(scalar, scalar);
+
+        var colorRoad = getProperty(ctx, '--color-minimap-road')
         for (let seg of this.graph.segments) {
-            seg.draw(ctx, {width: 4 / scalar, color: 'white'})
+            seg.draw(ctx, {width: 4 / scalar, color: colorRoad})
         }
+
+        var colorCar = getProperty(ctx, '--color-minimap-car')
+        var colorCarDamage = getProperty(ctx, '--color-minimap-car-damage')
         for (let car of cars) {
-            this.ctx.beginPath()
-            this.ctx.arc(car.x, car.y, 5 / scalar, 0, Math.PI * 2)
-            this.ctx.fill()
+            let fill = colorCar
+            if(car.damage) fill = colorCarDamage
+            drawCircle(ctx, car.x, car.y, 5 / scalar, {fill})
         }
-        for (let car of cars) {
-            if (car.damage) continue
-            new Point(car.x, car.y).draw(ctx, {color: 'red'});
-        }
+
 
         ctx.restore()
     }

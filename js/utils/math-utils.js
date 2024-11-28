@@ -11,7 +11,7 @@ export function reduceToZero(value, friction) {
     return 0
 }
 
-export function clap(value, min, max) {
+export function clamp(value, min, max) {
     return Math.max(Math.min(value, max), min)
 }
 

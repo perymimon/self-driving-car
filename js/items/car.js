@@ -1,12 +1,13 @@
 import BrainControls from "../controls/brainControls.js";
 import DummyControls from "../controls/dummyControls.js";
+import NeuralNetwork from "../math/neuralNetwork.js";
 import Point from "../primitives/point.js";
 import Polygon from "../primitives/polygon.js";
 import Segment from "../primitives/segment.js";
 import {getNearestSegment, magnitude, normalize, subtract} from "../utils/algebra-math-utils.js";
+import {cloneInstance} from "../utils/clone.js";
 import {getMaxItem, TrackCounter} from "../utils/codeflow-utils.js";
-import {clap, isCloseZero, reduceToZero} from "../utils/math-utils.js";
-import Sensor from "./sensor.js";
+import {clamp, isCloseZero, reduceToZero} from "../utils/math-utils.js";
 
 const carImg = new Image();
 carImg.src = "../../assets/car.png"
@@ -26,23 +27,13 @@ export default class Car {
         noDamage = false, sensor
     } = {}) {
         this.id = ++Car.index
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.color = color
-
+        Object.assign(this,{
+            x,y, width, height,color, type,
+            acceleration,maxSpeed,maxReverseSpeed,friction,angle, label
+        })
         // this.controlType = controlType
-        this.type = type
-
         this.speed = 0
-        this.acceleration = acceleration
-        this.maxSpeed = maxSpeed
-        this.maxReverseSpeed = maxReverseSpeed
-        this.friction = friction
-        this.angle = angle
         this.damage = false
-        this.label = label
         this.fitness = 0
         this.noDamageMode = noDamage
 
@@ -80,16 +71,34 @@ export default class Car {
 
     }
 
-    static load(info, mutation) {
-        var {x, y, width, height, brain} = info
-        var car = new Car(x, y, width, height, info)
-        // if (brain) {
-        //     car.controls = new BrainControls(car, brain, mutation , info.sensor)
-        //     // car.controls.distanceSensor = new Sensor(car, info.sensor)
-        // }
+    toJSON() {
+        var {
+            width, height, color, type,
+            acceleration, maxSpeed, maxReverseSpeed,
+            friction, label, noDamageMode, controls
+        } = this
+        return {
+            width, height, color, type,
+            acceleration, maxSpeed, maxReverseSpeed,
+            friction, label, noDamageMode, controls
+        }
+    }
 
+    static FromJSON(info, x = 0, y = 0, mutation = 0) {
+        var {width, height, type, controls} = info
+        var car = new Car(x, y, width, height, {...info, mutation})
+        // if(type =='AI' || type =='KEYS') {
+        //     car.controls = BrainControls.FromJSON(car, controls)
+        // }
         return car
 
+    }
+
+    static clone(instance, mutation, override) {
+        var car = cloneInstance(instance)
+        Object.assign(car, override)
+        NeuralNetwork.mutate(car.controls.brain, mutation)
+        return car
     }
 
     * [Symbol.iterator]() {
@@ -240,15 +249,15 @@ export default class Car {
             this.speed -= this.acceleration
         }
 
-        this.speed = clap(this.speed, this.maxReverseSpeed, this.maxSpeed)
+        this.speed = clamp(this.speed, this.maxReverseSpeed, this.maxSpeed)
 
         this.speed = reduceToZero(this.speed, this.friction)
-        if (this.speed === 0) return new Point(0, 0)
+        // if (this.speed === 0) return new Point(0, 0)
 
         if (this.controls.tilt) {
             this.angle -= this.controls.tilt * 0.03
         } else {
-            const flip = this.speed > 0 ? 1 : -1
+            const flip = this.controls.reverse ? -1 : 1
             if (this.controls.left) {
                 this.angle += 0.03 * flip
             }
@@ -256,7 +265,6 @@ export default class Car {
                 this.angle -= 0.03 * flip
             }
         }
-        // console.table(this)
         let {x, y} = this
         this.x -= Math.sin(this.angle) * this.speed
         this.y -= Math.cos(this.angle) * this.speed

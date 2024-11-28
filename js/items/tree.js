@@ -1,5 +1,6 @@
 import {add, lerp, lerp2D, scale, subtract, translate} from "../utils/algebra-math-utils.js";
 import Polygon from "../primitives/polygon.js";
+import {getProperty, mixColors} from "../utils/canvas-utils.js";
 import {pseudoRandom} from "../utils/math-utils.js";
 
 export default class Tree {
@@ -16,10 +17,13 @@ export default class Tree {
         const diff = subtract(this.center, viewPoint);
         const top = add(this.center, scale(diff, this.heightCoef))
 
+        var colorDark = getProperty(ctx,'--color-tree-dark')
+        var colorLight = getProperty(ctx,'--color-tree-light')
+
         for (let i = 0; i < this.levelCount; i++) {
             let t = i / (this.levelCount);
             let point = lerp2D(this.center, top, t);
-            let color = `rgb(30,${lerp(50, 200, t)},70)`
+            let color = mixColors(colorDark, colorLight, t);
             let size = lerp(this.size, this.size / 4, t)
             let poly = this.#generateLevel(point, size, i)
             poly.draw(ctx, {fill: color, stroke: '#0000'});

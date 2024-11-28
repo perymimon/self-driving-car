@@ -5,7 +5,7 @@
 }
 
 #networkCanvas {
-    background: #957895;
+    background: var(--color-neuron-bg);
     /*width: 200px*/
 }
 

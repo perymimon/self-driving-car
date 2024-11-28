@@ -14,7 +14,7 @@ import Envelope from "./primitives/envelope.js";
 import Point from "./primitives/point.js";
 import Polygon from "./primitives/polygon.js";
 import Segment from "./primitives/segment.js";
-import {add, angle, distance, eps, lerp, scale} from "./utils/algebra-math-utils.js";
+import {add, angleToScreen, distance, eps, lerp, scale} from "./utils/algebra-math-utils.js";
 
 const Markings = {
     'cross': Cross,
@@ -46,7 +46,6 @@ export default class World extends DispatcherWithWeakRef {
         this.laneGuides = []
 
         this.cars = []
-        this.bestCar = null
 
         this.markings = []
 
@@ -143,32 +142,18 @@ export default class World extends DispatcherWithWeakRef {
 
     }
 
-    addGenerateCars({N = 1, type = 'CUSTOM', mutation = 0, carMold = null, color = 'red', name = ''} = {}) {
-        const starts = this.markings.filter(m => m instanceof Start)
-        let start = starts.at(0)// starts[random(0, starts.length - 1, true)]
-        let point = start?.center ?? new Point(100, 100)
-        let dir = start?.directionVector ?? new Point(0, -1)
-        let cars = []
-        var brain = JSON.parse(localStorage.getItem('bestBrain'))
-        for (let i of Array(N).keys()) {
-            let car = Car.load({
-                ...carMold,
-                brain: brain ?? carMold?.brain,
-                x: point.x,
-                y: point.y,
-                width: 30,
-                height: 50,
-                type,
-                angle: Math.PI / 2 - angle(dir),
-                maxSpeed: 4,
-                color,
-                label: String(i)
-            }, i == 0 ? 0 : mutation)
+    addGenerateCars(N = 1, carJSON, mutation, override = {}) {
+        var start = this.markings.filter(m => m instanceof Start)?.at(0) ??
+            {center: new Point(100, 100), directionVector: new Point(0, -1)}
 
-            car.name = name.replace('{i}', String(i))
-            cars.push(car)
-
-        }
+        var angle = angleToScreen(start.directionVector)
+        var {x, y} = start.center
+        var mold = {...carJSON, ...override, angle}
+        let cars = Array(N).keys().map(i => {
+            let car = Car.FromJSON(mold, x, y, mutation)
+            car.label = String(i)
+            return car
+        })
         this.cars.push(...cars)
     }
 
@@ -297,30 +282,30 @@ export default class World extends DispatcherWithWeakRef {
     } = {}) {
         let viewPoint = scale(viewPort.getOffset(), -1)
 
-        for (let env of this.envelopes) {
-            env.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
+        /* Roads */
+        for (let envelop of this.envelopes) {
+            // envelop.draw(ctx, {fill: '#BBB', stroke: '#BBB', lineWidth: 15});
+            envelop.draw(ctx, {fill: '--color-road', stroke: '--color-road', lineWidth: 1});
         }
 
-
         for (let seg of this.graph.segments) {
-            seg.draw(ctx, {dash: [10, 10], color: 'white', width: 4});
+            seg.draw(ctx, {dash: [10, 10], color: '--color-lane-marking-white', width: 4});
         }
 
         for (let seg of this.roadBorders) {
-            seg.draw(ctx, {color: 'white', width: 4})
+            seg.draw(ctx, {color: '--color-lane-marking-yellow', width: 4})
         }
-
         if (this.corridor && showCorridorBorder)
             for (let seg of this.corridor.borders) {
-                seg.draw(ctx, {color: 'red', width: 4});
+                seg.draw(ctx, {color: '--color-lane-corridor-race', width: 4});
             }
         if (this.corridor && showCorridorSkeleton)
             for (let seg of this.corridor.skeleton) {
-                seg.draw(ctx, {color: 'yellow', width: 4});
+                seg.draw(ctx, {color: '--color-lane-marking-race', width: 4});
             }
-
-        // todo:draw each layer on different image and draw all layer
-        // if(!viewPoint.equal(this.#lastViewPoint)) {
+        //
+        // // todo:draw each layer on different image and draw all layer
+        // // if(!viewPoint.equal(this.#lastViewPoint)) {
         if (showItems) {
             let items = [...this.buildings, ...this.trees]
                 // .filter(item => viewPort.inRenderBox(item.base.points))
@@ -334,21 +319,20 @@ export default class World extends DispatcherWithWeakRef {
                 item.draw(ctx, viewPoint, {drawId: true})
             }
         }
-        if (showLane)
-            for (const seg of this.laneGuides) {
-                seg.draw(ctx, {color: '#7f0505'})
-            }
-
-        for (let marking of this.markings) {
-            if (showStartMarkings == false && marking instanceof Start) continue
-            marking.draw(ctx);
-        }
-        ctx.globalAlpha = .2
-        for (let car of this.cars) {
-            car.draw(ctx, {drawSensor: false})
-        }
-        ctx.globalAlpha = 1
-        this.bestCar?.draw(ctx, {drawSensor})
+        // if (showLane)
+        //     for (const seg of this.laneGuides) {
+        //         seg.draw(ctx, {color: '#7f0505'})
+        //     }
+        //
+        // for (let marking of this.markings) {
+        //     if (showStartMarkings == false && marking instanceof Start) continue
+        //     marking.draw(ctx);
+        // }
+        // ctx.globalAlpha = .2
+        // for (let car of this.cars) {
+        //     car.draw(ctx, {drawSensor: false})
+        // }
+        // ctx.globalAlpha = 1
     }
 
 }

@@ -1,27 +1,35 @@
 import Sensor from "../items/sensor.js";
 import SensorCompass from "../items/sensorCompass.js";
-import NeuralNetwork from "../math/network.js";
+import NeuralNetwork from "../math/neuralNetwork.js";
 import KeyboardControls from "./keyboardControls.js";
 
 export default class BrainControls extends KeyboardControls {
-    constructor(car, brain, mutation = 0.1, sensors = {}) {
+
+    constructor(car, brain, mutation = 0.1, proximitySensor = {}) {
         super()
         this.proximitySensor = new Sensor(car, {
             rayCount: 6, rayLength: 150,
             raySpread: Math.PI / 2, rayOffset: 0,
-            ...sensors
+            ...proximitySensor
         })
 
         this.pathSensor = new SensorCompass(car)
         this.sensors = [this.proximitySensor, this.pathSensor]
 
         const count = this.sensors.reduce((acc, b) => acc + b.sensorsCount, 0);
-        var newBrain = brain ?? new NeuralNetwork([count, 6, 4]);
-        if (count != brain.levels.at(0).inputs.length) console.error('Brain input not matched sensor inputs')
-        this.brain = brain ? NeuralNetwork.mutate(newBrain, mutation) : newBrain;
+        this.brain = brain? NeuralNetwork.mutate(brain, mutation): new NeuralNetwork([count, 6, 4]);
+        if (brain.levels.at(0).inputs.length != count ) console.error('Brain input not matched sensor inputs')
 
         this.state = 'auto'
         this.gear(this.state)
+    }
+    toJSON(){
+        var {proximitySensor, pathSensor,brain} = this
+        return {proximitySensor, pathSensor,brain}
+    }
+    static FromJSON(car, json) {
+        var {proximitySensor, pathSensor,brain} = json
+        return  new BrainControls(car, brain, 0, proximitySensor )
     }
 
     gear(state = 'manual') {

@@ -16,7 +16,9 @@
 #miniMapCanvas{
     border-radius:50%;
     border: 1px solid white
-
+}
+#networkCanvas{
+    background: var(--color-neuron-bg);
 }
 
 #verticalButtons{

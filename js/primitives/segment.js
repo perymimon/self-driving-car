@@ -10,6 +10,7 @@ import {
     scale,
     subtract
 } from "../utils/algebra-math-utils.js";
+import {style} from "../utils/canvas-utils.js";
 import Point from "./point.js";
 
 export default class Segment {
@@ -49,12 +50,8 @@ export default class Segment {
     }
 
     draw(ctx, {width = 2, color = "black", dash = null, cap = "butt"} = {}) {
+        style(ctx,{stroke:color,lineWidth:width, dash, cap})
         ctx.beginPath();
-        ctx.lineWidth = width;
-        ctx.strokeStyle = color;
-        ctx.lineCap = cap;
-        if (dash)
-            ctx.setLineDash(dash)
         ctx.moveTo(this.p1.x, this.p1.y);
         ctx.lineTo(this.p2.x, this.p2.y);
         ctx.stroke()

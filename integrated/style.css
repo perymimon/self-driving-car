@@ -21,7 +21,7 @@
     }
 
     & #carCanvas {
-        grid-row: 2;
+        grid-row: 1;
         flex: 1 1 0;
         width: 100%;
         height: 100%;
@@ -31,34 +31,57 @@
 
     & #visualizer {
         position: absolute;
-        grid-row: 2 / -1;
+        grid-row: 1 / -1;
         right: anchor(--project right);
         inset: 0 0 0 auto;
+        width: 10em;
     }
 }
 
 #visualizer {
     display: flex;
     flex-direction: column;
-    gap: 0.2em;
-    opacity: 0.5;
-    width: 200px;
+    gap: 0.1em;
+
     /* justify-content: space-around; */
 }
 
 #networkCanvas, #miniMapCanvas {
-    background: rgba(149, 120, 149, 0.46);
+    /* background: rgba(149, 110, 149, 0.46); */
+    background-color: var(--color-minimap-bg)
     /* flex:1; */
 }
 
 #networkCanvas {
     height: 50%;
+    background: var(--color-neuron-bg);
+    clip-path: polygon(
+            calc(1em) 0%, calc(100% - 1em) 0%,
+            100% calc(1em), 100% calc(100% - 1em),
+            calc(100% - 1em) 100%, calc(1em) 100%,
+            0% calc(100% - 1em), 0% calc(1em)
+    );
 }
 
 #miniMapCanvas {
-    border-radius: 50%;
-    border: 1px solid white;
+    /* border-radius: 50%; */
     aspect-ratio: 1/1;
+}
+
+.cliping-nonagon {
+    position: relative;
+    width: fit-content;
+    max-height: fit-content;
+    clip-path: polygon(50% 0%, 80% 10%, 100% 35%, 100% 70%, 80% 90%, 50% 100%, 20% 90%, 0% 70%, 0% 35%, 20% 10%, 51% 0%);
+
+    &::before {
+        clip-path: polygon(50% 1%, 79% 11%, 99% 35%, 99% 70%, 79% 89%, 50% 99%, 20% 89%, 1% 70%, 1% 35%, 20% 11%, 50% 1%, 50% 0, 0 0, 0 100%, 100% 100%, 100% 0, 50% 0);
+        /*clip-path: polygon(50% 0%, 80% 10%, 100% 35%, 100% 70%, 80% 90%, 50% 100%, 20% 90%, 0% 70%, 0% 35%, 20% 10%, 50% 0%, 0 0, 0 100%, 100% 100%, 100% 0, 50% 0);*/
+        content: '';
+        position: absolute;
+        inset: 0px;
+        background: rgba(71, 143, 35, 0.64);
+    }
 }
 
 #verticalButtons {
@@ -78,7 +101,7 @@ body {
         width: min(40em, 40vw);
     }
 
-    & > .main-section:nth-child(2) {
+    & > .main-section:nth-child(1) {
         flex: 1;
         align-items: stretch;
         width: max(60em, 60vw);

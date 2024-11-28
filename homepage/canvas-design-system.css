@@ -1,0 +1,42 @@
+canvas {
+    background-color: var(--color-background);
+    /* Base colors */
+    --color-background: #1e3a3a;
+    --color-primary: #3498db;
+    --color-secondary: #2ecc71;
+    --color-accent: #e74c3c;
+    --color-text: #ecf0f1;
+
+    /* Specific element colors */
+    --color-road: #34495e;
+    --color-lane-marking-white: #ecf0f1;
+    --color-lane-marking-yellow: #f1c40f;
+    --color-lane-corridor-race: red;
+    --color-lane-marking-race: rgba(37, 231, 37, 0.5);
+    --color-building-roof: #c0392b;
+    --color-building-wall: #858585;
+    --color-building-wall-stroke: #9b9b9b;
+    --color-tree-dark: #239d56;
+    --color-tree-light: #47e88a;
+    /*--color-car: #34495e;*/
+    --color-minimap-bg: rgba(44, 62, 80, 0.8);
+    --color-minimap-road: #7c8286;
+    --color-minimap-car: #e74c3c;
+    --color-minimap-car-damage: #2d140f;
+
+    /*--color-neuron-bg: rgba(71, 143, 35, 0.64);*/
+    --color-neuron-bg: var(--color-minimap-bg);
+    --color-neuron-negative: #3ca0e7;
+    --color-neuron-positive: #e7e43c;
+
+    /* Glow effects (for canvas shadow) */
+    --glow-small: 0 0 2px;
+    --glow-medium: 0 0 5px;
+    --glow-large: 0 0 10px;
+
+    /* Fonts */
+    --font-family: 'Courier New', monospace;
+    --font-size-small: 12px;
+    --font-size-medium: 14px;
+    --font-size-large: 16px;
+}

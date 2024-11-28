@@ -59,8 +59,8 @@ export default class Point extends DispatcherWithWeakRef {
     }
 
     toJSON() {
-        let {x, y} = this
-        return {x, y}
+        let {x, y, z} = this
+        return {x, y, z}
     }
 
     static load(p) {

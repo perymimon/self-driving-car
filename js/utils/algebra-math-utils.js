@@ -74,11 +74,15 @@ export function angle2P(p1, p2) {
 }
 
 export function angle2PScreen(p1, p2) {
-    return Math.atan2(p1.y - p2.y, p2.x - p1.x) - Math.PI / 2 // zero is up
+    return Math.PI / 2 - angle2P(p1, p2)
 }
 
 export function angle(p) {
     return Math.atan2(p.y, p.x)
+}
+
+export function angleToScreen(p) {
+    return Math.PI / 2 - angle(p)
 }
 
 export function add(p1, p2) {

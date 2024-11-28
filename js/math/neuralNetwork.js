@@ -12,6 +12,14 @@ export default class NeuralNetwork {
         }
     }
 
+    static FromJSON(info) {
+        var brain = new NeuralNetwork([])
+        for (let infoLevel of info.levels) {
+            brain.levels.push(Level.fromJSON(infoLevel))
+        }
+        return brain
+    }
+
     static feedForward(givenInputs, network) {
         var outputs = givenInputs
         for (let i = 0; i < network.levels.length; i++) {
@@ -20,9 +28,9 @@ export default class NeuralNetwork {
         return outputs
     }
 
-    static mutate(brain, amount = 1) {
-        if(amount == 0) return brain
-        let network = structuredClone(brain)
+    static mutate(network, amount = 1) {
+        if (amount == 0) return network
+        // let network = structuredClone(brain)
         for (let level of network.levels) {
             level.biases = level.biases.map(b => lerp(b, Math.random() * 2 - 1, amount))
 
@@ -53,6 +61,14 @@ class Level {
         }
 
         Level.#randomize(this)
+    }
+
+    static fromJSON(info) {
+        var level = new Level()
+        level.inputs = info.inputs
+        level.biases = info.biases
+        level.weights = info.weights
+        return level
     }
 
     static #randomize(level) {

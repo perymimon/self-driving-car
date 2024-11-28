@@ -5,7 +5,7 @@ export const SELECTED = 'selected', CANCEL = 'cancel'
 
 export class PolygonSelector extends Dispatcher {
 
-    constructor(viewPort, polygons) {
+    constructor(viewPort, polygons , selectedCallback = null) {
         super()
         this.viewPort = viewPort;
         this.polygons = polygons;
@@ -16,6 +16,7 @@ export class PolygonSelector extends Dispatcher {
         this.intent = null
         this.selected = null
         this.enable()
+        if(selectedCallback) this.addEventListener(SELECTED, selectedCallback)
     }
     setPolygons(polygons) {
         this.polygons = polygons;

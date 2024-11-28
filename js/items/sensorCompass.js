@@ -17,7 +17,12 @@ export default class SensorCompass {
         this.nearSeg = null
         this.sensorsCount = 1
     }
-
+    toJSON(){
+        return {}
+    }
+    fromJSON(car, json) {
+        return new SensorCompass(car)
+    }
     update(segments){
         if(!segments || segments.length === 0) return 0
         this.nearSeg = getNearestSegment(this.car,segments)
