@@ -9,10 +9,10 @@ import {cloneInstance} from "../utils/clone.js";
 import {getMaxItem, TrackCounter} from "../utils/codeflow-utils.js";
 import {clamp, isCloseZero, reduceToZero} from "../utils/math-utils.js";
 
-const carImg = new Image();
-carImg.src = "../../assets/car.png"
+const baseCarImg = new Image();
+baseCarImg.src = "../../assets/car.png"
 const resolver = Promise.withResolvers()
-carImg.onload = function () {
+baseCarImg.onload = function () {
     resolver.resolve()
 }
 
@@ -27,9 +27,9 @@ export default class Car {
         noDamage = false, sensor
     } = {}) {
         this.id = ++Car.index
-        Object.assign(this,{
-            x,y, width, height,color, type,
-            acceleration,maxSpeed,maxReverseSpeed,friction,angle, label
+        Object.assign(this, {
+            x, y, width, height, color, type,
+            acceleration, maxSpeed, maxReverseSpeed, friction, angle, label
         })
         // this.controlType = controlType
         this.speed = 0
@@ -106,20 +106,6 @@ export default class Car {
             if (value == null) continue
             yield [key, value]
         }
-    }
-
-    setColor(color) {
-        const maskCtx = this.mask.getContext("2d");
-        this.color = color
-        resolver.promise.then(() => {
-            maskCtx.drawImage(carImg, 0, 0, this.width, this.height);
-            maskCtx.globalCompositeOperation = "source-in";
-
-            maskCtx.fillStyle = color;
-            maskCtx.fillRect(0, 0, this.width, this.height);
-
-
-        })
     }
 
 
@@ -274,19 +260,29 @@ export default class Car {
         return positionPoint
     }
 
+    setColor(color) {
+        if (!color || this.color === color) return
+        this.color = color
+        resolver.promise.then(() => {
+            const maskCtx = this.mask.getContext("2d")
+            maskCtx.drawImage(baseCarImg, 0, 0, this.width, this.height)
+            maskCtx.globalCompositeOperation = "source-in";
+
+            maskCtx.fillStyle = color;
+            maskCtx.fillRect(0, 0, this.width, this.height);
+        })
+    }
+
     draw(ctx, {drawSensor = false, color} = {}) {
         /* In a race car rich to the end*/
-        // if (!carImg.complete) return
+        // if (!baseCarImg.complete) return
         /* If car's color change create it again */
-        if (color && this.color != color) {
-            this.setColor(color)
-        }
+        this.setColor(color)
         /* draw sensors */
         this.controls.draw(ctx)
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(-this.angle);
-
 
         if (!this.damage) {
             ctx.drawImage(this.mask,
@@ -296,11 +292,9 @@ export default class Car {
                 this.height);
             ctx.globalCompositeOperation = "multiply";
         }
-        ctx.drawImage(carImg,
-            -this.width / 2,
-            -this.height / 2,
-            this.width,
-            this.height);
+        ctx.drawImage(baseCarImg, -this.width / 2, -this.height / 2, this.width, this.height);
+
+
         ctx.restore();
         // this.polygons.draw(ctx);
 

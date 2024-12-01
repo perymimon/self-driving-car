@@ -46,7 +46,7 @@ function reload(world) {
     miniMap.graph = world.graph
     world.cars.length = 0
     world.addGenerateCars(1, carJSON, 0, {type: 'KEYS', color: 'gray', name: 'Me'})
-    // world.addGenerateCars(30, carJSON, 0.2, {type: 'AI', name: 'AI{i}'})
+    // world.addGenerateCars(1, carJSON, 0.2, {type: 'AI', name: 'AI{i}'})
 
     carSelector.setPolygons(world.cars.map(c=>c.polygons))
     // for (let car of world.cars)
@@ -79,10 +79,11 @@ function animate() {
     viewPort.reset()
     // world.draw(ctx, viewPort, {showCorridorBorder: false, drawSensor: true})
 
+    myCar?.draw(ctx, {drawSensor:true, color:'blue'})
     let intentCar = world.cars.find(c=> c.polygons == carSelector.intent)
     intentCar?.draw(ctx,{color:'orange'})
 
-    bestCar?.draw(ctx, {drawSensor:true})
+
 
     miniMap.update(viewPort, world.cars)
     BrainVisualizer.drawNetwork(networkCtx, selectedCar.controls.brain)

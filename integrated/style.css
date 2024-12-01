@@ -48,8 +48,8 @@
 
 #networkCanvas, #miniMapCanvas {
     /* background: rgba(149, 110, 149, 0.46); */
-    background-color: var(--color-minimap-bg)
-    /* flex:1; */
+    background-color: var(--color-minimap-bg);
+    background-position-y: 2px;
 }
 
 #networkCanvas {
@@ -73,10 +73,14 @@
     width: fit-content;
     max-height: fit-content;
     clip-path: polygon(50% 0%, 80% 10%, 100% 35%, 100% 70%, 80% 90%, 50% 100%, 20% 90%, 0% 70%, 0% 35%, 20% 10%, 51% 0%);
+    height: fit-content;
+    
+    
+    
 
     &::before {
         clip-path: polygon(50% 1%, 79% 11%, 99% 35%, 99% 70%, 79% 89%, 50% 99%, 20% 89%, 1% 70%, 1% 35%, 20% 11%, 50% 1%, 50% 0, 0 0, 0 100%, 100% 100%, 100% 0, 50% 0);
-        /*clip-path: polygon(50% 0%, 80% 10%, 100% 35%, 100% 70%, 80% 90%, 50% 100%, 20% 90%, 0% 70%, 0% 35%, 20% 10%, 50% 0%, 0 0, 0 100%, 100% 100%, 100% 0, 50% 0);*/
+        /* clip-path: polygon(50% 0%, 80% 10%, 100% 35%, 100% 70%, 80% 90%, 50% 100%, 20% 90%, 0% 70%, 0% 35%, 20% 10%, 50% 0%, 0 0, 0 100%, 100% 100%, 100% 0, 50% 0); */
         content: '';
         position: absolute;
         inset: 0px;
